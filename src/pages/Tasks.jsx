@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Tasks.css';
+import { useNeo } from '../context/NeoContext';
 import { FaHome, FaTasks, FaUser, FaCalendar, FaPlay, FaPlus, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaChevronRight, FaChevronLeft, FaClock, FaVideo, FaHeadphones, FaArrowRight, FaComments } from 'react-icons/fa';
 
 const Tasks = () => {
   const navigate = useNavigate();
+  const { startLesson } = useNeo();
   const [userData, setUserData] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('calendar');
@@ -21,6 +23,10 @@ const Tasks = () => {
   const handleLogout = () => {
     localStorage.removeItem('smartclass_user');
     navigate('/');
+  };
+
+  const askNeoForHelp = (subject) => {
+    navigate(`/lesson/${subject}`);
   };
 
   if (!userData) {
@@ -174,6 +180,17 @@ const Tasks = () => {
                 ))}
               </div>
             </div>
+
+            {/* Neo Help Section */}
+            <div className="section-block">
+              <button 
+                className="countdown-expand-btn" 
+                style={{ background: '#7E57C2' }}
+                onClick={() => askNeoForHelp(userData.subjects?.[0] || 'Mathematics')}
+              >
+                💜 Ask Neo to Help You Study
+              </button>
+            </div>
           </>
         )}
 
@@ -202,6 +219,24 @@ const Tasks = () => {
               <div className="session-main-footer">
                 <span><FaClock /> {liveSession.time} • {liveSession.duration}</span>
                 <span className="session-join-tag">Join Session</span>
+              </div>
+            </button>
+
+            {/* Ask Neo about this subject */}
+            <button 
+              className="session-main-card" 
+              style={{ border: '2px solid #EDE0F4' }}
+              onClick={() => askNeoForHelp(liveSession.subject)}
+            >
+              <div className="session-main-body">
+                <div className="session-main-icon" style={{ background: '#7E57C2' + '15' }}>
+                  💜
+                </div>
+                <div className="session-main-info">
+                  <h2>Learn {liveSession.subject} with Neo</h2>
+                  <p>Neo will teach you {liveSession.topic} step by step</p>
+                  <span className="session-main-tutor">Your AI Tutor</span>
+                </div>
               </div>
             </button>
 

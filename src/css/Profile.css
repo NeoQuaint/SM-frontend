@@ -405,3 +405,42 @@
 .note-delete-btn:hover {
   background: #FFF0F0;
 }
+
+.neo-progress-card {
+  background: linear-gradient(135deg, #F9F6FC, #FFFFFF);
+  border: 2px solid #EDE0F4;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.neo-progress-text h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #7E57C2;
+  margin: 0 0 6px;
+}
+
+.neo-progress-text p {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.neo-progress-btn {
+  padding: 10px 18px;
+  background: #7E57C2;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+}

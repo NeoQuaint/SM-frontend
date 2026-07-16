@@ -174,3 +174,25 @@
 .results-message { font-size: 14px; color: #888; margin: 0 0 28px; }
 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.neo-voice-icon-sm {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7E57C2, #B39DDB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  animation: neoPulse 2s infinite;
+  box-shadow: 0 0 16px rgba(126, 87, 194, 0.25);
+}
+
+.neo-voice-icon-sm svg {
+  color: #FFFFFF;
+  font-size: 16px;
+}
+
+@keyframes neoPulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(126, 87, 194, 0.25); }
+  50% { box-shadow: 0 0 28px rgba(126, 87, 194, 0.5); }
+}

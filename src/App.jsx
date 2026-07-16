@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { NeoProvider } from './context/NeoContext';
 import Welcome from './pages/Welcome';
 import Assessment from './pages/Assessment';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import StudyRoom from './pages/StudyRoom';
 import Profile from './pages/Profile';
+import SubjectLesson from './pages/SubjectLesson';
+import FloatingNeo from './components/FloatingNeo';
 import './App.css';
 
 // Splash Screen Component
@@ -32,19 +35,25 @@ function App() {
 
   return (
     <Router>
-      {showSplash ? (
-        <SplashScreen onFinish={() => setShowSplash(false)} />
-      ) : (
-        <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/assessment" element={<Assessment />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/studyroom" element={<StudyRoom />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      )}
+      <NeoProvider>
+        {showSplash ? (
+          <SplashScreen onFinish={() => setShowSplash(false)} />
+        ) : (
+          <>
+            <Routes>
+              <Route path="/" element={<Welcome />} />
+              <Route path="/assessment" element={<Assessment />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/studyroom" element={<StudyRoom />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/lesson/:subject" element={<SubjectLesson />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+            <FloatingNeo />
+          </>
+        )}
+      </NeoProvider>
     </Router>
   );
 }

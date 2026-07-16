@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Dashboard.css';
-import { FaHome,  FaComments, FaTasks, FaUser, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaCamera, FaFileAlt, FaPlay, FaSearch, FaBolt } from 'react-icons/fa';
+import { useNeo } from '../context/NeoContext';
+import { FaHome, FaTasks, FaUser, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaCamera, FaFileAlt, FaPlay, FaSearch, FaBolt, FaComments, FaMicrophone } from 'react-icons/fa';
 
 const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#2D2420' }) => {
   const radius = (size - strokeWidth) / 2;
@@ -24,6 +25,7 @@ const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#2D242
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { startLesson, buildLearningPath, learningPath, currentLesson } = useNeo();
   const [userData, setUserData] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,14 +41,22 @@ const Dashboard = () => {
         setTimeout(() => setShowBubble(true), 500);
         setTimeout(() => setShowBubble(false), 5000);
       }
+
+      // Build Neo's learning path based on performance
+      buildLearningPath(parsed);
     } else {
       navigate('/');
     }
-  }, [navigate]);
+  }, [navigate, buildLearningPath]);
 
   const handleLogout = () => {
     localStorage.removeItem('smartclass_user');
     navigate('/');
+  };
+
+  // Open a Neo lesson for a subject
+  const openNeoLesson = (subject) => {
+    navigate(`/lesson/${subject}`);
   };
 
   if (!userData) {
@@ -60,7 +70,6 @@ const Dashboard = () => {
   const avatarMap = { 'AVO': '/AVO.png', 'CAT': '/CAT.png', 'STRAW': '/STRAW.png', 'ORANGE': '/ORANGE.png', 'DOG': '/DOG.png' };
   const performanceScores = { 'Bad': 25, 'Fair': 50, 'Good': 75, 'Very Good': 95 };
 
-  // Subject image mapping
   const subjectImages = {
     'Mathematics': '/M.png',
     'Economics': '/E.png',
@@ -74,7 +83,7 @@ const Dashboard = () => {
   };
 
   const subjects = userData.subjects || [];
-  const weakestSubject = subjects.reduce((w, s) => {
+  const weakestSubject = learningPath?.focusSubject || subjects.reduce((w, s) => {
     const ws = performanceScores[userData.performance[w]] || 100;
     const cs = performanceScores[userData.performance[s]] || 0;
     return cs < ws ? s : w;
@@ -83,8 +92,10 @@ const Dashboard = () => {
   const weakestScore = performanceScores[userData.performance[weakestSubject]] || 0;
 
   const getNeoMessage = () => {
-    if (weakestScore < 60) return `Let's work on ${weakestSubject} — a few sessions could really boost your marks.`;
-    return "You're making great progress. Keep the momentum going!";
+    if (currentLesson) return `Continue your ${currentLesson.subject} lesson? Pick up where you left off.`;
+    if (learningPath?.recommendation) return learningPath.recommendation;
+    if (weakestScore < 60) return `Let's work on ${weakestSubject} — I'll teach you step by step.`;
+    return "You're making great progress. Ready to learn something new?";
   };
 
   const focusRecommendation = {
@@ -139,7 +150,9 @@ const Dashboard = () => {
         {/* Neo's Proactive Message */}
         <div className="neo-question-section">
           <div className="neo-line">
-            <img src={avatarMap[userData.avatar]} alt="" className="neo-img" />
+            <div className="neo-voice-icon">
+              <FaMicrophone />
+            </div>
             <span className="neo-question">{getNeoMessage()}</span>
           </div>
           
@@ -161,7 +174,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Your Subjects - Using PNG images */}
+        {/* Your Subjects — Click to open Neo lesson */}
         <div className="section-block">
           <span className="section-label">YOUR SUBJECTS</span>
           <div className="subjects-compact-grid">
@@ -172,16 +185,19 @@ const Dashboard = () => {
               const subjectImg = subjectImages[subject] || null;
               
               return (
-                <div key={subject} className="subject-compact" style={{ background: bg, borderColor: color + '30' }}>
-                  {/* Speech Bubble */}
+                <div 
+                  key={subject} 
+                  className="subject-compact" 
+                  style={{ background: bg, borderColor: color + '30', cursor: 'pointer' }}
+                  onClick={() => openNeoLesson(subject)}
+                >
                   {i === 0 && showBubble && (
                     <div className="speech-bubble">
-                      <span>Continue learning 👋</span>
+                      <span>Tap to learn with Neo 👋</span>
                       <div className="speech-bubble-arrow"></div>
                     </div>
                   )}
                   
-                  {/* Subject Image */}
                   {subjectImg ? (
                     <img src={subjectImg} alt={subject} className="sc-image" />
                   ) : (
@@ -200,9 +216,13 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Neo's Focus Recommendation */}
+        {/* Neo's Focus Recommendation — Click to start lesson */}
         <div className="primary-actions">
-          <button className="action-card" style={{ background: '#FFF8F0' }}>
+          <button 
+            className="action-card" 
+            style={{ background: '#FFF8F0', cursor: 'pointer' }}
+            onClick={() => openNeoLesson(focusRecommendation.subject)}
+          >
             <span className="action-icon" style={{ color: focusRecommendation.color }}>🎯</span>
             <div className="action-text">
               <span className="action-label">Focus: {focusRecommendation.subject}</span>
@@ -252,14 +272,18 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Continue Learning */}
+        {/* Continue Learning — Opens last/weakest subject with Neo */}
         <div className="section-block">
           <span className="section-label">CONTINUE LEARNING</span>
-          <div className="continue-card">
+          <div 
+            className="continue-card" 
+            style={{ cursor: 'pointer' }}
+            onClick={() => openNeoLesson(focusRecommendation.subject)}
+          >
             <div className="continue-left">
-              <h3>{focusRecommendation.subject}</h3>
-              <p>{focusRecommendation.topic}</p>
-              <span className="continue-time">{focusRecommendation.time}</span>
+              <h3>{currentLesson ? currentLesson.subject : focusRecommendation.subject}</h3>
+              <p>{currentLesson ? 'Resume your lesson' : focusRecommendation.topic}</p>
+              <span className="continue-time">{currentLesson ? 'In progress' : focusRecommendation.time}</span>
             </div>
             <div className="continue-right">
               <ProgressWheel percentage={focusRecommendation.progress} size={48} strokeWidth={4} color="#4CAF50" />
@@ -271,21 +295,21 @@ const Dashboard = () => {
         </div>
       </main>
 
-      {/* Footer - Update in ALL pages: Dashboard.js, Tasks.js, Profile.js */}
-<footer className="dash-footer">
-  <button className="ftab active" onClick={() => navigate('/dashboard')}>
-    <FaHome />
-  </button>
-  <button className="ftab" onClick={() => navigate('/tasks')}>
-    <FaTasks />
-  </button>
-  <button className="ftab" onClick={() => navigate('/studyroom')}>
-    <FaComments />
-  </button>
-  <button className="ftab" onClick={() => navigate('/profile')}>
-    <FaUser />
-  </button>
-</footer>
+      {/* Footer */}
+      <footer className="dash-footer">
+        <button className="ftab active">
+          <FaHome />
+        </button>
+        <button className="ftab" onClick={() => navigate('/tasks')}>
+          <FaTasks />
+        </button>
+        <button className="ftab" onClick={() => navigate('/studyroom')}>
+          <FaComments />
+        </button>
+        <button className="ftab" onClick={() => navigate('/profile')}>
+          <FaUser />
+        </button>
+      </footer>
     </div>
   );
 };

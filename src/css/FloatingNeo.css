@@ -1,0 +1,150 @@
+.floating-neo-btn {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7E57C2, #B39DDB);
+  color: #FFFFFF;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 150;
+  box-shadow: 0 4px 20px rgba(126, 87, 194, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.floating-neo-btn:hover {
+  transform: scale(1.08);
+}
+
+.floating-neo-panel {
+  position: fixed;
+  bottom: 160px;
+  right: 20px;
+  width: 350px;
+  max-height: 500px;
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 150;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.floating-neo-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  background: linear-gradient(135deg, #7E57C2, #B39DDB);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.floating-neo-header button {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 16px;
+  margin-left: auto;
+}
+
+.floating-neo-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+}
+
+.floating-neo-msg {
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.floating-neo-msg.neo {
+  background: #F9F6FC;
+  align-self: flex-start;
+  max-width: 85%;
+}
+
+.floating-neo-msg.user {
+  background: #7E57C2;
+  color: #FFFFFF;
+  align-self: flex-end;
+  max-width: 85%;
+}
+
+.floating-neo-msg strong {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+
+.floating-neo-typing {
+  font-size: 13px;
+  color: #999;
+  padding: 8px 14px;
+  font-style: italic;
+}
+
+.floating-neo-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid #F5F5F5;
+}
+
+.floating-neo-input input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #F0EDE8;
+  border-radius: 20px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+}
+
+.floating-neo-input button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #7E57C2;
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-neo-input button:disabled {
+  opacity: 0.4;
+}
+
+@media (max-width: 500px) {
+  .floating-neo-panel {
+    width: calc(100vw - 40px);
+    right: 20px;
+    bottom: 150px;
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}

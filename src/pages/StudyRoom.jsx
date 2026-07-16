@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/StudyRoom.css';
+import { useNeo } from '../context/NeoContext';
+import NeoVoice from '../components/NeoVoice';
 import {
   FaHome, FaTasks, FaUser, FaComments, FaTimes, FaSignOutAlt,
   FaCog, FaQuestionCircle, FaPlus, FaPaperPlane, FaLink,
@@ -13,6 +15,7 @@ import {
 
 const StudyRoom = () => {
   const navigate = useNavigate();
+  const { startLesson } = useNeo();
   const [userData, setUserData] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
@@ -41,6 +44,7 @@ const StudyRoom = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [newMessageToast, setNewMessageToast] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [neoSpokenMessage, setNeoSpokenMessage] = useState('');
   const chatEndRef = useRef(null);
   
   // Timer
@@ -87,6 +91,8 @@ const StudyRoom = () => {
   
   // Active content tab
   const [contentTab, setContentTab] = useState('tasks');
+
+  const API_URL = import.meta.env.VITE_API_URL || 'https://smartclass-wlgb.onrender.com';
 
   useEffect(() => {
     const data = localStorage.getItem('smartclass_user');
@@ -157,6 +163,12 @@ const StudyRoom = () => {
     navigate('/');
   };
 
+  const openNeoLesson = () => {
+    if (currentRoom?.subject) {
+      navigate(`/lesson/${currentRoom.subject}`);
+    }
+  };
+
   const handleCreateRoom = () => {
     if (!roomName.trim()) return;
     const code = Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -220,7 +232,7 @@ const StudyRoom = () => {
     setJoinPassword('');
   };
 
-  const handleSendMessage = (text = null) => {
+  const handleSendMessage = async (text = null) => {
     const msgText = text || chatInput.trim();
     if (!msgText) return;
     
@@ -230,6 +242,7 @@ const StudyRoom = () => {
       avatar: userData?.avatar || 'AVO',
       text: msgText,
       timestamp: new Date().toISOString(),
+      isUser: true,
     };
     
     const updatedMessages = [...messages, newMsg];
@@ -243,12 +256,65 @@ const StudyRoom = () => {
     }
     
     setChatInput('');
-    
-    // Show toast if chat is closed
-    if (!chatOpen) {
-      setUnreadCount(prev => prev + 1);
-      setNewMessageToast({ sender: newMsg.sender, text: newMsg.text });
-      setTimeout(() => setNewMessageToast(null), 4000);
+
+    // If message is for Neo
+    if (msgText.startsWith('@neo') || msgText.toLowerCase().includes('neo')) {
+      const typingMsg = {
+        id: 'typing',
+        sender: 'Neo',
+        avatar: null,
+        text: '...',
+        timestamp: new Date().toISOString(),
+        isNeo: true,
+        isTyping: true,
+      };
+      setMessages(prev => [...prev, typingMsg]);
+
+      try {
+        const cleanMessage = msgText.replace(/@neo/i, '').trim();
+        const response = await fetch(`${API_URL}/api/neo/ask`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: cleanMessage,
+            subject: currentRoom?.subject,
+            userId: userData?.id || userData?.email || 'student',
+          })
+        });
+        const data = await response.json();
+
+        setMessages(prev => {
+          const withoutTyping = prev.filter(m => m.id !== 'typing');
+          return [...withoutTyping, {
+            id: Date.now() + 1,
+            sender: 'Neo',
+            avatar: null,
+            text: data.reply || 'Sorry, try again.',
+            timestamp: new Date().toISOString(),
+            isNeo: true,
+          }];
+        });
+        setNeoSpokenMessage(data.reply || '');
+      } catch (err) {
+        setMessages(prev => {
+          const withoutTyping = prev.filter(m => m.id !== 'typing');
+          return [...withoutTyping, {
+            id: Date.now() + 1,
+            sender: 'Neo',
+            avatar: null,
+            text: 'I\'m having trouble. Try again.',
+            timestamp: new Date().toISOString(),
+            isNeo: true,
+          }];
+        });
+      }
+    } else {
+      // Show toast for regular messages
+      if (!chatOpen) {
+        setUnreadCount(prev => prev + 1);
+        setNewMessageToast({ sender: newMsg.sender, text: newMsg.text });
+        setTimeout(() => setNewMessageToast(null), 4000);
+      }
     }
   };
 
@@ -497,7 +563,7 @@ const StudyRoom = () => {
             <div className="sr-hero">
               <div className="sr-hero-icon">📚</div>
               <h2>Study Together</h2>
-              <p>Create or join a virtual study room. Teachers can set timed tasks, and students can solve problems together.</p>
+              <p>Create or join a virtual study room. Neo is here to help you learn.</p>
             </div>
 
             <div className="sr-lobby-actions">
@@ -604,6 +670,9 @@ const StudyRoom = () => {
                 <span className="sr-participant-count" title={`${participants.length} participants`}>
                   <FaUsers /> {participants.length}
                 </span>
+                <button className="sr-room-code-btn" onClick={openNeoLesson} style={{ background: '#7E57C2', color: '#FFF', marginRight: '6px' }}>
+                  💜 Neo
+                </button>
                 <button className="sr-room-code-btn" onClick={copyRoomCode} title="Copy room code">
                   <FaCopy /> {currentRoom.code}
                 </button>
@@ -643,7 +712,6 @@ const StudyRoom = () => {
               {/* Tasks Tab */}
               {contentTab === 'tasks' && (
                 <div className="sr-tasks-content">
-                  {/* Task Builder Button */}
                   <button className="sr-create-task-btn" onClick={() => setShowTaskBuilder(!showTaskBuilder)}>
                     <FaPlus /> {showTaskBuilder ? 'Cancel' : 'Create Task'}
                   </button>
@@ -651,7 +719,6 @@ const StudyRoom = () => {
                     <FaLightbulb /> {showQuizBuilder ? 'Cancel Quiz' : 'Quick Quiz'}
                   </button>
 
-                  {/* Task Builder */}
                   {showTaskBuilder && (
                     <div className="sr-task-builder">
                       <h4>Create a Task</h4>
@@ -662,7 +729,6 @@ const StudyRoom = () => {
                         <input type="number" placeholder="Time limit (minutes)" value={taskTimeLimit} onChange={(e) => setTaskTimeLimit(e.target.value)} min="1" />
                       </div>
                       
-                      {/* Questions */}
                       <div className="sr-task-questions-section">
                         <h5>Questions</h5>
                         {taskQuestions.map((q, i) => (
@@ -694,7 +760,6 @@ const StudyRoom = () => {
                     </div>
                   )}
 
-                  {/* Quiz Builder */}
                   {showQuizBuilder && (
                     <div className="sr-task-builder">
                       <h4>Quick Quiz</h4>
@@ -727,7 +792,6 @@ const StudyRoom = () => {
                     </div>
                   )}
 
-                  {/* Task List */}
                   <div className="sr-task-list">
                     <h4>Available Tasks & Quizzes</h4>
                     {tasks.length === 0 && !activeQuiz && (
@@ -756,15 +820,14 @@ const StudyRoom = () => {
                       </div>
                     ))}
                     
-                    {/* Active Quiz in list */}
                     {activeQuiz && !quizSubmitted && (
-                      <div className="sr-task-card quiz-card" onClick={() => setContentTab('tasks')}>
+                      <div className="sr-task-card quiz-card">
                         <div className="sr-task-card-header">
                           <div>
                             <h5>📝 {activeQuiz.title}</h5>
                             <span className="sr-task-meta">by {activeQuiz.createdBy} • {activeQuiz.questions.length} questions</span>
                           </div>
-                          <button onClick={(e) => { e.stopPropagation(); setActiveQuiz(null); }} className="sr-task-delete-btn">
+                          <button onClick={() => setActiveQuiz(null)} className="sr-task-delete-btn">
                             <FaTimes />
                           </button>
                         </div>
@@ -896,40 +959,50 @@ const StudyRoom = () => {
 
             {/* Chat Icon + Toast + Slide-out Panel */}
             <div className="sr-chat-zone">
-              {/* New message toast */}
               {newMessageToast && !chatOpen && (
                 <div className="sr-chat-toast" onClick={openChat}>
                   <strong>{newMessageToast.sender}:</strong> {newMessageToast.text}
                 </div>
               )}
               
-              {/* Chat icon button */}
               <button className="sr-chat-toggle-btn" onClick={() => { if (chatOpen) { setChatOpen(false); } else { openChat(); } }}>
                 <FaComments />
                 {unreadCount > 0 && <span className="sr-chat-badge">{unreadCount}</span>}
               </button>
 
-              {/* Slide-out chat panel */}
               {chatOpen && (
                 <div className="sr-chat-panel">
                   <div className="sr-chat-panel-header">
                     <span>Chat</span>
+                    <NeoVoice 
+                      onSpeechResult={(transcript) => handleSendMessage(transcript)}
+                      neoMessage={neoSpokenMessage}
+                    />
                     <button onClick={() => setChatOpen(false)}><FaTimes /></button>
                   </div>
                   <div className="sr-chat-panel-messages">
                     {messages.map(msg => (
-                      <div key={msg.id} className="sr-chat-msg">
-                        <img src={avatarMap[msg.avatar] || '/AVO.png'} alt="" className="sr-chat-msg-avatar" />
-                        <div className="sr-chat-msg-body">
-                          <span className="sr-chat-msg-sender">{msg.sender}</span>
-                          <p className="sr-chat-msg-text">{msg.text}</p>
-                        </div>
+                      <div key={msg.id} className={`sr-chat-msg ${msg.isNeo ? 'neo' : ''}`}>
+                        {msg.isNeo ? (
+                          <div className="sr-chat-msg-body neo-body">
+                            <span className="sr-chat-msg-sender neo-sender">💜 Neo</span>
+                            <p className="sr-chat-msg-text">{msg.text}</p>
+                          </div>
+                        ) : (
+                          <>
+                            <img src={avatarMap[msg.avatar] || '/AVO.png'} alt="" className="sr-chat-msg-avatar" />
+                            <div className="sr-chat-msg-body">
+                              <span className="sr-chat-msg-sender">{msg.sender}</span>
+                              <p className="sr-chat-msg-text">{msg.text}</p>
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                     <div ref={chatEndRef} />
                   </div>
                   <div className="sr-chat-panel-input">
-                    <input type="text" placeholder="Type a message..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} />
+                    <input type="text" placeholder="Type @neo to ask Neo..." value={chatInput} onChange={(e) => setChatInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()} />
                     <button onClick={() => handleSendMessage()} disabled={!chatInput.trim()}><FaPaperPlane /></button>
                   </div>
                 </div>

@@ -1,0 +1,42 @@
+.neo-voice-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.neo-voice-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: #F5F5F5;
+  color: #666;
+}
+
+.neo-voice-btn:hover {
+  background: #EDE0F4;
+  color: #7E57C2;
+}
+
+.neo-voice-btn.listening {
+  background: #EF4444;
+  color: #FFFFFF;
+  animation: neoPulse 1.5s infinite;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+}
+
+.neo-voice-btn.muted {
+  background: #FFF0F0;
+  color: #E57373;
+}
+
+@keyframes neoPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+}

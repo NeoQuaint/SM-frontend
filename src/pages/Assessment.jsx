@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Assessment.css';
-import { FaArrowRight, FaArrowLeft, FaCheck, FaStar, FaPlay } from 'react-icons/fa';
+import { useNeo } from '../context/NeoContext';
+import { FaArrowRight, FaArrowLeft, FaCheck, FaStar, FaPlay, FaMicrophone } from 'react-icons/fa';
 
 const Assessment = () => {
   const navigate = useNavigate();
+  const { buildLearningPath } = useNeo();
   const [userData, setUserData] = useState(null);
   const [marks, setMarks] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -26,8 +28,14 @@ const Assessment = () => {
     );
   }
 
-  const avatarMap = { 'AVO': '/AVO.png', 'CAT': '/CAT.png', 'STRAW': '/STRAW.png', 'ORANGE': '/ORANGE.png', 'DOG': '/DOG.png' };
   const subjects = userData.subjects || ['Mathematics'];
+  const performanceScores = { 'Bad': 25, 'Fair': 50, 'Good': 75, 'Very Good': 95 };
+
+  const weakestSubject = subjects.reduce((w, s) => {
+    const ws = performanceScores[userData.performance[w]] || 100;
+    const cs = performanceScores[userData.performance[s]] || 0;
+    return cs < ws ? s : w;
+  }, subjects[0]);
 
   const handleMarkChange = (subject, value) => {
     setMarks(prev => ({ ...prev, [subject]: value }));
@@ -53,7 +61,7 @@ const Assessment = () => {
 
   const score = calculateResults();
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     const assessmentData = {
       marks,
       diagnosticScore: score,
@@ -61,12 +69,15 @@ const Assessment = () => {
     };
     const updatedUser = { ...userData, assessment: assessmentData };
     localStorage.setItem('smartclass_user', JSON.stringify(updatedUser));
-    navigate('/dashboard');
+    
+    // Build learning path and navigate to weakest subject with Neo
+    await buildLearningPath(updatedUser);
+    navigate(`/lesson/${weakestSubject}`);
   };
 
   return (
     <div className="assess-app">
-      {/* Header - matching app style */}
+      {/* Header */}
       <header className="assess-header">
         <span className="assess-header-greeting">Hi {userData.fullName.split(' ')[0]} 👋</span>
         <div className="assess-header-progress">
@@ -81,7 +92,9 @@ const Assessment = () => {
         {step === 1 && (
           <div className="assess-card">
             <div className="assess-neo">
-              <img src={avatarMap[userData.avatar]} alt="" className="assess-neo-img" />
+              <div className="neo-voice-icon-sm">
+                <FaMicrophone />
+              </div>
               <div>
                 <h2>Let's personalize your learning</h2>
                 <p>Enter your current marks so I know where to start.</p>
@@ -183,11 +196,15 @@ const Assessment = () => {
               {score >= 70 ? 'Great start!' : score >= 40 ? 'Good foundation' : 'Room to grow'}
             </h2>
             <p className="results-message">
-              {score >= 70 ? "You're ready. Let's build on this." : score >= 40 ? 'Solid base. We know where to focus.' : 'No stress. We start from where you are.'}
+              {score >= 70 
+                ? "You're ready. Neo will build on this." 
+                : score >= 40 
+                  ? 'Solid base. Neo knows exactly where to focus.' 
+                  : 'No stress. Neo starts from where you are and builds you up.'}
             </p>
 
             <button className="assess-btn primary" onClick={handleFinish}>
-              <FaPlay /> Start Learning
+              <FaPlay /> Start Learning with Neo
             </button>
           </div>
         )}

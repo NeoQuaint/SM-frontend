@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Profile.css';
+import { useNeo } from '../context/NeoContext';
 import {
   FaHome, FaTasks, FaUser, FaTimes, FaSignOutAlt, FaCog,
   FaQuestionCircle, FaEdit, FaCalendar, FaBell, FaLock,
-  FaChevronRight, FaPlus, FaTrash, FaStickyNote, FaComments
+  FaChevronRight, FaPlus, FaTrash, FaStickyNote, FaComments,
+  FaMicrophone, FaPlay
 } from 'react-icons/fa';
 
 const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#4CAF50' }) => {
@@ -27,6 +29,7 @@ const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#4CAF5
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { learningPath, buildLearningPath } = useNeo();
   const [userData, setUserData] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notes, setNotes] = useState([]);
@@ -34,14 +37,19 @@ const Profile = () => {
 
   useEffect(() => {
     const data = localStorage.getItem('smartclass_user');
-    if (data) setUserData(JSON.parse(data));
-    else navigate('/');
+    if (data) {
+      const parsed = JSON.parse(data);
+      setUserData(parsed);
+      buildLearningPath(parsed);
+    } else {
+      navigate('/');
+    }
 
     const savedNotes = localStorage.getItem('smartclass_notes');
     if (savedNotes) {
       setNotes(JSON.parse(savedNotes));
     }
-  }, [navigate]);
+  }, [navigate, buildLearningPath]);
 
   useEffect(() => {
     localStorage.setItem('smartclass_notes', JSON.stringify(notes));
@@ -180,6 +188,27 @@ const Profile = () => {
           </div>
         </div>
 
+        {/* Neo's Progress Summary */}
+        {learningPath && (
+          <div className="section-block">
+            <div className="neo-progress-card">
+              <div className="neo-voice-icon-sm">
+                <FaMicrophone />
+              </div>
+              <div className="neo-progress-text">
+                <h3>Neo's Notes</h3>
+                <p>{learningPath.recommendation}</p>
+                <button 
+                  className="neo-progress-btn"
+                  onClick={() => navigate(`/lesson/${learningPath.focusSubject}`)}
+                >
+                  Start Lesson with Neo <FaPlay />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ========== MY NOTES ========== */}
         <div className="section-block">
           <h2 className="section-title">
@@ -230,7 +259,7 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Subjects Summary */}
+        {/* Subjects Summary — Clickable to Neo lessons */}
         <div className="section-block">
           <h2 className="section-title">
             <img src="/books.png" alt="" className="section-title-icon" />
@@ -242,7 +271,12 @@ const Profile = () => {
               const color = colors[i % colors.length];
               const score = performanceScores[userData.performance[subject]] || 0;
               return (
-                <div key={subject} className="profile-subject-item">
+                <div 
+                  key={subject} 
+                  className="profile-subject-item"
+                  onClick={() => navigate(`/lesson/${subject}`)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <ProgressWheel percentage={score} size={32} strokeWidth={2} color="#4CAF50" />
                   <div className="profile-subject-info">
                     <span className="profile-subject-name">{subject}</span>
