@@ -432,3 +432,68 @@
   background: #FFF8F0;
   padding: 8px;
 }
+
+/* Neo Proactive Suggestions */
+.neo-suggestions {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.neo-suggestion-card {
+  background: linear-gradient(135deg, #F9F6FC, #FFFFFF);
+  border: 2px solid #EDE0F4;
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.2s ease;
+}
+
+.neo-suggestion-card:hover {
+  border-color: #7E57C2;
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(126, 87, 194, 0.1);
+}
+
+.neo-suggestion-card.comeback {
+  background: linear-gradient(135deg, #FFF8F0, #FFFFFF);
+  border-color: #FFE0B2;
+}
+
+.neo-suggestion-card.celebration {
+  background: linear-gradient(135deg, #FFF9C4, #FFFFFF);
+  border-color: #FFE082;
+}
+
+.neo-suggestion-card.daily_plan {
+  background: linear-gradient(135deg, #F0F4FF, #FFFFFF);
+  border-color: #BBDEFB;
+}
+
+.neo-suggestion-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+
+.neo-suggestion-content {
+  flex: 1;
+}
+
+.neo-suggestion-content p {
+  font-size: 15px;
+  color: #1a1a1a;
+  margin: 0 0 6px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.neo-suggestion-action {
+  font-size: 13px;
+  color: #7E57C2;
+  font-weight: 700;
+}

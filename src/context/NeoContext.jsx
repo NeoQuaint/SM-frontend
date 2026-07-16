@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import neoEngine from '../lib/neoEngine';
 
 const NeoContext = createContext(null);
 
@@ -8,44 +9,51 @@ export const NeoProvider = ({ children }) => {
   const [isTeaching, setIsTeaching] = useState(false);
   const [neoMessage, setNeoMessage] = useState('');
   const [learningPath, setLearningPath] = useState(null);
+  const [suggestions, setSuggestions] = useState([]);
+  const [userData, setUserData] = useState(null);
+  const [isMemoryLoaded, setIsMemoryLoaded] = useState(false);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'https://smartclass-wlgb.onrender.com';
+  const API_URL = 'https://smartclass-wlgb.onrender.com';
+
+  // Load user data and Neo's memory on mount
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+    if (data.fullName || data.email) {
+      setUserData(data);
+      const userId = data.id || data.email || data.fullName;
+      neoEngine.loadMemory(userId).then(() => {
+        setIsMemoryLoaded(true);
+        buildLearningPath(data);
+      });
+    }
+  }, []);
 
   // Start a Neo lesson for a subject
   const startLesson = useCallback(async (subject, userData) => {
     setIsTeaching(true);
     
-    const grade = userData?.grade || '10';
-    const performance = userData?.performance?.[subject] || 'Fair';
+    const context = neoEngine.buildContext(userData, 'lesson', { subject });
     
     const lesson = {
       subject,
-      grade,
-      performance,
       startedAt: new Date().toISOString(),
       messages: [
         { 
           sender: 'Neo', 
-          text: `Let's work on ${subject}. You're in Grade ${grade} and your current level is ${performance}. I'll teach you step by step. Ready?` 
+          text: `Let's work on ${subject}. Based on your progress, I'll teach you step by step. Ready?` 
         }
       ],
     };
 
     setCurrentLesson(lesson);
 
-    // Get Neo's first lesson message
     try {
-      const response = await fetch(`${API_URL}/api/neo/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Start teaching me ${subject}. I'm in Grade ${grade}, my current performance is ${performance}. Begin with an introduction and the first concept. Teach me like you're my personal tutor.`,
-          subject,
-          userId: userData?.id || userData?.email || 'student',
-        })
-      });
-
-      const data = await response.json();
+      const data = await neoEngine.ask(
+        `Start teaching me ${subject}. Begin with an introduction and the first concept.`,
+        userData,
+        'lesson',
+        { subject }
+      );
       
       if (data.reply) {
         setCurrentLesson(prev => ({
@@ -59,11 +67,11 @@ export const NeoProvider = ({ children }) => {
     } finally {
       setIsTeaching(false);
     }
-  }, [API_URL]);
+  }, []);
 
-  // Continue the lesson — student asks or answers
+  // Continue the lesson
   const continueLesson = useCallback(async (message) => {
-    if (!currentLesson) return;
+    if (!currentLesson || !userData) return;
 
     const updatedMessages = [
       ...currentLesson.messages,
@@ -78,17 +86,12 @@ export const NeoProvider = ({ children }) => {
     setIsTeaching(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/neo/ask`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Continue teaching me ${currentLesson.subject}. The student says: "${message}". Keep teaching step by step. If they got something right, celebrate. If wrong, guide them gently.`,
-          subject: currentLesson.subject,
-          userId: 'student',
-        })
-      });
-
-      const data = await response.json();
+      const data = await neoEngine.ask(
+        message,
+        userData,
+        'lesson',
+        { subject: currentLesson.subject }
+      );
       
       if (data.reply) {
         setCurrentLesson(prev => ({
@@ -102,7 +105,7 @@ export const NeoProvider = ({ children }) => {
     } finally {
       setIsTeaching(false);
     }
-  }, [currentLesson, API_URL]);
+  }, [currentLesson, userData]);
 
   // End the lesson
   const endLesson = useCallback(() => {
@@ -117,26 +120,40 @@ export const NeoProvider = ({ children }) => {
   }, [currentLesson]);
 
   // Build learning path from assessment
-  const buildLearningPath = useCallback(async (userData) => {
-    const subjects = userData?.subjects || [];
-    const performance = userData?.performance || {};
+  const buildLearningPath = useCallback(async (data) => {
+    if (!data?.subjects) return;
     
-    // Find weakest subjects
-    const sorted = [...subjects].sort((a, b) => {
-      const scores = { 'Bad': 1, 'Fair': 2, 'Good': 3, 'Very Good': 4 };
-      return (scores[performance[a]] || 2) - (scores[performance[b]] || 2);
-    });
-
+    const context = neoEngine.buildContext(data, 'dashboard');
+    
     const path = {
-      focusSubject: sorted[0],
-      secondarySubject: sorted[1],
-      recommendation: `${sorted[0]} needs the most attention right now. Let's work on it together.`,
-      allSubjects: sorted,
+      focusSubject: context.weakestSubject,
+      secondarySubject: context.strongestSubject,
+      recommendation: `Let's focus on ${context.weakestSubject} — that's where we'll see the biggest improvement.`,
+      allSubjects: data.subjects,
     };
 
     setLearningPath(path);
+    
+    // Generate proactive suggestions
+    const newSuggestions = neoEngine.generateSuggestion(context);
+    setSuggestions(newSuggestions);
+    
     return path;
   }, []);
+
+  // Ask Neo a direct question from anywhere in the app
+  const askNeo = useCallback(async (message, currentPage = 'general', additionalContext = {}) => {
+    if (!userData) return { reply: 'Please complete onboarding first.' };
+    
+    try {
+      const data = await neoEngine.ask(message, userData, currentPage, additionalContext);
+      setNeoMessage(data.reply || '');
+      return data;
+    } catch (err) {
+      console.error('Ask Neo failed:', err);
+      return { reply: 'I\'m having trouble connecting. Try again.' };
+    }
+  }, [userData]);
 
   return (
     <NeoContext.Provider value={{
@@ -145,11 +162,16 @@ export const NeoProvider = ({ children }) => {
       isTeaching,
       neoMessage,
       learningPath,
+      suggestions,
+      userData,
+      isMemoryLoaded,
       startLesson,
       continueLesson,
       endLesson,
       buildLearningPath,
       setNeoMessage,
+      askNeo,
+      neoEngine,
     }}>
       {children}
     </NeoContext.Provider>

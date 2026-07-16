@@ -25,7 +25,7 @@ const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#2D242
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { startLesson, buildLearningPath, learningPath, currentLesson } = useNeo();
+  const { startLesson, buildLearningPath, learningPath, currentLesson, suggestions, neoEngine } = useNeo();
   const [userData, setUserData] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,7 +42,6 @@ const Dashboard = () => {
         setTimeout(() => setShowBubble(false), 5000);
       }
 
-      // Build Neo's learning path based on performance
       buildLearningPath(parsed);
     } else {
       navigate('/');
@@ -54,7 +53,6 @@ const Dashboard = () => {
     navigate('/');
   };
 
-  // Open a Neo lesson for a subject
   const openNeoLesson = (subject) => {
     navigate(`/lesson/${subject}`);
   };
@@ -92,6 +90,12 @@ const Dashboard = () => {
   const weakestScore = performanceScores[userData.performance[weakestSubject]] || 0;
 
   const getNeoMessage = () => {
+    // Check for proactive suggestions first
+    if (suggestions && suggestions.length > 0) {
+      const highPriority = suggestions.find(s => s.priority === 'high');
+      if (highPriority) return highPriority.message;
+    }
+    
     if (currentLesson) return `Continue your ${currentLesson.subject} lesson? Pick up where you left off.`;
     if (learningPath?.recommendation) return learningPath.recommendation;
     if (weakestScore < 60) return `Let's work on ${weakestSubject} — I'll teach you step by step.`;
@@ -173,6 +177,35 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+
+        {/* Neo's Proactive Suggestions */}
+        {suggestions && suggestions.length > 0 && (
+          <div className="neo-suggestions">
+            {suggestions.map((suggestion, i) => (
+              <div 
+                key={i} 
+                className={`neo-suggestion-card ${suggestion.type}`}
+                onClick={() => suggestion.action && navigate(`/${suggestion.action}`)}
+                style={{ cursor: suggestion.action ? 'pointer' : 'default' }}
+              >
+                <div className="neo-suggestion-icon">
+                  {suggestion.type === 'comeback' && '👋'}
+                  {suggestion.type === 'celebration' && '🔥'}
+                  {suggestion.type === 'daily_plan' && '📅'}
+                  {suggestion.type === 'intervention' && '💡'}
+                </div>
+                <div className="neo-suggestion-content">
+                  <p>{suggestion.message}</p>
+                  {suggestion.action && (
+                    <span className="neo-suggestion-action">
+                      {suggestion.action.startsWith('lesson/') ? 'Start Lesson' : 'Go'} →
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Your Subjects — Click to open Neo lesson */}
         <div className="section-block">

@@ -92,7 +92,7 @@ const StudyRoom = () => {
   // Active content tab
   const [contentTab, setContentTab] = useState('tasks');
 
-  const API_URL = import.meta.env.VITE_API_URL || 'https://smartclass-wlgb.onrender.com';
+  const API_URL = 'https://smartclass-wlgb.onrender.com';
 
   useEffect(() => {
     const data = localStorage.getItem('smartclass_user');
@@ -343,6 +343,13 @@ const StudyRoom = () => {
     setTimerRunning(false);
     setTimerMinutes(timerMode === 'focus' ? 25 : 5);
     setTimerSeconds(0);
+  };
+
+  const setPresetTimer = (mins) => {
+    setTimerRunning(false);
+    setTimerMinutes(mins);
+    setTimerSeconds(0);
+    setTimerMode('focus');
   };
 
   // Tasks
@@ -719,6 +726,7 @@ const StudyRoom = () => {
                     <FaLightbulb /> {showQuizBuilder ? 'Cancel Quiz' : 'Quick Quiz'}
                   </button>
 
+                  {/* Task Builder */}
                   {showTaskBuilder && (
                     <div className="sr-task-builder">
                       <h4>Create a Task</h4>
@@ -760,6 +768,7 @@ const StudyRoom = () => {
                     </div>
                   )}
 
+                  {/* Quiz Builder */}
                   {showQuizBuilder && (
                     <div className="sr-task-builder">
                       <h4>Quick Quiz</h4>
@@ -792,6 +801,7 @@ const StudyRoom = () => {
                     </div>
                   )}
 
+                  {/* Task List */}
                   <div className="sr-task-list">
                     <h4>Available Tasks & Quizzes</h4>
                     {tasks.length === 0 && !activeQuiz && (

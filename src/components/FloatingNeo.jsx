@@ -13,7 +13,7 @@ const FloatingNeo = () => {
   const [neoMessage, setNeoMessage] = useState('');
   const messagesEndRef = useRef(null);
 
-  const API_URL = import.meta.env.VITE_API_URL || 'https://smartclass-wlgb.onrender.com';
+  const API_URL = 'https://smartclass-wlgb.onrender.com';
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
