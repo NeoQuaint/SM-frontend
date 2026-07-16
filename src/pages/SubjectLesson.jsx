@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useNeo } from '../context/NeoContext';
-import NeoVoice from '../components/NeoVoice';
-import { FaArrowLeft, FaPaperPlane, FaBookOpen } from 'react-icons/fa';
+import NeoVoiceInput from '../components/NeoVoiceInput';
+import { FaArrowLeft, FaBookOpen } from 'react-icons/fa';
 import '../css/SubjectLesson.css';
 
 const SubjectLesson = () => {
@@ -30,6 +30,12 @@ const SubjectLesson = () => {
     setInput('');
   };
 
+  const handleVoiceTranscript = (transcript) => {
+    if (transcript && !isTeaching) {
+      continueLesson(transcript);
+    }
+  };
+
   const handleEndLesson = () => {
     endLesson();
     navigate('/dashboard');
@@ -39,7 +45,6 @@ const SubjectLesson = () => {
 
   return (
     <div className="subject-lesson">
-      {/* Header */}
       <header className="sl-header">
         <button className="sl-back" onClick={handleEndLesson}>
           <FaArrowLeft /> Dashboard
@@ -48,17 +53,12 @@ const SubjectLesson = () => {
           <FaBookOpen />
           <span>{subject}</span>
         </div>
-        <NeoVoice 
-          onSpeechResult={(transcript) => {
-            setInput(transcript);
-            continueLesson(transcript);
-          }}
-          neoMessage={neoMessage}
-        />
       </header>
 
-      {/* Messages */}
       <main className="sl-messages">
+        {messages.length === 0 && !isTeaching && (
+          <div className="sl-typing">Neo is preparing your lesson...</div>
+        )}
         {messages.map((msg, i) => (
           <div key={i} className={`sl-message ${msg.sender === 'Neo' ? 'neo' : 'student'}`}>
             <div className="sl-message-sender">
@@ -73,19 +73,17 @@ const SubjectLesson = () => {
         <div ref={messagesEndRef} />
       </main>
 
-      {/* Input */}
       <footer className="sl-input">
+        <NeoVoiceInput onTranscript={handleVoiceTranscript} />
         <input
           type="text"
-          placeholder="Ask Neo a question or tell her you're ready for the next step..."
+          placeholder="Type your answer or ask Neo a question..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           disabled={isTeaching}
+          style={{ marginLeft: '10px', flex: 1 }}
         />
-        <button onClick={handleSend} disabled={!input.trim() || isTeaching}>
-          <FaPaperPlane />
-        </button>
       </footer>
     </div>
   );

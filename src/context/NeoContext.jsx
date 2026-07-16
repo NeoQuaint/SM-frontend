@@ -13,8 +13,6 @@ export const NeoProvider = ({ children }) => {
   const [userData, setUserData] = useState(null);
   const [isMemoryLoaded, setIsMemoryLoaded] = useState(false);
 
-  const API_URL = 'https://smartclass-wlgb.onrender.com';
-
   // Load user data and Neo's memory on mount
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
@@ -55,11 +53,11 @@ export const NeoProvider = ({ children }) => {
         { subject }
       );
       
-      if (data.reply) {
-        setCurrentLesson(prev => ({
+      if (data && data.reply) {
+        setCurrentLesson(prev => prev ? {
           ...prev,
-          messages: [...prev.messages, { sender: 'Neo', text: data.reply }]
-        }));
+          messages: [...(prev.messages || []), { sender: 'Neo', text: data.reply }]
+        } : prev);
         setNeoMessage(data.reply);
       }
     } catch (err) {
@@ -74,14 +72,14 @@ export const NeoProvider = ({ children }) => {
     if (!currentLesson || !userData) return;
 
     const updatedMessages = [
-      ...currentLesson.messages,
+      ...(currentLesson.messages || []),
       { sender: 'Student', text: message }
     ];
     
-    setCurrentLesson(prev => ({
+    setCurrentLesson(prev => prev ? {
       ...prev,
       messages: updatedMessages
-    }));
+    } : prev);
 
     setIsTeaching(true);
 
@@ -93,11 +91,11 @@ export const NeoProvider = ({ children }) => {
         { subject: currentLesson.subject }
       );
       
-      if (data.reply) {
-        setCurrentLesson(prev => ({
+      if (data && data.reply) {
+        setCurrentLesson(prev => prev ? {
           ...prev,
-          messages: [...prev.messages, { sender: 'Neo', text: data.reply }]
-        }));
+          messages: [...(prev.messages || []), { sender: 'Neo', text: data.reply }]
+        } : prev);
         setNeoMessage(data.reply);
       }
     } catch (err) {
@@ -136,7 +134,7 @@ export const NeoProvider = ({ children }) => {
     
     // Generate proactive suggestions
     const newSuggestions = neoEngine.generateSuggestion(context);
-    setSuggestions(newSuggestions);
+    setSuggestions(newSuggestions || []);
     
     return path;
   }, []);
@@ -147,8 +145,8 @@ export const NeoProvider = ({ children }) => {
     
     try {
       const data = await neoEngine.ask(message, userData, currentPage, additionalContext);
-      setNeoMessage(data.reply || '');
-      return data;
+      setNeoMessage(data?.reply || '');
+      return data || { reply: '' };
     } catch (err) {
       console.error('Ask Neo failed:', err);
       return { reply: 'I\'m having trouble connecting. Try again.' };
