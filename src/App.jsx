@@ -7,11 +7,10 @@ import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import StudyRoom from './pages/StudyRoom';
 import Profile from './pages/Profile';
-import SubjectLesson from './pages/SubjectLesson';
-import FloatingNeo from './components/FloatingNeo';
+import Topics from './pages/Topics';
+import TopicLesson from './pages/TopicLesson';
 import './App.css';
 
-// Splash Screen Component
 const SplashScreen = ({ onFinish }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,19 +38,17 @@ function App() {
         {showSplash ? (
           <SplashScreen onFinish={() => setShowSplash(false)} />
         ) : (
-          <>
-            <Routes>
-              <Route path="/" element={<Welcome />} />
-              <Route path="/assessment" element={<Assessment />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/tasks" element={<Tasks />} />
-              <Route path="/studyroom" element={<StudyRoom />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/lesson/:subject" element={<SubjectLesson />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-            <FloatingNeo />
-          </>
+          <Routes>
+            <Route path="/" element={<Welcome />} />
+            <Route path="/assessment" element={<Assessment />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/studyroom" element={<StudyRoom />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/subjects/:subject" element={<Topics />} />
+            <Route path="/lesson/:subject/:topicId" element={<TopicLesson />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
         )}
       </NeoProvider>
     </Router>

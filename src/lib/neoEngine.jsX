@@ -7,12 +7,6 @@ class NeoEngine {
     this.memory = {};
     this.patterns = {};
     this.preferences = {};
-    this.language = 'en'; // Default language
-  }
-
-  // Set the teaching language
-  setLanguage(lang) {
-    this.language = lang;
   }
 
   // Load student's full memory from backend
@@ -71,9 +65,6 @@ class NeoEngine {
       
       // Patterns Neo has noticed
       patterns: this.patterns,
-      
-      // Language
-      language: this.language,
     };
   }
 
@@ -86,19 +77,7 @@ class NeoEngine {
       preferences, patterns 
     } = context;
 
-    // Language instruction
-    const languageNames = { en: 'English', zu: 'Zulu', tn: 'Setswana' };
-    const languageName = languageNames[this.language] || 'English';
-    const languageInstruction = this.language === 'en' 
-      ? 'Respond in English. Use clear, natural English throughout.'
-      : `Respond entirely in ${languageName}. Use natural, conversational ${languageName}. Teach in ${languageName}. Use ${languageName} for all explanations, examples, and encouragement.`;
-
     return `You are Neo, the AI operating system of SmartClass. You are not a chatbot. You are the platform's intelligence layer.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-LANGUAGE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${languageInstruction}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 STUDENT STATE (What you know right now)
@@ -139,8 +118,6 @@ YOUR ROLE AS THE OS
 
 7. CELEBRATE PROGRESS — They've studied for ${studyStreak} days in a row. Acknowledge their consistency.
 
-8. SOUTH AFRICAN CONTEXT — Use rands (R) for money examples. Reference South African places, culture, and CAPS curriculum. Be culturally inclusive.
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RESPONSE RULES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -164,8 +141,8 @@ RESPONSE RULES
           message,
           subject: additionalContext.subject || context.weakestSubject,
           userId: userData?.id || userData?.email || 'student',
-          systemPrompt,
-          context,
+          systemPrompt, // Override default system prompt
+          context, // Full context for memory storage
         })
       });
 
@@ -177,7 +154,7 @@ RESPONSE RULES
       return data;
     } catch (err) {
       console.error('Neo ask failed:', err);
-      return { reply: this.language === 'zu' ? 'Nginenkinga yokuxhuma. Zama futhi.' : this.language === 'tn' ? 'Ke na le bothata jwa go golagana. Leka gape.' : 'I\'m having trouble connecting. Try again.' };
+      return { reply: 'I\'m having trouble connecting. Try again.' };
     }
   }
 
@@ -225,12 +202,8 @@ RESPONSE RULES
     if (hoursSinceLastStudy > 24) {
       suggestions.push({
         type: 'comeback',
-        message: this.language === 'zu' 
-          ? `Sawubona! Sekuphele amahora angu-${hoursSinceLastStudy} ugcine ukufunda. Usulungele ukuqhubeka ne-${weakestSubject}?`
-          : this.language === 'tn'
-            ? `O amogetswe! Go fetile diura tse ${hoursSinceLastStudy} o sa ithute. A o itumedetse go tswelela ka ${weakestSubject}?`
-            : `Welcome back! It's been ${hoursSinceLastStudy} hours. Ready for a quick ${weakestSubject} refresher?`,
-        action: `subjects/${weakestSubject}`,
+        message: `Welcome back! It's been ${hoursSinceLastStudy} hours. Ready for a quick ${weakestSubject} refresher?`,
+        action: `lesson/${weakestSubject}`,
         priority: 'high',
       });
     }
@@ -238,11 +211,7 @@ RESPONSE RULES
     if (studyStreak > 0 && studyStreak % 5 === 0) {
       suggestions.push({
         type: 'celebration',
-        message: this.language === 'zu'
-          ? `🔥 Izinsuku eziyi-${studyStreak} ulandelana ufunda! Wakha umkhuba omuhle. Asiqhubeke!`
-          : this.language === 'tn'
-            ? `🔥 Malatsi a le ${studyStreak} o ithuta o sa kgaotse! O aga mokgwa o o siameng. A re tsweleleng!`
-            : `🔥 ${studyStreak} day streak! You're building a real habit. Let's keep it going!`,
+        message: `🔥 ${studyStreak} day streak! You're building a real habit. Let's keep it going!`,
         priority: 'medium',
       });
     }
@@ -250,12 +219,8 @@ RESPONSE RULES
     if (timeOfDay === 'morning') {
       suggestions.push({
         type: 'daily_plan',
-        message: this.language === 'zu'
-          ? `Sawubona ekuseni! Okugxilwe kukho namuhla: imizuzu engu-20 ye-${weakestSubject} ukuze uqale kahle.`
-          : this.language === 'tn'
-            ? `Dumela mo mosong! Se re tla ithuta sona gompieno: metsotso e le 20 ya ${weakestSubject} go simolola sentle.`
-            : `Good morning! Today's focus: 20 minutes of ${weakestSubject} to start strong.`,
-        action: `subjects/${weakestSubject}`,
+        message: `Good morning! Today's focus: 20 minutes of ${weakestSubject} to start strong.`,
+        action: `lesson/${weakestSubject}`,
         priority: 'high',
       });
     }

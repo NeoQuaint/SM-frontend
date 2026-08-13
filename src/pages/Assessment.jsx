@@ -29,13 +29,6 @@ const Assessment = () => {
   }
 
   const subjects = userData.subjects || ['Mathematics'];
-  const performanceScores = { 'Bad': 25, 'Fair': 50, 'Good': 75, 'Very Good': 95 };
-
-  const weakestSubject = subjects.reduce((w, s) => {
-    const ws = performanceScores[userData.performance[w]] || 100;
-    const cs = performanceScores[userData.performance[s]] || 0;
-    return cs < ws ? s : w;
-  }, subjects[0]);
 
   const handleMarkChange = (subject, value) => {
     setMarks(prev => ({ ...prev, [subject]: value }));
@@ -70,9 +63,8 @@ const Assessment = () => {
     const updatedUser = { ...userData, assessment: assessmentData };
     localStorage.setItem('smartclass_user', JSON.stringify(updatedUser));
     
-    // Build learning path and navigate to weakest subject with Neo
     await buildLearningPath(updatedUser);
-    navigate(`/lesson/${weakestSubject}`);
+    navigate('/dashboard');
   };
 
   return (
@@ -92,12 +84,9 @@ const Assessment = () => {
         {step === 1 && (
           <div className="assess-card">
             <div className="assess-neo">
-              <div className="neo-voice-icon-sm">
-                <FaMicrophone />
-              </div>
               <div>
                 <h2>Let's personalize your learning</h2>
-                <p>Enter your current marks so I know where to start.</p>
+                <p>Enter your current marks so we know where to start.</p>
               </div>
             </div>
 
@@ -197,14 +186,14 @@ const Assessment = () => {
             </h2>
             <p className="results-message">
               {score >= 70 
-                ? "You're ready. Neo will build on this." 
+                ? "You're ready. Let's build on this." 
                 : score >= 40 
-                  ? 'Solid base. Neo knows exactly where to focus.' 
-                  : 'No stress. Neo starts from where you are and builds you up.'}
+                  ? 'Solid base. We know where to focus.' 
+                  : 'No stress. We start from where you are.'}
             </p>
 
             <button className="assess-btn primary" onClick={handleFinish}>
-              <FaPlay /> Start Learning with Neo
+              <FaPlay /> Start Learning
             </button>
           </div>
         )}

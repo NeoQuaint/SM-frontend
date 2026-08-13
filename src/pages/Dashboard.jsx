@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Dashboard.css';
 import { useNeo } from '../context/NeoContext';
+import LanguageSelector from '../components/LanguageSelector';
 import { FaHome, FaTasks, FaUser, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaCamera, FaFileAlt, FaPlay, FaSearch, FaBolt, FaComments, FaMicrophone } from 'react-icons/fa';
 
 const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#2D2420' }) => {
@@ -54,7 +55,7 @@ const Dashboard = () => {
   };
 
   const openNeoLesson = (subject) => {
-    navigate(`/lesson/${subject}`);
+    navigate(`/subjects/${subject}`);
   };
 
   if (!userData) {
@@ -90,7 +91,6 @@ const Dashboard = () => {
   const weakestScore = performanceScores[userData.performance[weakestSubject]] || 0;
 
   const getNeoMessage = () => {
-    // Check for proactive suggestions first
     if (suggestions && suggestions.length > 0) {
       const highPriority = suggestions.find(s => s.priority === 'high');
       if (highPriority) return highPriority.message;
@@ -125,9 +125,12 @@ const Dashboard = () => {
       {/* Header */}
       <header className="dash-header">
         <span className="header-greeting">Hi {userData.fullName.split(' ')[0]} 👋</span>
-        <button className="dash-profile-btn" onClick={() => setSidebarOpen(true)}>
-          <img src={avatarMap[userData.avatar]} alt="" className="dash-avatar" />
-        </button>
+        <div className="dash-header-right">
+          <LanguageSelector />
+          <button className="dash-profile-btn" onClick={() => setSidebarOpen(true)}>
+            <img src={avatarMap[userData.avatar]} alt="" className="dash-avatar" />
+          </button>
+        </div>
       </header>
 
       {/* Sidebar */}
@@ -198,7 +201,7 @@ const Dashboard = () => {
                   <p>{suggestion.message}</p>
                   {suggestion.action && (
                     <span className="neo-suggestion-action">
-                      {suggestion.action.startsWith('lesson/') ? 'Start Lesson' : 'Go'} →
+                      {suggestion.action.startsWith('subjects/') ? 'Start Lesson' : 'Go'} →
                     </span>
                   )}
                 </div>
@@ -207,7 +210,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* Your Subjects — Click to open Neo lesson */}
+        {/* Your Subjects — Click to open Topics page */}
         <div className="section-block">
           <span className="section-label">YOUR SUBJECTS</span>
           <div className="subjects-compact-grid">
@@ -249,7 +252,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Neo's Focus Recommendation — Click to start lesson */}
+        {/* Neo's Focus Recommendation — Click to open Topics */}
         <div className="primary-actions">
           <button 
             className="action-card" 
@@ -305,7 +308,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Continue Learning — Opens last/weakest subject with Neo */}
+        {/* Continue Learning — Opens Topics page */}
         <div className="section-block">
           <span className="section-label">CONTINUE LEARNING</span>
           <div 

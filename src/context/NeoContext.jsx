@@ -12,6 +12,16 @@ export const NeoProvider = ({ children }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [userData, setUserData] = useState(null);
   const [isMemoryLoaded, setIsMemoryLoaded] = useState(false);
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('smartclass_language') || 'en';
+  });
+
+  // Save language preference
+  useEffect(() => {
+    localStorage.setItem('smartclass_language', language);
+    // Update neoEngine with current language
+    neoEngine.setLanguage(language);
+  }, [language]);
 
   // Load user data and Neo's memory on mount
   useEffect(() => {
@@ -163,6 +173,8 @@ export const NeoProvider = ({ children }) => {
       suggestions,
       userData,
       isMemoryLoaded,
+      language,
+      setLanguage,
       startLesson,
       continueLesson,
       endLesson,

@@ -25,7 +25,6 @@ const Welcome = () => {
   const [learningTime, setLearningTime] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  // Prevent browser back button from exiting the site during onboarding
   useEffect(() => {
     if (step >= 1) {
       window.history.pushState(null, '', window.location.href);
@@ -325,7 +324,6 @@ const Welcome = () => {
       {step >= 1 && !showAuth && (
         <div className="onboarding-overlay">
           <div className="onboarding-container">
-            {/* Top Bar: Back + Progress + Icon */}
             <div className="onboarding-top-bar">
               <button className="top-back-btn" onClick={prevStep}>
                 <FaArrowLeft />
@@ -569,78 +567,64 @@ const Welcome = () => {
 
             {/* Step 7: Learning Time */}
             {step === 7 && (
-              <div className="onboarding-step neo-step">
-                <div className="neo-container">
-                  <div className="neo-message">
-                    <div className="neo-logo-wrapper">
-                      <img src="/SM-LOGO.png" alt="SmartClass" className="neo-logo" />
-                    </div>
-                    <div className="neo-text">
-                      <h2 className="neo-greeting">
-                        When will SmartClass fit into your day?
-                      </h2>
-                    </div>
-                  </div>
+              <div className="onboarding-step">
+                <h2 className="onboarding-title">When will SmartClass fit into your day?</h2>
+                <p className="onboarding-subtitle">Choose your preferred learning time</p>
 
-                  <div className="learning-time-grid">
-                    <button
-                      className={`learning-time-card ${learningTime === 'morning' ? 'selected' : ''}`}
-                      onClick={() => setLearningTime('morning')}
-                      style={{ animationDelay: '0.1s' }}
-                    >
-                      <div className="learning-time-icon-wrapper morning">🌅</div>
-                      <span className="learning-time-label">Morning Focus</span>
-                      {learningTime === 'morning' && (
-                        <div className="learning-time-check"><FaCheck /></div>
-                      )}
-                    </button>
+                <div className="learning-time-grid">
+                  <button
+                    className={`learning-time-card ${learningTime === 'morning' ? 'selected' : ''}`}
+                    onClick={() => setLearningTime('morning')}
+                  >
+                    <div className="learning-time-icon-wrapper morning">🌅</div>
+                    <span className="learning-time-label">Morning Focus</span>
+                    {learningTime === 'morning' && (
+                      <div className="learning-time-check"><FaCheck /></div>
+                    )}
+                  </button>
 
-                    <button
-                      className={`learning-time-card ${learningTime === 'afternoon' ? 'selected' : ''}`}
-                      onClick={() => setLearningTime('afternoon')}
-                      style={{ animationDelay: '0.2s' }}
-                    >
-                      <div className="learning-time-icon-wrapper afternoon">☀️</div>
-                      <span className="learning-time-label">Afternoon Boost</span>
-                      {learningTime === 'afternoon' && (
-                        <div className="learning-time-check"><FaCheck /></div>
-                      )}
-                    </button>
+                  <button
+                    className={`learning-time-card ${learningTime === 'afternoon' ? 'selected' : ''}`}
+                    onClick={() => setLearningTime('afternoon')}
+                  >
+                    <div className="learning-time-icon-wrapper afternoon">☀️</div>
+                    <span className="learning-time-label">Afternoon Boost</span>
+                    {learningTime === 'afternoon' && (
+                      <div className="learning-time-check"><FaCheck /></div>
+                    )}
+                  </button>
 
-                    <button
-                      className={`learning-time-card ${learningTime === 'evening' ? 'selected' : ''}`}
-                      onClick={() => setLearningTime('evening')}
-                      style={{ animationDelay: '0.3s' }}
-                    >
-                      <div className="learning-time-icon-wrapper evening">🌙</div>
-                      <span className="learning-time-label">Evening Study</span>
-                      {learningTime === 'evening' && (
-                        <div className="learning-time-check"><FaCheck /></div>
-                      )}
-                    </button>
+                  <button
+                    className={`learning-time-card ${learningTime === 'evening' ? 'selected' : ''}`}
+                    onClick={() => setLearningTime('evening')}
+                  >
+                    <div className="learning-time-icon-wrapper evening">🌙</div>
+                    <span className="learning-time-label">Evening Study</span>
+                    {learningTime === 'evening' && (
+                      <div className="learning-time-check"><FaCheck /></div>
+                    )}
+                  </button>
 
-                    <button
-                      className={`learning-time-card ${learningTime === 'flexible' ? 'selected' : ''}`}
-                      onClick={() => setLearningTime('flexible')}
-                      style={{ animationDelay: '0.4s' }}
-                    >
-                      <div className="learning-time-icon-wrapper flexible">✨</div>
-                      <span className="learning-time-label">Flexible Schedule</span>
-                      {learningTime === 'flexible' && (
-                        <div className="learning-time-check"><FaCheck /></div>
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    className={`learning-time-card ${learningTime === 'flexible' ? 'selected' : ''}`}
+                    onClick={() => setLearningTime('flexible')}
+                  >
+                    <div className="learning-time-icon-wrapper flexible">✨</div>
+                    <span className="learning-time-label">Flexible Schedule</span>
+                    {learningTime === 'flexible' && (
+                      <div className="learning-time-check"><FaCheck /></div>
+                    )}
+                  </button>
+                </div>
 
-                  <div className="onboarding-nav" style={{ marginTop: '40px' }}>
-                    <button 
-                      className="onboarding-nav-btn finish neo-begin-btn" 
-                      onClick={nextStep}
-                      disabled={learningTime === ''}
-                    >
-                      Continue
-                    </button>
-                  </div>
+                <div className="onboarding-nav" style={{ marginTop: '40px' }}>
+                  <button 
+                    className="onboarding-nav-btn next" 
+                    onClick={nextStep}
+                    disabled={learningTime === ''}
+                  >
+                    Continue <FaArrowRight />
+                  </button>
                 </div>
               </div>
             )}
@@ -650,9 +634,6 @@ const Welcome = () => {
               <div className="onboarding-step notification-step">
                 <div className="notification-container">
                   <div className="notification-illustration">
-                    <div className="neo-behind-card">
-                      <img src="/AVO.png" alt="Neo" className="neo-character" />
-                    </div>
                     <div className="notification-card-float">
                       <div className="notification-card-inner">
                         <div className="notification-card-icon">
