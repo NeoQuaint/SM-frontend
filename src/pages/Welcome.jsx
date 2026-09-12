@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/Welcome.css';
-import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaSpinner, FaArrowRight, FaArrowLeft, FaCheck, FaBell, FaVolumeUp } from 'react-icons/fa';
+import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash, FaSpinner, FaArrowRight, FaArrowLeft, FaCheck, FaBell } from 'react-icons/fa';
+
+const API_URL = 'https://smartclass-wlgb.onrender.com';
+const GOOGLE_CLIENT_ID = '115779885917-9585t8u86v6uh5raspcsclicodeesk6q.apps.googleusercontent.com';
+
+const MAX_SUBJECTS = 4;
 
 const Welcome = () => {
   const navigate = useNavigate();
@@ -13,30 +18,43 @@ const Welcome = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const [educationLevel, setEducationLevel] = useState('');
-  const [grade, setGrade] = useState('');
-  const [universityLevel, setUniversityLevel] = useState('');
-  const [preschoolSubjects, setPreschoolSubjects] = useState([]);
   const [fullName, setFullName] = useState('');
-  const [avatar, setAvatar] = useState('');
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const googleInitialized = useRef(false);
+  
   const [selectedSubjects, setSelectedSubjects] = useState([]);
-  const [subjectPerformance, setSubjectPerformance] = useState({});
-  const [learningTime, setLearningTime] = useState('');
+  const [grade, setGrade] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
+  // Load Google Identity Services script
   useEffect(() => {
-    if (step >= 1) {
-      window.history.pushState(null, '', window.location.href);
-      const handlePopState = () => {
-        if (step > 1) {
-          prevStep();
-        }
-      };
-      window.addEventListener('popstate', handlePopState);
-      return () => window.removeEventListener('popstate', handlePopState);
+    if (!document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
     }
-  }, [step]);
+  }, []);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    const userData = localStorage.getItem('smartclass_user');
+    
+    if (token && userData) {
+      const user = JSON.parse(userData);
+      if (user.onboardingComplete === true) {
+        navigate('/dashboard');
+      } else {
+        setEmail(user.email || '');
+        setFullName(user.fullName || '');
+        setStep(1);
+      }
+    }
+  }, [navigate]);
 
   const avatars = [
     { id: 'AVO', src: '/AVO.png', name: 'Avo' },
@@ -46,134 +64,255 @@ const Welcome = () => {
     { id: 'DOG', src: '/DOG.png', name: 'Dog' }
   ];
 
-  const performanceLevels = ['Bad', 'Fair', 'Good', 'Very Good'];
-
-  const educationLevels = [
-    { id: 'preschool', label: 'Pre-School', image: '/preschool.png', desc: 'Early learning' },
-    { id: 'primary', label: 'Primary School', image: '/primary.png', desc: 'Grade 1-7' },
-    { id: 'highschool', label: 'High School', image: '/highschool.png', desc: 'Grade 8-12' },
-    { id: 'college', label: 'University / TVET', image: '/university.png', desc: 'Tertiary' }
+  const subjects = [
+    { id: 'mathematics', label: 'Mathematics' },
+    { id: 'physical-sciences', label: 'Physical Sciences' },
+    { id: 'life-sciences', label: 'Life Sciences' },
+    { id: 'economics', label: 'Economics' },
+    { id: 'mathematical-literacy', label: 'Mathematical Literacy' },
+    { id: 'accounting', label: 'Accounting' },
+    { id: 'business-studies', label: 'Business Studies' },
+    { id: 'geography', label: 'Geography' },
+    { id: 'history', label: 'History' },
+    { id: 'english', label: 'English' },
+    { id: 'afrikaans', label: 'Afrikaans' },
+    { id: 'cat', label: 'CAT' },
+    { id: 'technology', label: 'Technology' },
   ];
 
-  const universityLevels = ['Undergrad', 'Honours', 'Masters', 'PhD'];
+  // ==========================================
+  // HYDRATE USER DATA FROM BACKEND
+  // ==========================================
+  const hydrateUserData = async (token) => {
+    try {
+      const meRes = await fetch(`${API_URL}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-  const preschoolAreas = [
-    'Reading & Phonics', 
-    'Visual Learning', 
-    'Understanding Concepts',
-    'Motor Skills',
-    'Speech & Language',
-    'Social Skills',
-    'Creative Play'
-  ];
+      const meData = await meRes.json();
 
-  const getSubjectsForLevel = (level) => {
-    switch(level) {
-      case 'preschool':
-        return preschoolAreas;
-      case 'primary':
-        return ['Mathematics', 'English', 'Afrikaans', 'Natural Science', 'Social Studies', 'Life Skills', 'Technology'];
-      case 'highschool':
-        return ['Mathematics', 'Physical Sciences', 'English', 'Life Sciences', 'Geography', 'Accounting', 'Business Studies', 'History', 'CAT', 'Afrikaans'];
-      case 'college':
-        return ['Mathematics', 'Statistics', 'Computer Science', 'Economics', 'Physics', 'Chemistry', 'Biology', 'Literature', 'Psychology', 'Engineering'];
-      default:
-        return [];
+      if (meData.status === 'success' && meData.user) {
+        const userData = {
+          id: meData.user.id,
+          email: meData.user.email,
+          fullName: meData.user.full_name || '',
+          avatar: meData.user.avatar || 'AVO',
+          grade: meData.user.grade || '',
+          subjects: meData.user.subjects || [],
+          notificationsEnabled: meData.user.notifications_enabled || false,
+          onboardingComplete: meData.user.onboarding_complete || false
+        };
+
+        localStorage.setItem('smartclass_user', JSON.stringify(userData));
+
+        try {
+          const subRes = await fetch(`${API_URL}/api/yoco/check-subscription?userId=${encodeURIComponent(meData.user.email)}`);
+          const subData = await subRes.json();
+          
+          if (subData.hasSubscription) {
+            localStorage.setItem('smartclass_subscription', JSON.stringify({
+              ...subData.subscription,
+              active: true
+            }));
+          } else {
+            localStorage.removeItem('smartclass_subscription');
+          }
+        } catch (subErr) {
+          console.error('Subscription fetch error:', subErr);
+        }
+
+        return userData;
+      }
+    } catch (err) {
+      console.error('Hydrate error:', err);
     }
+    return null;
   };
 
-  const handleLevelSelect = (levelId) => {
-    setEducationLevel(levelId);
-    setTimeout(() => {
-      if (levelId === 'highschool' || levelId === 'primary') {
-        setStep(2);
-      } else if (levelId === 'college') {
-        setStep(2);
-      } else if (levelId === 'preschool') {
-        setStep(3);
+  const handleGoogleButtonClick = useCallback(() => {
+    setError('');
+    setGoogleLoading(false);
+
+    const redirectUri = `${window.location.origin}/auth/google/callback`;
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=id_token&scope=email%20profile%20openid&nonce=${Date.now()}&prompt=select_account`;
+    
+    window.location.href = authUrl;
+  }, []);
+
+  const toggleSubject = (subjectId) => {
+    setSelectedSubjects(prev => {
+      if (prev.includes(subjectId)) {
+        return prev.filter(id => id !== subjectId);
       }
-    }, 400);
+      if (prev.length >= MAX_SUBJECTS) {
+        return prev;
+      }
+      return [...prev, subjectId];
+    });
+  };
+
+  const handleContinueFromSubjects = () => {
+    if (selectedSubjects.length > 0) {
+      setStep(2);
+    }
   };
 
   const handleGradeSelect = (g) => {
     setGrade(g.toString());
-    setTimeout(() => {
-      setStep(3);
-    }, 300);
+    setTimeout(() => setStep(3), 300);
   };
 
-  const handleUniversityLevelSelect = (level) => {
-    setUniversityLevel(level);
-    setTimeout(() => {
-      setStep(3);
-    }, 300);
-  };
-
+  // ==========================================
+  // LOGIN - Now hydrates from backend
+  // ==========================================
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success' || data.success) {
+        localStorage.setItem('authToken', data.token);
+        
+        const hydratedUser = await hydrateUserData(data.token);
+        
+        const userData = hydratedUser || {
+          id: data.user.id,
+          email: data.user.email,
+          fullName: data.user.full_name || data.user.fullName || '',
+          avatar: data.user.avatar || 'AVO',
+          grade: data.user.grade || '',
+          subjects: data.user.subjects || [],
+          notificationsEnabled: data.user.notifications_enabled || false,
+          onboardingComplete: data.user.onboarding_complete || data.user.onboardingComplete || false
+        };
+        
+        if (!hydratedUser) {
+          localStorage.setItem('smartclass_user', JSON.stringify(userData));
+        }
+        
+        setIsLoading(false);
+        setShowAuth(false);
+        setShowEmailForm(false);
+        
+        if (userData.onboardingComplete === true) {
+          navigate('/dashboard');
+        } else {
+          setFullName(userData.fullName || '');
+          setSelectedSubjects(userData.subjects || []);
+          setGrade(userData.grade || '');
+          setAvatar(userData.avatar || '');
+          setTimeout(() => setStep(1), 100);
+        }
+      } else {
+        setError(data.error || 'Login failed');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Network error. Please try again.');
       setIsLoading(false);
-      setShowAuth(false);
-      setStep(1);
-    }, 1500);
+    }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, full_name: '' })
+      });
+      
+      const data = await response.json();
+      
+      if (data.status === 'success' || data.success) {
+        localStorage.setItem('authToken', data.token);
+        
+        const userData = {
+          id: data.user.id,
+          email: data.user.email,
+          fullName: '',
+          avatar: 'AVO',
+          grade: '',
+          subjects: [],
+          notificationsEnabled: false,
+          onboardingComplete: false
+        };
+        localStorage.setItem('smartclass_user', JSON.stringify(userData));
+        
+        setIsLoading(false);
+        setShowAuth(false);
+        setShowEmailForm(false);
+        setTimeout(() => setStep(1), 100);
+      } else {
+        setError(data.error || 'Registration failed');
+        setIsLoading(false);
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
       setIsLoading(false);
-      setShowAuth(false);
-      setStep(1);
-    }, 1500);
-  };
-
-  const toggleSubject = (subject) => {
-    if (educationLevel === 'preschool') {
-      setPreschoolSubjects(prev => {
-        if (prev.includes(subject)) {
-          return prev.filter(s => s !== subject);
-        }
-        return [...prev, subject];
-      });
-    } else {
-      setSelectedSubjects(prev => {
-        if (prev.includes(subject)) {
-          return prev.filter(s => s !== subject);
-        }
-        return [...prev, subject];
-      });
     }
   };
 
-  const setPerformance = (subject, level) => {
-    setSubjectPerformance(prev => ({
-      ...prev,
-      [subject]: level
-    }));
+  const handleContinueWithEmail = () => {
+    setShowEmailForm(true);
+    setError('');
   };
 
-  const saveAndGoToAssessment = (notifications = false) => {
-    const finalSubjects = educationLevel === 'preschool' ? preschoolSubjects : selectedSubjects;
+  const handleBackFromEmail = () => {
+    setShowEmailForm(false);
+    setError('');
+  };
+
+  const saveAndGoToDashboard = async (notifications = false) => {
+    const token = localStorage.getItem('authToken');
+    
+    try {
+      if (token) {
+        await fetch(`${API_URL}/api/auth/complete-onboarding`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            subjects: selectedSubjects,
+            grade: grade,
+            avatar: avatar,
+            full_name: fullName,
+            notifications_enabled: notifications
+          })
+        });
+        console.log('✅ Onboarding saved to backend');
+      }
+    } catch (err) {
+      console.error('Backend save error:', err);
+    }
+    
     const userData = {
       email,
       fullName,
       avatar,
-      educationLevel,
+      subjects: selectedSubjects,
       grade,
-      universityLevel,
-      subjects: finalSubjects,
-      performance: subjectPerformance,
-      learningTime,
       notificationsEnabled: notifications,
       onboardingComplete: true,
       joinedDate: new Date().toISOString()
     };
     localStorage.setItem('smartclass_user', JSON.stringify(userData));
-    navigate('/assessment');
+    navigate('/dashboard');
   };
 
   const requestNotificationPermission = async () => {
@@ -181,31 +320,28 @@ const Welcome = () => {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         setNotificationsEnabled(true);
-        saveAndGoToAssessment(true);
+        saveAndGoToDashboard(true);
       } else {
-        saveAndGoToAssessment(false);
+        saveAndGoToDashboard(false);
       }
     } else {
-      saveAndGoToAssessment(false);
+      saveAndGoToDashboard(false);
     }
   };
 
   const handleMaybeLater = () => {
     setNotificationsEnabled(false);
-    saveAndGoToAssessment(false);
+    saveAndGoToDashboard(false);
   };
 
   const nextStep = () => setStep(prev => prev + 1);
   const prevStep = () => setStep(prev => Math.max(1, prev - 1));
 
   const getProgressPercent = () => {
-    return ((step - 1) / 7) * 100;
+    return ((step - 1) / 4) * 100;
   };
 
-  const getTotalSteps = () => 8;
-
-  const currentSubjects = educationLevel === 'preschool' ? preschoolSubjects : selectedSubjects;
-  const allSubjects = getSubjectsForLevel(educationLevel);
+  const getTotalSteps = () => 4;
 
   return (
     <div className="welcome-app">
@@ -213,42 +349,21 @@ const Welcome = () => {
       {step === 0 && !showAuth && (
         <div className="welcome-container">
           <div className="welcome-hero-banner">
-            <img 
-              src="/BANNER.png" 
-              alt="Welcome to SmartClass" 
-              className="hero-banner-image"
-            />
+            <img src="/BANNER.png" alt="Welcome to SmartClass" className="hero-banner-image" />
           </div>
-
-          <div className="welcome-content">
-            <h1 className="welcome-heading">
-              Your learning journey starts here.
-            </h1>
+          <div className="welcome-content" style={{ paddingBottom: '0px' }}>
+            <h1 className="welcome-heading">Your learning journey starts here.</h1>
             <p className="welcome-description">
               Find the perfect tutor, learn at your own pace, and reach your goals with a little help along the way.
             </p>
-
-            <div className="welcome-actions">
-              <button 
-                className="welcome-btn learner"
-                onClick={() => { setIsLogin(false); setShowAuth(true); }}
-              >
+            <div className="welcome-actions" style={{ marginTop: '80px' }}>
+              <button className="welcome-btn learner" onClick={() => { setIsLogin(false); setShowAuth(true); setShowEmailForm(false); }}>
                 I'm a learner
               </button>
-              <button 
-                className="welcome-btn educator"
-                onClick={() => { setIsLogin(false); setShowAuth(true); }}
-              >
-                I'm an educator
-              </button>
             </div>
-
-            <div className="welcome-signin">
+            <div className="welcome-signin" style={{ marginTop: '28px' }}>
               <span className="signin-text">Already have an account?</span>
-              <button 
-                className="signin-link"
-                onClick={() => { setIsLogin(true); setShowAuth(true); }}
-              >
+              <button className="signin-link" onClick={() => { setIsLogin(true); setShowAuth(true); setShowEmailForm(false); }}>
                 Sign In
               </button>
             </div>
@@ -262,60 +377,113 @@ const Welcome = () => {
           <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
             <button className="auth-close-btn" onClick={() => setShowAuth(false)}>×</button>
             
-            <div className="auth-modal-header">
-              <img src="/SM-LOGO.png" alt="SmartClass" className="auth-modal-logo" />
-              <h2>{isLogin ? 'Welcome back' : 'Join the family'}</h2>
-              <p>{isLogin ? 'Good to see you again' : "We're so happy you're here"}</p>
-            </div>
-
-            {error && <div className="auth-error">{error}</div>}
-
-            <form onSubmit={isLogin ? handleLogin : handleRegister}>
-              <div className="auth-input-group">
-                <label>Email</label>
-                <div className="auth-input-wrapper">
-                  <FaEnvelope className="auth-input-icon" />
-                  <input
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+            {!showEmailForm ? (
+              <>
+                <div className="auth-modal-header">
+                  <img src="/SM-LOGO.png" alt="SmartClass" className="auth-modal-logo" />
+                  <h2>{isLogin ? 'Welcome back' : 'Join the family'}</h2>
+                  <p>{isLogin ? 'Good to see you again' : "We're so happy you're here"}</p>
                 </div>
-              </div>
 
-              <div className="auth-input-group">
-                <label>Password</label>
-                <div className="auth-input-wrapper">
-                  <FaLock className="auth-input-icon" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <button type="button" className="auth-password-toggle" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {error && <div className="auth-error">{error}</div>}
+
+                <button
+                  type="button"
+                  className="google-auth-btn"
+                  onClick={handleGoogleButtonClick}
+                  disabled={googleLoading}
+                >
+                  {googleLoading ? (
+                    'Redirecting...'
+                  ) : (
+                    <>
+                      <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      </svg>
+                      Continue with Google
+                    </>
+                  )}
+                </button>
+
+                <div className="auth-divider">
+                  <span>or</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="google-auth-btn"
+                  onClick={handleContinueWithEmail}
+                  style={{ background: 'white', color: '#333', border: '2px solid #E8D9CC' }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  Continue with Email
+                </button>
+
+                <div className="auth-footer">
+                  <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="auth-toggle-btn">
+                    {isLogin ? "Don't have an account? Join us" : 'Already have an account? Sign in'}
                   </button>
                 </div>
-              </div>
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
+                  <button 
+                    onClick={handleBackFromEmail}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '5px', marginRight: '10px', fontSize: '20px', color: '#666' }}
+                  >
+                    ←
+                  </button>
+                  <div>
+                    <h2 style={{ fontSize: '22px', margin: 0, fontFamily: 'Georgia, serif' }}>
+                      {isLogin ? 'Welcome back' : 'Join the family'}
+                    </h2>
+                    <p style={{ fontSize: '14px', margin: '4px 0 0', color: '#8B7E74' }}>
+                      {isLogin ? 'Good to see you again' : "We're so happy you're here"}
+                    </p>
+                  </div>
+                </div>
 
-              <button type="submit" className="auth-submit-btn" disabled={isLoading}>
-                {isLoading ? (
-                  <><FaSpinner className="spinner" /> Please wait...</>
-                ) : (
-                  isLogin ? 'Sign In' : 'Get Started'
-                )}
-              </button>
-            </form>
+                {error && <div className="auth-error">{error}</div>}
 
-            <div className="auth-footer">
-              <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="auth-toggle-btn">
-                {isLogin ? "Don't have an account? Join us" : 'Already have an account? Sign in'}
-              </button>
-            </div>
+                <form onSubmit={isLogin ? handleLogin : handleRegister}>
+                  <div className="auth-input-group">
+                    <label>Email</label>
+                    <div className="auth-input-wrapper">
+                      <FaEnvelope className="auth-input-icon" />
+                      <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    </div>
+                  </div>
+
+                  <div className="auth-input-group">
+                    <label>Password</label>
+                    <div className="auth-input-wrapper">
+                      <FaLock className="auth-input-icon" />
+                      <input type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                      <button type="button" className="auth-password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" className="auth-submit-btn" disabled={isLoading}>
+                    {isLoading ? <><FaSpinner className="spinner" /> Please wait...</> : (isLogin ? 'Sign In' : 'Get Started')}
+                  </button>
+                </form>
+
+                <div className="auth-footer">
+                  <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="auth-toggle-btn">
+                    {isLogin ? "Don't have an account? Join us" : 'Already have an account? Sign in'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -333,52 +501,57 @@ const Welcome = () => {
                   <div className="progress-fill" style={{ width: `${getProgressPercent()}%` }} />
                 </div>
               </div>
-              <button className="top-icon-btn">
-                <FaVolumeUp />
-              </button>
+              <div style={{ width: 40 }} />
             </div>
 
             <span className="progress-text">Step {step} of {getTotalSteps()}</span>
 
-            {/* Step 1: Education Level */}
             {step === 1 && (
               <div className="onboarding-step">
-                <h2 className="onboarding-title">Where are you in your journey?</h2>
-                <p className="onboarding-subtitle">Select your level — we'll take it from there</p>
+                <h2 className="onboarding-title">Choose your subjects</h2>
+                <p className="onboarding-subtitle">Select up to {MAX_SUBJECTS} subjects</p>
                 
-                <div className="level-grid">
-                  {educationLevels.map((level) => (
-                    <button
-                      key={level.id}
-                      className={`level-card ${educationLevel === level.id ? 'selected' : ''}`}
-                      onClick={() => handleLevelSelect(level.id)}
-                      style={{ backgroundImage: `url(${level.image})` }}
-                    >
-                      <div className="level-card-overlay">
-                        <span className="level-label">{level.label}</span>
-                        <span className="level-desc-text">{level.desc}</span>
-                      </div>
-                    </button>
-                  ))}
+                <div className="subject-buttons-grid">
+                  {subjects.map((subject) => {
+                    const isSelected = selectedSubjects.includes(subject.id);
+                    const isFull = selectedSubjects.length >= MAX_SUBJECTS && !isSelected;
+                    
+                    return (
+                      <button
+                        key={subject.id}
+                        className={`subject-chip-btn ${isSelected ? 'selected' : ''} ${isFull ? 'disabled' : ''}`}
+                        onClick={() => toggleSubject(subject.id)}
+                        disabled={isFull}
+                      >
+                        {subject.label}
+                        {isSelected && <FaCheck />}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                {selectedSubjects.length >= MAX_SUBJECTS && (
+                  <p className="subject-limit-message">
+                    You've selected {MAX_SUBJECTS} subjects. Deselect one to choose a different subject.
+                  </p>
+                )}
+
+                <div className="onboarding-nav" style={{ marginTop: '32px' }}>
+                  <button className="onboarding-nav-btn next" onClick={handleContinueFromSubjects} disabled={selectedSubjects.length === 0}>
+                    Continue <FaArrowRight />
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* Step 2a: Grade Selection */}
-            {step === 2 && (educationLevel === 'highschool' || educationLevel === 'primary') && (
+            {step === 2 && (
               <div className="onboarding-step">
                 <h2 className="onboarding-title">Which grade are you in?</h2>
-                <p className="onboarding-subtitle">
-                  {educationLevel === 'highschool' ? 'Grade 8-12' : 'Grade 1-7'}
-                </p>
+                <p className="onboarding-subtitle">Grade 8-12</p>
                 
                 <div className="grade-grid">
-                  {(educationLevel === 'highschool' ? [8, 9, 10, 11, 12] : [1, 2, 3, 4, 5, 6, 7]).map((g) => (
-                    <button
-                      key={g}
-                      className={`grade-btn ${grade === g.toString() ? 'selected' : ''}`}
-                      onClick={() => handleGradeSelect(g)}
-                    >
+                  {[8, 9, 10, 11, 12].map((g) => (
+                    <button key={g} className={`grade-btn ${grade === g.toString() ? 'selected' : ''}`} onClick={() => handleGradeSelect(g)}>
                       Grade {g}
                     </button>
                   ))}
@@ -386,27 +559,6 @@ const Welcome = () => {
               </div>
             )}
 
-            {/* Step 2b: University Level */}
-            {step === 2 && educationLevel === 'college' && (
-              <div className="onboarding-step">
-                <h2 className="onboarding-title">What's your level?</h2>
-                <p className="onboarding-subtitle">Select your current academic standing</p>
-                
-                <div className="grade-grid">
-                  {universityLevels.map((level) => (
-                    <button
-                      key={level}
-                      className={`grade-btn ${universityLevel === level ? 'selected' : ''}`}
-                      onClick={() => handleUniversityLevelSelect(level)}
-                    >
-                      {level}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Step 3: Profile */}
             {step === 3 && (
               <div className="onboarding-step">
                 <h2 className="onboarding-title">Tell us about yourself</h2>
@@ -417,12 +569,7 @@ const Welcome = () => {
                     <label>Your Name</label>
                     <div className="name-input-wrapper">
                       <FaUser className="name-input-icon" />
-                      <input
-                        type="text"
-                        placeholder="What should we call you?"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                      />
+                      <input type="text" placeholder="What should we call you?" value={fullName} onChange={(e) => setFullName(e.target.value)} />
                     </div>
                   </div>
 
@@ -430,11 +577,7 @@ const Welcome = () => {
                     <label>Pick an avatar that feels like you</label>
                     <div className="avatar-grid">
                       {avatars.map((av) => (
-                        <button
-                          key={av.id}
-                          className={`avatar-btn ${avatar === av.id ? 'selected' : ''}`}
-                          onClick={() => setAvatar(av.id)}
-                        >
+                        <button key={av.id} className={`avatar-btn ${avatar === av.id ? 'selected' : ''}`} onClick={() => setAvatar(av.id)}>
                           <img src={av.src} alt={av.name} />
                           <span>{av.name}</span>
                         </button>
@@ -444,196 +587,20 @@ const Welcome = () => {
                 </div>
 
                 <div className="onboarding-nav" style={{ marginTop: '32px' }}>
-                  <button className="onboarding-nav-btn next" 
-                    onClick={nextStep}
-                    disabled={fullName === '' || avatar === ''}
-                  >
+                  <button className="onboarding-nav-btn next" onClick={nextStep} disabled={fullName === '' || avatar === ''}>
                     Continue <FaArrowRight />
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Step 4: Subjects */}
             {step === 4 && (
-              <div className="onboarding-step">
-                <h2 className="onboarding-title">
-                  {educationLevel === 'preschool' ? 'What areas would you like to focus on?' : 'What would you like help with?'}
-                </h2>
-                <p className="onboarding-subtitle">
-                  {educationLevel === 'preschool' ? 'Pick the areas you want to develop' : 'Pick the subjects you need a hand in'}
-                </p>
-                
-                <div className="subjects-grid">
-                  {allSubjects.map((subject) => (
-                    <button
-                      key={subject}
-                      className={`subject-chip ${currentSubjects.includes(subject) ? 'selected' : ''}`}
-                      onClick={() => toggleSubject(subject)}
-                    >
-                      {currentSubjects.includes(subject) && <FaCheck />}
-                      {subject}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="onboarding-nav" style={{ marginTop: '36px' }}>
-                  <button 
-                    className="onboarding-nav-btn next" 
-                    onClick={nextStep}
-                    disabled={currentSubjects.length === 0}
-                  >
-                    Continue <FaArrowRight />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Performance */}
-            {step === 5 && (
-              <div className="onboarding-step">
-                <h2 className="onboarding-title">How are you feeling about each one?</h2>
-                <p className="onboarding-subtitle">No judgment — just so we know where to start</p>
-                
-                <div className="performance-list">
-                  {currentSubjects.map((subject) => (
-                    <div key={subject} className="performance-item">
-                      <span className="performance-subject">{subject}</span>
-                      <div className="performance-bars">
-                        {performanceLevels.map((level) => (
-                          <button
-                            key={level}
-                            className={`perf-bar ${subjectPerformance[subject] === level ? 'active' : ''}`}
-                            onClick={() => setPerformance(subject, level)}
-                          >
-                            {level}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="onboarding-nav" style={{ marginTop: '36px' }}>
-                  <button 
-                    className="onboarding-nav-btn next" 
-                    onClick={nextStep}
-                    disabled={!currentSubjects.every(s => subjectPerformance[s])}
-                  >
-                    Continue <FaArrowRight />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 6: Summary */}
-            {step === 6 && (
-              <div className="onboarding-step">
-                <div className="completion-card">
-                  <div className="completion-check">✨</div>
-                  <h2 className="completion-title">Looking good, {fullName}!</h2>
-                  <p className="completion-subtitle">Here's a quick look at what we've got</p>
-                  <div className="completion-summary">
-                    <div className="summary-item">
-                      <span className="summary-label">Level</span>
-                      <span className="summary-value">{educationLevels.find(l => l.id === educationLevel)?.label}</span>
-                    </div>
-                    {grade && (
-                      <div className="summary-item">
-                        <span className="summary-label">Grade</span>
-                        <span className="summary-value">Grade {grade}</span>
-                      </div>
-                    )}
-                    {universityLevel && (
-                      <div className="summary-item">
-                        <span className="summary-label">Level</span>
-                        <span className="summary-value">{universityLevel}</span>
-                      </div>
-                    )}
-                    <div className="summary-item">
-                      <span className="summary-label">Focus Areas</span>
-                      <span className="summary-value">{currentSubjects.length} selected</span>
-                    </div>
-                  </div>
-
-                  <div className="onboarding-nav" style={{ marginTop: '32px' }}>
-                    <button className="onboarding-nav-btn next" onClick={nextStep}>
-                      One more thing <FaArrowRight />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 7: Learning Time */}
-            {step === 7 && (
-              <div className="onboarding-step">
-                <h2 className="onboarding-title">When will SmartClass fit into your day?</h2>
-                <p className="onboarding-subtitle">Choose your preferred learning time</p>
-
-                <div className="learning-time-grid">
-                  <button
-                    className={`learning-time-card ${learningTime === 'morning' ? 'selected' : ''}`}
-                    onClick={() => setLearningTime('morning')}
-                  >
-                    <div className="learning-time-icon-wrapper morning">🌅</div>
-                    <span className="learning-time-label">Morning Focus</span>
-                    {learningTime === 'morning' && (
-                      <div className="learning-time-check"><FaCheck /></div>
-                    )}
-                  </button>
-
-                  <button
-                    className={`learning-time-card ${learningTime === 'afternoon' ? 'selected' : ''}`}
-                    onClick={() => setLearningTime('afternoon')}
-                  >
-                    <div className="learning-time-icon-wrapper afternoon">☀️</div>
-                    <span className="learning-time-label">Afternoon Boost</span>
-                    {learningTime === 'afternoon' && (
-                      <div className="learning-time-check"><FaCheck /></div>
-                    )}
-                  </button>
-
-                  <button
-                    className={`learning-time-card ${learningTime === 'evening' ? 'selected' : ''}`}
-                    onClick={() => setLearningTime('evening')}
-                  >
-                    <div className="learning-time-icon-wrapper evening">🌙</div>
-                    <span className="learning-time-label">Evening Study</span>
-                    {learningTime === 'evening' && (
-                      <div className="learning-time-check"><FaCheck /></div>
-                    )}
-                  </button>
-
-                  <button
-                    className={`learning-time-card ${learningTime === 'flexible' ? 'selected' : ''}`}
-                    onClick={() => setLearningTime('flexible')}
-                  >
-                    <div className="learning-time-icon-wrapper flexible">✨</div>
-                    <span className="learning-time-label">Flexible Schedule</span>
-                    {learningTime === 'flexible' && (
-                      <div className="learning-time-check"><FaCheck /></div>
-                    )}
-                  </button>
-                </div>
-
-                <div className="onboarding-nav" style={{ marginTop: '40px' }}>
-                  <button 
-                    className="onboarding-nav-btn next" 
-                    onClick={nextStep}
-                    disabled={learningTime === ''}
-                  >
-                    Continue <FaArrowRight />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Step 8: Notification Permission */}
-            {step === 8 && (
               <div className="onboarding-step notification-step">
                 <div className="notification-container">
                   <div className="notification-illustration">
+                    <div className="neo-behind-card">
+                      <img src={avatars.find(a => a.id === avatar)?.src || '/AVO.png'} alt="Your avatar" className="neo-character" />
+                    </div>
                     <div className="notification-card-float">
                       <div className="notification-card-inner">
                         <div className="notification-card-icon">
@@ -654,7 +621,7 @@ const Welcome = () => {
 
                   <div className="notification-text-section">
                     <h2 className="notification-heading">
-                      Stay on track with SmartClass
+                      Stay on track, {fullName.split(' ')[0]}!
                     </h2>
                     <p className="notification-description">
                       Allow SmartClass to send gentle reminders, celebrate your achievements, and help you build a consistent learning habit.
@@ -662,17 +629,11 @@ const Welcome = () => {
                   </div>
 
                   <div className="notification-buttons">
-                    <button 
-                      className="notification-btn primary"
-                      onClick={requestNotificationPermission}
-                    >
+                    <button className="notification-btn primary" onClick={requestNotificationPermission}>
                       <FaBell style={{ marginRight: '8px' }} />
                       Allow Notifications
                     </button>
-                    <button 
-                      className="notification-btn secondary"
-                      onClick={handleMaybeLater}
-                    >
+                    <button className="notification-btn secondary" onClick={handleMaybeLater}>
                       Maybe Later
                     </button>
                   </div>

@@ -1,0 +1,131 @@
+.payment-result-container {
+  min-height: 100vh;
+  background-color: #FBE9F0;
+  background-image: linear-gradient(90deg, #FBE9F0 0%, #CDE7F0 38%, #E6D6F5 67%, #D6F0E4 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.payment-result-card {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 40px 32px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  animation: slideUp 0.4s ease;
+}
+
+.result-icon {
+  font-size: 60px;
+  margin-bottom: 16px;
+  animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.payment-result-card.success .result-icon {
+  color: #4CAF50;
+}
+
+.payment-result-card.cancelled .result-icon {
+  color: #E57373;
+}
+
+.result-spinner {
+  font-size: 60px;
+  color: #7E57C2;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.payment-result-card h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 12px;
+}
+
+.result-message p {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.result-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.primary-btn {
+  width: 100%;
+  padding: 14px;
+  background: #7E57C2;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.primary-btn:hover {
+  background: #6A47B0;
+}
+
+.secondary-btn {
+  width: 100%;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #666;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.redirect-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  color: #999;
+  font-size: 13px;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  font-size: 12px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}

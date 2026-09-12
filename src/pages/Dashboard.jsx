@@ -1,61 +1,258 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import '../css/Dashboard.css';
 import { useNeo } from '../context/NeoContext';
-import LanguageSelector from '../components/LanguageSelector';
-import { FaHome, FaTasks, FaUser, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaCamera, FaFileAlt, FaPlay, FaSearch, FaBolt, FaComments, FaMicrophone } from 'react-icons/fa';
-
-const ProgressWheel = ({ percentage, size = 40, strokeWidth = 3, color = '#2D2420' }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <div className="pw" style={{ width: size, height: size }}>
-      <svg width={size} height={size}>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#F5F5F5" strokeWidth={strokeWidth} />
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
-          strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: 'stroke-dashoffset 1s ease' }}
-        />
-      </svg>
-    </div>
-  );
-};
+import { FaUser, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaCamera, FaFileAlt, FaSpinner, FaHome, FaTasks, FaComments } from 'react-icons/fa';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { startLesson, buildLearningPath, learningPath, currentLesson, suggestions, neoEngine } = useNeo();
+  const { buildLearningPath, learningPath, neoMessage, setNeoMessage } = useNeo();
   const [userData, setUserData] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showBubble, setShowBubble] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [displayedText, setDisplayedText] = useState('');
+  const audioRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const uploadInputRef = useRef(null);
+  const typewriterRef = useRef(null);
+  const API_URL = 'https://smartclass-wlgb.onrender.com';
+  
+  // Scan Homework state
+  const [scanView, setScanView] = useState(false);
+  const [studentImage, setStudentImage] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [aiCorrection, setAiCorrection] = useState('');
+  const [aiMistake, setAiMistake] = useState('');
+  const [aiTeaching, setAiTeaching] = useState('');
+  const [scanComplete, setScanComplete] = useState(false);
+
+  // ==========================================
+  // SMOOTH TYPEWRITER (character by character with punctuation pauses)
+  // ==========================================
+  const startTypewriter = (text) => {
+    // Clear any existing animation
+    if (typewriterRef.current) {
+      clearTimeout(typewriterRef.current);
+      typewriterRef.current = null;
+    }
+    
+    setDisplayedText('');
+    setIsTyping(true);
+    let currentIndex = 0;
+    const characters = text.split('');
+    
+    const typeNextChar = () => {
+      if (currentIndex >= characters.length) {
+        setIsTyping(false);
+        typewriterRef.current = null;
+        return;
+      }
+      
+      const char = characters[currentIndex];
+      setDisplayedText(text.slice(0, currentIndex + 1));
+      currentIndex++;
+      
+      // Natural pauses on punctuation
+      let delay = 25;
+      if (char === '.' || char === '!' || char === '?') delay = 350;
+      else if (char === ',') delay = 180;
+      else if (char === ';' || char === ':') delay = 200;
+      else if (char === ' ') delay = 35;
+      
+      typewriterRef.current = setTimeout(typeNextChar, delay);
+    };
+    
+    typeNextChar();
+  };
+
+  const speakText = async (text) => {
+    try {
+      // Start typewriter effect
+      startTypewriter(text);
+      
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      
+      const cleanText = text.replace(/[^a-zA-Z0-9\s.,!?()=+\-']/g, '');
+      if (!cleanText.trim()) return;
+      
+      setIsSpeaking(true);
+      
+      const response = await fetch(`${API_URL}/api/neo/speak`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: cleanText }),
+      });
+
+      if (!response.ok) throw new Error('Speak failed');
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.volume = 1.0;
+      
+      audio.play().catch(() => {});
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
+        setIsSpeaking(false);
+      };
+    } catch (error) {
+      console.error('Voice error:', error);
+      setIsSpeaking(false);
+      // Even if voice fails, complete the typewriter instantly
+      if (typewriterRef.current) {
+        clearTimeout(typewriterRef.current);
+        typewriterRef.current = null;
+      }
+      setDisplayedText(text);
+      setIsTyping(false);
+    }
+  };
 
   useEffect(() => {
     const data = localStorage.getItem('smartclass_user');
     if (data) {
       const parsed = JSON.parse(data);
       setUserData(parsed);
-      
-      if (!parsed.assessment) {
-        setTimeout(() => setShowBubble(true), 500);
-        setTimeout(() => setShowBubble(false), 5000);
-      }
-
       buildLearningPath(parsed);
+      
+      const firstName = parsed.fullName?.split(' ')[0] || 'there';
+      const hasMetNeo = localStorage.getItem('smartclass_met_neo');
+      
+      let introMsg;
+      if (!hasMetNeo) {
+        introMsg = `Hi ${firstName}! Nice to meet you! My name is Neo, and I'm your personal tutor. I can't wait to help you learn and grow. Tap any subject below and we'll get started!`;
+        localStorage.setItem('smartclass_met_neo', 'true');
+      } else {
+        introMsg = `Welcome back ${firstName}! Ready to learn something new? Pick a subject below!`;
+      }
+      
+      setNeoMessage(introMsg);
+      speakText(introMsg);
     } else {
       navigate('/');
     }
-  }, [navigate, buildLearningPath]);
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (typewriterRef.current) {
+        clearTimeout(typewriterRef.current);
+      }
+    };
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('smartclass_user');
+    localStorage.removeItem('smartclass_met_neo');
+    localStorage.removeItem('smartclass_subscription');
+    localStorage.removeItem('smartclass_free_topic_used');
+    localStorage.removeItem('smartclass_basic_subjects');
     navigate('/');
   };
 
   const openNeoLesson = (subject) => {
     navigate(`/subjects/${subject}`);
+  };
+
+  const handleScanHomework = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const imageUrl = URL.createObjectURL(file);
+    setStudentImage(imageUrl);
+    setScanView(true);
+    setIsScanning(true);
+    setAiCorrection('');
+    setAiMistake('');
+    setAiTeaching('');
+    setScanComplete(false);
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      await analyzeHomework(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const analyzeHomework = async (imageBase64) => {
+    try {
+      const response = await fetch(`${API_URL}/api/neo/vision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageBase64,
+          subject: userData?.subjects?.[0] || 'mathematics',
+          message: `This is a homework question the student photographed. 
+          
+          Read the question and their answer. Check if correct.
+          
+          If CORRECT:
+          "CORRECT: [brief praise]"
+          
+          If WRONG:
+          "INCORRECT: [what they wrote vs correct]
+          WHY: [one sentence]
+          FIX: [step by step correction]
+          AGAIN: [encouragement]"
+          
+          If CAN'T READ:
+          "UNCLEAR"`,
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.reply || '';
+
+      if (reply.startsWith('CORRECT:')) {
+        setAiCorrection(reply.replace('CORRECT:', '').trim());
+        setScanComplete(true);
+        speakText('Your answer is correct! Great job!');
+      } else if (reply.startsWith('UNCLEAR')) {
+        setAiCorrection("I couldn't read the image clearly. Please try taking a clearer photo.");
+        setScanComplete(true);
+      } else {
+        const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
+        const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
+        const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
+        
+        setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
+        setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : '');
+        setAiTeaching(teachingMatch ? teachingMatch[1].trim() : '');
+        setScanComplete(true);
+        
+        const speakMsg = teachingMatch ? teachingMatch[1].trim() : '';
+        if (speakMsg) speakText(speakMsg);
+      }
+    } catch (error) {
+      console.error('Scan error:', error);
+      setAiCorrection('Failed to analyze. Try again.');
+      setScanComplete(true);
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const closeScanView = () => {
+    setScanView(false);
+    setStudentImage(null);
+    setAiCorrection('');
+    setAiMistake('');
+    setAiTeaching('');
+    setScanComplete(false);
   };
 
   if (!userData) {
@@ -67,66 +264,151 @@ const Dashboard = () => {
   }
 
   const avatarMap = { 'AVO': '/AVO.png', 'CAT': '/CAT.png', 'STRAW': '/STRAW.png', 'ORANGE': '/ORANGE.png', 'DOG': '/DOG.png' };
-  const performanceScores = { 'Bad': 25, 'Fair': 50, 'Good': 75, 'Very Good': 95 };
 
   const subjectImages = {
-    'Mathematics': '/M.png',
-    'Economics': '/E.png',
-    'Accounting': '/A.png',
-    'Life Sciences': '/LS.png',
-    'Physical Sciences': '/PS.png',
-    'Computer Applications Technology': '/CAT.png',
-    'Technology': '/T.png',
-    'Business Studies': '/BS.png',
-    'Geography': '/G.png',
+    'mathematics': '/M.png',
+    'physical-sciences': '/PS.png',
+    'life-sciences': '/LS.png',
+    'economics': '/E.png',
+    'mathematical-literacy': '/ML.png',
+    'accounting': '/A.png',
+    'business-studies': '/BS.png',
+    'geography': '/G.png',
+    'history': '/H.png',
+    'english': '/EN.png',
+    'afrikaans': '/AF.png',
+    'cat': '/CAT.png',
+    'technology': '/T.png',
   };
 
-  const subjects = userData.subjects || [];
-  const weakestSubject = learningPath?.focusSubject || subjects.reduce((w, s) => {
-    const ws = performanceScores[userData.performance[w]] || 100;
-    const cs = performanceScores[userData.performance[s]] || 0;
-    return cs < ws ? s : w;
-  }, subjects[0]);
+  const subjectLabels = {
+    'mathematics': 'Mathematics',
+    'physical-sciences': 'Physical Sciences',
+    'life-sciences': 'Life Sciences',
+    'economics': 'Economics',
+    'mathematical-literacy': 'Mathematical Literacy',
+    'accounting': 'Accounting',
+    'business-studies': 'Business Studies',
+    'geography': 'Geography',
+    'history': 'History',
+    'english': 'English',
+    'afrikaans': 'Afrikaans',
+    'cat': 'CAT',
+    'technology': 'Technology',
+  };
 
-  const weakestScore = performanceScores[userData.performance[weakestSubject]] || 0;
+  const displaySubjects = userData.subjects || [];
 
   const getNeoMessage = () => {
-    if (suggestions && suggestions.length > 0) {
-      const highPriority = suggestions.find(s => s.priority === 'high');
-      if (highPriority) return highPriority.message;
-    }
-    
-    if (currentLesson) return `Continue your ${currentLesson.subject} lesson? Pick up where you left off.`;
-    if (learningPath?.recommendation) return learningPath.recommendation;
-    if (weakestScore < 60) return `Let's work on ${weakestSubject} — I'll teach you step by step.`;
-    return "You're making great progress. Ready to learn something new?";
+    return displayedText || neoMessage || `Hi ${userData?.fullName?.split(' ')[0] || 'there'}! Ready to learn?`;
   };
 
-  const focusRecommendation = {
-    subject: weakestSubject || 'Mathematics',
-    topic: weakestScore < 50 ? 'Fundamentals' : 'Practice & Application',
-    time: '8 min',
-    progress: weakestScore,
-    color: weakestScore < 50 ? '#EF4444' : weakestScore < 70 ? '#FF9800' : '#4CAF50',
-  };
-
-  const quickExercises = [
-    { subject: 'Math', topic: 'Quadratic Equations', questions: 5, time: '3 min', color: '#FF9800', bg: '#FFF8F0' },
-    { subject: 'Science', topic: 'Periodic Table', questions: 10, time: '5 min', color: '#42A5F5', bg: '#F0F4FF' },
-    { subject: 'English', topic: 'Comprehension', questions: 3, time: '4 min', color: '#EF5350', bg: '#FFF0F0' },
-  ];
-
-  const displaySubjects = subjects.slice(0, 4);
-  const subjectColors = ['#FF9800', '#42A5F5', '#4CAF50', '#EF5350'];
-  const subjectBgs = ['#FFF8F0', '#F0F4FF', '#F0FFF4', '#FFF0F0'];
+  const subjectColors = ['#FF9800', '#42A5F5', '#4CAF50', '#EF5350', '#7E57C2'];
+  const subjectBgs = ['#FFF8F0', '#F0F4FF', '#F0FFF4', '#FFF0F0', '#F9F6FC'];
 
   return (
     <div className="dash-app">
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleImageCapture}
+        accept="image/*" 
+        capture="environment" 
+        style={{ display: 'none' }} 
+      />
+      <input 
+        type="file" 
+        ref={uploadInputRef} 
+        onChange={handleImageCapture}
+        accept="image/*" 
+        style={{ display: 'none' }} 
+      />
+      
+      {/* SCAN HOMEWORK OVERLAY */}
+      <AnimatePresence>
+        {scanView && (
+          <motion.div
+            className="scan-homework-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeScanView}
+          >
+            <motion.div
+              className="scan-homework-content"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button className="scan-close-btn" onClick={closeScanView}>
+                <FaTimes />
+              </button>
+              
+              <h2 className="scan-title">📸 Scan Homework</h2>
+              
+              <div className="scan-split-container">
+                <div className="scan-image-panel">
+                  <span className="scan-panel-label">Your Work</span>
+                  {studentImage && (
+                    <img src={studentImage} alt="Student work" className="scan-student-image" />
+                  )}
+                </div>
+
+                <div className="scan-correction-panel">
+                  <span className="scan-panel-label">Neo's Correction</span>
+                  
+                  {isScanning ? (
+                    <div className="scan-checking">
+                      <FaSpinner className="scan-spinner" />
+                      <p>Neo is analyzing your work...</p>
+                    </div>
+                  ) : scanComplete ? (
+                    <div className="scan-correction-content">
+                      {aiCorrection && !aiMistake && !aiTeaching && (
+                        <div className="scan-correct-msg">
+                          <span className="scan-correct-icon">✅</span>
+                          <p>{aiCorrection}</p>
+                        </div>
+                      )}
+                      
+                      {aiCorrection && aiMistake && (
+                        <div className="scan-wrong-msg">
+                          <div className="scan-what-you-wrote">
+                            <strong>Your answer:</strong>
+                            <p>{aiCorrection}</p>
+                          </div>
+                          <div className="scan-mistake-type">
+                            <strong>💡 Why:</strong>
+                            <p>{aiMistake}</p>
+                          </div>
+                          {aiTeaching && (
+                            <div className="scan-teaching-correct">
+                              <strong>📝 Fix:</strong>
+                              <p>{aiTeaching}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="scan-placeholder">Take a photo to get started</p>
+                  )}
+                </div>
+              </div>
+              
+              <button className="scan-take-photo-btn" onClick={handleScanHomework}>
+                <FaCamera /> Take Photo of Homework
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="dash-header">
         <span className="header-greeting">Hi {userData.fullName.split(' ')[0]} 👋</span>
         <div className="dash-header-right">
-          <LanguageSelector />
           <button className="dash-profile-btn" onClick={() => setSidebarOpen(true)}>
             <img src={avatarMap[userData.avatar]} alt="" className="dash-avatar" />
           </button>
@@ -143,7 +425,7 @@ const Dashboard = () => {
               <h3>{userData.fullName}</h3>
             </div>
             <div className="sidebar-menu">
-              <button className="sidebar-item"><FaUser /> Profile</button>
+              <button className="sidebar-item" onClick={() => { setSidebarOpen(false); navigate('/profile'); }}><FaUser /> Profile</button>
               <button className="sidebar-item"><FaCog /> Settings</button>
               <button className="sidebar-item"><FaQuestionCircle /> Help</button>
             </div>
@@ -154,70 +436,32 @@ const Dashboard = () => {
 
       {/* Main */}
       <main className="dash-main">
-        {/* Neo's Proactive Message */}
+        {/* Neo's Introduction - WhatsApp Bubble with Typewriter */}
         <div className="neo-question-section">
           <div className="neo-line">
             <div className="neo-voice-icon">
-              <FaMicrophone />
+              <span className="wave-bar"></span>
+              <span className="wave-bar"></span>
+              <span className="wave-bar"></span>
+              <span className="wave-bar"></span>
+              <span className="wave-bar"></span>
             </div>
-            <span className="neo-question">{getNeoMessage()}</span>
-          </div>
-          
-          {/* Search Bar */}
-          <div className="search-bar-wrap">
-            <FaSearch className="search-icon" />
-            <input 
-              type="text" 
-              className="search-input" 
-              placeholder="Search any topic..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button className="search-clear" onClick={() => setSearchQuery('')}>
-                <FaTimes />
-              </button>
-            )}
+            <div className="neo-chat-bubble">
+              <p className={`neo-chat-text ${isTyping ? 'typing' : ''}`}>
+                {getNeoMessage()}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Neo's Proactive Suggestions */}
-        {suggestions && suggestions.length > 0 && (
-          <div className="neo-suggestions">
-            {suggestions.map((suggestion, i) => (
-              <div 
-                key={i} 
-                className={`neo-suggestion-card ${suggestion.type}`}
-                onClick={() => suggestion.action && navigate(`/${suggestion.action}`)}
-                style={{ cursor: suggestion.action ? 'pointer' : 'default' }}
-              >
-                <div className="neo-suggestion-icon">
-                  {suggestion.type === 'comeback' && '👋'}
-                  {suggestion.type === 'celebration' && '🔥'}
-                  {suggestion.type === 'daily_plan' && '📅'}
-                  {suggestion.type === 'intervention' && '💡'}
-                </div>
-                <div className="neo-suggestion-content">
-                  <p>{suggestion.message}</p>
-                  {suggestion.action && (
-                    <span className="neo-suggestion-action">
-                      {suggestion.action.startsWith('subjects/') ? 'Start Lesson' : 'Go'} →
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Your Subjects — Click to open Topics page */}
+        {/* Your Subjects */}
         <div className="section-block">
           <span className="section-label">YOUR SUBJECTS</span>
+          
           <div className="subjects-compact-grid">
             {displaySubjects.map((subject, i) => {
-              const score = performanceScores[userData.performance[subject]] || 0;
-              const color = subjectColors[i] || '#FF9800';
-              const bg = subjectBgs[i] || '#FFF8F0';
+              const color = subjectColors[i % subjectColors.length] || '#FF9800';
+              const bg = subjectBgs[i % subjectBgs.length] || '#FFF8F0';
               const subjectImg = subjectImages[subject] || null;
               
               return (
@@ -227,119 +471,54 @@ const Dashboard = () => {
                   style={{ background: bg, borderColor: color + '30', cursor: 'pointer' }}
                   onClick={() => openNeoLesson(subject)}
                 >
-                  {i === 0 && showBubble && (
-                    <div className="speech-bubble">
-                      <span>Tap to learn with Neo 👋</span>
-                      <div className="speech-bubble-arrow"></div>
-                    </div>
-                  )}
-                  
                   {subjectImg ? (
                     <img src={subjectImg} alt={subject} className="sc-image" />
                   ) : (
                     <span className="sc-emoji">📝</span>
                   )}
                   
-                  <span className="sc-name">{subject}</span>
-                  <div className="sc-progress-mini">
-                    <div className="sc-mini-bar">
-                      <div className="sc-mini-fill" style={{ width: `${score}%`, background: '#4CAF50' }}></div>
-                    </div>
-                  </div>
+                  <span className="sc-name">{subjectLabels[subject] || subject}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Neo's Focus Recommendation — Click to open Topics */}
+        {/* Scan Homework */}
         <div className="primary-actions">
-          <button 
-            className="action-card" 
+          <div 
+            className="action-card scan-homework-card" 
             style={{ background: '#FFF8F0', cursor: 'pointer' }}
-            onClick={() => openNeoLesson(focusRecommendation.subject)}
+            onClick={handleScanHomework}
           >
-            <span className="action-icon" style={{ color: focusRecommendation.color }}>🎯</span>
-            <div className="action-text">
-              <span className="action-label">Focus: {focusRecommendation.subject}</span>
-              <span className="action-desc">{focusRecommendation.topic} • {focusRecommendation.time}</span>
-            </div>
-          </button>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="primary-actions">
-          <button className="action-card" style={{ background: '#FFF8F0' }}>
             <span className="action-icon" style={{ color: '#FF9800' }}><FaCamera /></span>
             <div className="action-text">
               <span className="action-label">Scan Homework</span>
               <span className="action-desc">Get instant help with any question</span>
             </div>
-          </button>
-          <button className="action-card" style={{ background: '#F0F4FF' }}>
-            <span className="action-icon" style={{ color: '#42A5F5' }}><FaFileAlt /></span>
-            <div className="action-text">
-              <span className="action-label">Exam Prep</span>
-              <span className="action-desc">39 days until Prelims — stay ready</span>
-            </div>
-          </button>
-        </div>
-
-        {/* Quick Exercises */}
-        <div className="section-block">
-          <div className="section-header">
-            <span className="section-label">NEO RECOMMENDS</span>
-            <span className="section-sub"><FaBolt /> Picked for you</span>
-          </div>
-          <div className="exercises-scroll">
-            {quickExercises.map((exercise, i) => (
-              <button key={i} className="exercise-card" style={{ background: exercise.bg }}>
-                <div className="exercise-top">
-                  <span className="exercise-subject" style={{ color: exercise.color }}>{exercise.subject}</span>
-                  <span className="exercise-questions">{exercise.questions} Q's</span>
-                </div>
-                <h4 className="exercise-topic">{exercise.topic}</h4>
-                <div className="exercise-bottom">
-                  <span className="exercise-time">{exercise.time}</span>
-                  <span className="exercise-start">Start <FaPlay /></span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Continue Learning — Opens Topics page */}
-        <div className="section-block">
-          <span className="section-label">CONTINUE LEARNING</span>
-          <div 
-            className="continue-card" 
-            style={{ cursor: 'pointer' }}
-            onClick={() => openNeoLesson(focusRecommendation.subject)}
-          >
-            <div className="continue-left">
-              <h3>{currentLesson ? currentLesson.subject : focusRecommendation.subject}</h3>
-              <p>{currentLesson ? 'Resume your lesson' : focusRecommendation.topic}</p>
-              <span className="continue-time">{currentLesson ? 'In progress' : focusRecommendation.time}</span>
-            </div>
-            <div className="continue-right">
-              <ProgressWheel percentage={focusRecommendation.progress} size={48} strokeWidth={4} color="#4CAF50" />
-              <button className="continue-play">
-                <FaPlay />
-              </button>
-            </div>
+            <button 
+              className="scan-upload-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                uploadInputRef.current?.click();
+              }}
+              title="Upload from gallery"
+            >
+              <FaFileAlt /> Upload
+            </button>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
+      {/* FOOTER */}
       <footer className="dash-footer">
-        <button className="ftab active">
+        <button className="ftab active" onClick={() => navigate('/dashboard')}>
           <FaHome />
         </button>
-        <button className="ftab" onClick={() => navigate('/tasks')}>
+        <button className="ftab" onClick={() => navigate('/tasks')} style={{ display: 'none' }}>
           <FaTasks />
         </button>
-        <button className="ftab" onClick={() => navigate('/studyroom')}>
+        <button className="ftab" onClick={() => navigate('/studyroom')} style={{ display: 'none' }}>
           <FaComments />
         </button>
         <button className="ftab" onClick={() => navigate('/profile')}>

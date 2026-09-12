@@ -1,195 +1,614 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNeo } from '../context/NeoContext';
 import NeoVoiceIndicator from '../components/NeoVoiceIndicator';
-import { FaArrowLeft, FaCamera, FaCheck, FaArrowRight, FaSpinner, FaVolumeUp } from 'react-icons/fa';
+import AnimatedGraph from '../components/AnimatedGraph';
+import { FaArrowLeft, FaCheck, FaArrowRight, FaSpinner, FaRedo, FaCamera, FaSync, FaTimes, FaBook } from 'react-icons/fa';
 import '../css/TopicLesson.css';
 
-// Typewriter component — writes text character by character
-const Typewriter = ({ text, onComplete, speed = 30 }) => {
-  const [displayed, setDisplayed] = useState('');
-  const [cursor, setCursor] = useState(true);
+// ==========================================
+// FUNCTIONS & GRAPHS - MASTER QUESTION BANK
+// ==========================================
+const QuestionBank = {
+  tier1: [
+    {
+      id: 'T1A',
+      source: '2023 NSC P1, Q4.1-4.3',
+      functionText: 'f(x) = 2^x - 4',
+      domain: 'x ∈ [-2; 4)',
+      parts: [
+        {
+          part: '4.1',
+          prompt: 'Write down the equation of the asymptote of f.',
+          answer: 'y = -4',
+          marks: 1,
+          formulas: [
+            'Asymptote: horizontal line the graph approaches',
+            'Look at the dotted line on the graph',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: -4,
+            asymptote: -4, showAsymptote: true, showXIntercept: false,
+            showYIntercept: true, closedDotAt: -2, openDotAt: 4,
+          },
+        },
+        {
+          part: '4.2',
+          prompt: 'Determine the coordinates of B (the x-intercept of f).',
+          answer: 'B(2; 0)',
+          marks: 2,
+          formulas: [
+            'X-intercept: Put y = 0 and solve for x',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: -4,
+            asymptote: -4, showAsymptote: true, showXIntercept: true,
+            xIntercepts: [2], pointAt: { x: 2, y: 0, label: 'B' },
+          },
+        },
+        {
+          part: '4.3',
+          prompt: 'Determine the equation of k, passing through A (y-intercept) and B.',
+          answer: 'k(x) = 1.5x - 3',
+          marks: 4,
+          formulas: [
+            'Gradient: m = (y₂ - y₁)/(x₂ - x₁)',
+            'Line equation: y = mx + c',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: -4,
+            asymptote: -4, showAsymptote: true, showXIntercept: true,
+            showYIntercept: true, xIntercepts: [2],
+            showLineK: true, lineK: { a: 1.5, c: -3 },
+          },
+        },
+      ],
+    },
+    {
+      id: 'T1B',
+      source: '2021 NSC P1, Q5.1-5.3',
+      functionText: 'f(x) = -1/(x-3) + 2',
+      domain: 'x ∈ R, x ≠ 3',
+      parts: [
+        {
+          part: '5.1',
+          prompt: 'Write down the equations of the asymptotes of f.',
+          answer: 'x = 3, y = 2',
+          marks: 2,
+          formulas: [
+            'Vertical asymptote: where denominator = 0',
+            'Horizontal asymptote: the number outside the fraction',
+          ],
+          graphConfig: {
+            functionType: 'hyperbola', a: -1, b: 0, c: 2,
+            asymptote: 2, verticalAsymptote: 3, showAsymptote: true,
+            showXIntercept: false, showYIntercept: false,
+          },
+        },
+        {
+          part: '5.2',
+          prompt: 'Write down the domain of f.',
+          answer: 'x ∈ R, x ≠ 3',
+          marks: 1,
+          formulas: [
+            'Domain: all x values EXCEPT where denominator = 0',
+          ],
+          graphConfig: {
+            functionType: 'hyperbola', a: -1, b: 0, c: 2,
+            asymptote: 2, verticalAsymptote: 3, showAsymptote: true,
+            showXIntercept: false, showYIntercept: false,
+          },
+        },
+        {
+          part: '5.3',
+          prompt: 'Determine the coordinates of the x-intercept and y-intercept.',
+          answer: 'x-int: (3.5; 0), y-int: (0; 7/3)',
+          marks: 3,
+          formulas: [
+            'X-intercept: Put y = 0',
+            'Y-intercept: Put x = 0',
+          ],
+          graphConfig: {
+            functionType: 'hyperbola', a: -1, b: 0, c: 2,
+            asymptote: 2, verticalAsymptote: 3, showAsymptote: true,
+            showXIntercept: true, showYIntercept: true,
+            xIntercepts: [3.5],
+          },
+        },
+      ],
+    },
+  ],
 
-  useEffect(() => {
-    setDisplayed('');
-    let index = 0;
-    
-    const interval = setInterval(() => {
-      if (index < text.length) {
-        setDisplayed(text.slice(0, index + 1));
-        index++;
-      } else {
-        clearInterval(interval);
-        if (onComplete) onComplete();
-      }
-    }, speed);
+  tier2: [
+    {
+      id: 'T2A',
+      source: '2023 NSC P1, Q4.4-4.7',
+      functionText: 'f(x) = 2^x - 4',
+      domain: 'x ∈ [-2; 4)',
+      parts: [
+        {
+          part: '4.4',
+          prompt: 'Calculate the vertical distance between k and f at x = 1.',
+          answer: '0.5 units',
+          marks: 2,
+          formulas: [
+            'Distance = |f(x) - k(x)|',
+            'Substitute x = 1 into both',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: -4,
+            asymptote: -4, showAsymptote: true, showXIntercept: true,
+            showYIntercept: true, xIntercepts: [2],
+            showLineK: true, lineK: { a: 1.5, c: -3 },
+          },
+        },
+        {
+          part: '4.5',
+          prompt: 'Write down the equation of g if g(x) = f(x) + 4.',
+          answer: 'g(x) = 2^x',
+          marks: 1,
+          formulas: [
+            'Adding shifts the graph UP by that amount',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: 0,
+            asymptote: 0, showAsymptote: true, showXIntercept: false,
+            showYIntercept: true,
+          },
+        },
+        {
+          part: '4.6',
+          prompt: 'Write down the equation of g⁻¹ in the form y = ...',
+          answer: 'y = log₂(x)',
+          marks: 2,
+          formulas: [
+            'Inverse: Swap x and y, then solve for y',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: 0,
+            asymptote: 0, showAsymptote: true, showXIntercept: false,
+            showYIntercept: true,
+          },
+        },
+      ],
+    },
+    {
+      id: 'T2B',
+      source: '2024 NSC P1, Q4.1-4.4',
+      functionText: 'f(x) = a^x - 1, a > 0',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '4.1',
+          prompt: 'Calculate the value of a if B(2; -5/9) lies on f.',
+          answer: 'a = 2/3',
+          marks: 3,
+          formulas: [
+            'Substitute the point into the equation',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 2/3, b: 0, c: -1,
+            asymptote: -1, showAsymptote: true, showXIntercept: false,
+            showYIntercept: true,
+          },
+        },
+        {
+          part: '4.2',
+          prompt: 'Write down the range of f.',
+          answer: 'y > -1',
+          marks: 1,
+          formulas: [
+            'Range: all y values the graph can take',
+            'The graph is always ABOVE the asymptote',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 2/3, b: 0, c: -1,
+            asymptote: -1, showAsymptote: true, showXIntercept: false,
+            showYIntercept: true,
+          },
+        },
+      ],
+    },
+  ],
 
-    return () => clearInterval(interval);
-  }, [text, speed]);
+  tier3: [
+    {
+      id: 'T3A',
+      source: '2022 NSC P1, Q4.2.1-4.2.5',
+      functionText: 'f(x) = x² - 4x - 5',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '4.2.1',
+          prompt: 'Write down the y-coordinate of C (y-intercept).',
+          answer: 'y = -5',
+          marks: 1,
+          formulas: [
+            'Y-intercept: Put x = 0',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: 1, b: -4, c: -5,
+            showXIntercept: true, showYIntercept: true,
+            xIntercepts: [-1, 5],
+          },
+        },
+        {
+          part: '4.2.2',
+          prompt: 'Determine the coordinates of D (turning point of f).',
+          answer: 'D(2; -9)',
+          marks: 3,
+          formulas: [
+            'Turning point: x = -b/(2a)',
+            'Substitute x back to find y',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: 1, b: -4, c: -5,
+            showXIntercept: true, showYIntercept: true,
+            xIntercepts: [-1, 5], showVertex: true,
+          },
+        },
+      ],
+    },
+    {
+      id: 'T3B',
+      source: '2025 NSC P1, Q5.1-5.6',
+      functionText: 'f(x) = -0.5x² + 3x + 3.5',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '5.1',
+          prompt: 'Write down the domain of g.',
+          answer: 'x ≠ 3',
+          marks: 1,
+          formulas: [
+            'Domain: all x values EXCEPT where denominator = 0',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: -0.5, b: 3, c: 3.5,
+            showXIntercept: true, showYIntercept: true,
+            showVertex: true,
+          },
+        },
+        {
+          part: '5.2',
+          prompt: 'Write down the range of f.',
+          answer: 'y ≤ 8',
+          marks: 2,
+          formulas: [
+            'Range: all y values from the turning point',
+            'For a downward parabola, y ≤ vertex y-value',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: -0.5, b: 3, c: 3.5,
+            showXIntercept: true, showYIntercept: true,
+            showVertex: true,
+          },
+        },
+      ],
+    },
+  ],
 
-  // Blinking cursor
-  useEffect(() => {
-    const blink = setInterval(() => setCursor(prev => !prev), 500);
-    return () => clearInterval(blink);
-  }, []);
+  tier4: [
+    {
+      id: 'T4A',
+      source: '2024 NSC P1, Q6.1-6.4',
+      functionText: 'f(x) = -x² + 4x + 5',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '6.1',
+          prompt: 'Calculate coordinates of B (turning point of f).',
+          answer: 'B(2; 9)',
+          marks: 3,
+          formulas: [
+            'Turning point: x = -b/(2a)',
+            'Substitute x back to find y',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: -1, b: 4, c: 5,
+            showXIntercept: true, showYIntercept: true,
+            xIntercepts: [-1, 5], showVertex: true,
+          },
+        },
+        {
+          part: '6.3',
+          prompt: 'Calculate the maximum length of EH (vertical distance for f > g).',
+          answer: '4 units',
+          marks: 4,
+          formulas: [
+            'Distance = f(x) - g(x)',
+            'Maximum at vertex: x = -b/(2a)',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: -1, b: 4, c: 5,
+            showXIntercept: true, showYIntercept: true,
+            xIntercepts: [-1, 5], showVertex: true,
+            showLineK: true, lineK: { a: 2, c: 2 },
+          },
+        },
+      ],
+    },
+    {
+      id: 'T4B',
+      source: '2021 NSC P1, Q7.4-7.5',
+      functionText: 'f(x) = (x + 4)(x - 6)',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '7.4',
+          prompt: 'Calculate gradient of AE.',
+          answer: 'm = 0.25',
+          marks: 2,
+          formulas: [
+            'Gradient: m = tan(θ)',
+            'Gradient: m = (y₂ - y₁)/(x₂ - x₁)',
+          ],
+          graphConfig: {
+            functionType: 'parabola', a: 1, b: -2, c: -24,
+            showXIntercept: true, showYIntercept: true,
+            xIntercepts: [-4, 6], showVertex: true,
+          },
+        },
+      ],
+    },
+  ],
 
-  const isComplete = displayed.length === text.length;
-
-  return (
-    <span className="typewriter">
-      {displayed}
-      {!isComplete && <span className={`typewriter-cursor ${cursor ? 'visible' : ''}`}>|</span>}
-    </span>
-  );
-};
-
-// Math highlight component — highlights parts of an equation
-const MathHighlight = ({ equation, highlightPart, isActive }) => {
-  if (!highlightPart) {
-    return <span className="math-normal">{equation}</span>;
-  }
-
-  const parts = equation.split(new RegExp(`(${highlightPart.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
-  
-  return (
-    <span className={`math-highlight-container ${isActive ? 'active' : ''}`}>
-      {parts.map((part, i) => 
-        part.toLowerCase() === highlightPart.toLowerCase() 
-          ? <span key={i} className="math-highlighted">{part}</span>
-          : <span key={i} className="math-normal">{part}</span>
-      )}
-    </span>
-  );
+  tier5: [
+    {
+      id: 'T5A',
+      source: '2025 NSC P1, Q9.1-9.4',
+      functionText: 'f(x) = x³ - 8x² + 5x + 14',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '9.1',
+          prompt: 'Calculate coordinates of E (local minimum).',
+          answer: 'E(5; -36)',
+          marks: 4,
+          formulas: [
+            'Find derivative: f\'(x)',
+            'Set f\'(x) = 0 and solve',
+            'Test which x gives a minimum',
+          ],
+          graphConfig: {
+            functionType: 'cubic', a: 1, b: -8, c: 5,
+            showXIntercept: true, showYIntercept: true,
+          },
+        },
+        {
+          part: '9.2',
+          prompt: 'For which values of x is f concave down?',
+          answer: 'x < 8/3',
+          marks: 2,
+          formulas: [
+            'Concave down: f\'\'(x) < 0',
+            'Find the SECOND derivative',
+          ],
+          graphConfig: {
+            functionType: 'cubic', a: 1, b: -8, c: 5,
+            showXIntercept: true, showYIntercept: true,
+          },
+        },
+      ],
+    },
+    {
+      id: 'T5B',
+      source: '2024 NSC P1, Q9.1-9.4',
+      functionText: 'Cubic with turning points A(1; 9) and B(2.5; 8)',
+      domain: 'x ∈ R',
+      parts: [
+        {
+          part: '9.1',
+          prompt: 'For which values of x is f decreasing?',
+          answer: 'x ∈ (1; 2.5)',
+          marks: 2,
+          formulas: [
+            'Decreasing where f\'(x) < 0',
+            'Between the turning points',
+          ],
+          graphConfig: {
+            functionType: 'cubic', a: 1, b: -8, c: 5,
+            showXIntercept: true, showYIntercept: true,
+          },
+        },
+        {
+          part: '9.2',
+          prompt: 'Write down the x-intercepts of f\'.',
+          answer: 'x = 1 and x = 2.5',
+          marks: 1,
+          formulas: [
+            'X-intercepts of f\' are the turning points of f',
+          ],
+          graphConfig: {
+            functionType: 'cubic', a: 1, b: -8, c: 5,
+            showXIntercept: true, showYIntercept: true,
+          },
+        },
+      ],
+    },
+  ],
 };
 
 const TopicLesson = () => {
   const { subject, topicId } = useParams();
   const navigate = useNavigate();
-  const { neoMessage, setNeoMessage, neoEngine, language } = useNeo();
+  const { neoMessage, setNeoMessage } = useNeo();
   const fileInputRef = useRef(null);
+  const audioRef = useRef(null);
+  const audioUnlockedRef = useRef(false);
   
-  const [currentEquationIndex, setCurrentEquationIndex] = useState(0);
-  const [equations, setEquations] = useState([]);
-  const [showTeaching, setShowTeaching] = useState(false);
+  const [currentTier, setCurrentTier] = useState(1);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentPartIndex, setCurrentPartIndex] = useState(0);
   const [isCorrect, setIsCorrect] = useState(null);
-  const [teachingSteps, setTeachingSteps] = useState([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [stepWritingComplete, setStepWritingComplete] = useState(false);
-  const [highlightPart, setHighlightPart] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(true);
-  const [completedEquations, setCompletedEquations] = useState([]);
-  const [showStudentWork, setShowStudentWork] = useState(false);
-  const [studentMistake, setStudentMistake] = useState('');
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [typedAnswer, setTypedAnswer] = useState('');
+  const [aiCorrection, setAiCorrection] = useState('');
+  const [aiMistake, setAiMistake] = useState('');
+  const [aiTeaching, setAiTeaching] = useState('');
+  const [showGraphInCorrection, setShowGraphInCorrection] = useState(false);
+  const [showAnotherWay, setShowAnotherWay] = useState(false);
+  const [alternativeExplanation, setAlternativeExplanation] = useState('');
+  const [alternativeCount, setAlternativeCount] = useState(0);
+  const [isGraphEnlarged, setIsGraphEnlarged] = useState(false);
+  const [studentImage, setStudentImage] = useState(null);
+  const [markingView, setMarkingView] = useState(false);
+  const [accessGranted, setAccessGranted] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(true);
 
-  const topicName = topicId?.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Topic';
+  const topicName = 'Functions and Graphs';
   const API_URL = 'https://smartclass-wlgb.onrender.com';
+  
+  const tierKey = `tier${currentTier}`;
+  const tierQuestions = QuestionBank[tierKey] || QuestionBank.tier1;
+  const activeQuestionSet = tierQuestions[currentQuestionIndex % tierQuestions.length];
+  const currentQuestion = activeQuestionSet?.parts[currentPartIndex] || null;
 
+  // ==================== ACCESS CHECK ====================
   useEffect(() => {
-    generateEquations();
-  }, [topicId]);
-
-  const generateEquations = async () => {
-    setIsGenerating(true);
+    const checkAccess = () => {
+      const subscription = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+      const hasActiveSub = subscription?.active === true;
+      const currentPackage = subscription?.package || null;
+      
+      if (hasActiveSub) {
+        if (currentPackage === 'Basic') {
+          const allowedSubjects = JSON.parse(localStorage.getItem('smartclass_basic_subjects') || '[]');
+          if (allowedSubjects.includes(subject)) {
+            setAccessGranted(true);
+          } else {
+            navigate('/paywall');
+            return;
+          }
+        } else {
+          setAccessGranted(true);
+        }
+      } else {
+        // No subscription - check if this is the free topic (first topic of first subject)
+        const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+        const userSubjects = userData.subjects || [];
+        const firstSubject = userSubjects[0];
+        
+        // Map of first topic IDs per subject
+        const firstTopicIds = {
+          'mathematics': 'functions-and-graphs',
+          'physical-sciences': 'mechanics',
+          'life-sciences': 'life-processes',
+          'economics': 'macroeconomic-core',
+          'mathematical-literacy': 'finance-financial-maths',
+          'accounting': 'financial-statements',
+          'business-studies': 'business-environments',
+          'geography': 'climate-and-weather',
+          'history': 'cold-war',
+          'english': 'comprehension',
+          'afrikaans': 'begrip',
+          'cat': 'hardware',
+          'technology': 'design',
+        };
+        
+        const isFirstSubject = subject === firstSubject;
+        const isFirstTopic = topicId === firstTopicIds[subject];
+        
+        if (isFirstSubject && isFirstTopic) {
+          setAccessGranted(true);
+        } else {
+          navigate('/paywall');
+          return;
+        }
+      }
+      
+      setIsCheckingAccess(false);
+    };
     
-    const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
-    const grade = userData?.grade || '10';
+    checkAccess();
+  }, [subject, topicId, navigate]);
 
+  // Unlock audio
+  useEffect(() => {
+    const unlockAudio = () => {
+      if (audioUnlockedRef.current) return;
+      audioUnlockedRef.current = true;
+      const silentAudio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABHgD///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAChoQAAgAAAJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+      silentAudio.volume = 0;
+      silentAudio.play().then(() => { silentAudio.pause(); }).catch(() => {});
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+    window.addEventListener('click', unlockAudio);
+    window.addEventListener('touchstart', unlockAudio);
+    return () => {
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+    };
+  }, []);
+
+  // Speak
+  const speakText = async (text) => {
+    try {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+      const cleanText = text.replace(/[^a-zA-Z0-9\s.,!?()=+\-']/g, '');
+      if (!cleanText.trim()) return;
+      setIsSpeaking(true);
+      const response = await fetch(`${API_URL}/api/neo/speak`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: cleanText }),
+      });
+      if (!response.ok) throw new Error('Speak failed');
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.volume = 1.0;
+      audio.play().catch(() => {});
+      audio.onended = () => { URL.revokeObjectURL(audioUrl); audioRef.current = null; setIsSpeaking(false); };
+    } catch (error) {
+      console.error('Voice error:', error);
+      setIsSpeaking(false);
+    }
+  };
+
+  // Welcome
+  useEffect(() => {
+    if (accessGranted) {
+      const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+      const firstName = userData.fullName?.split(' ')[0] || 'there';
+      const welcomeMsg = `Hi ${firstName}! Welcome to Functions and Graphs! Check the formulas below for help. Type your answer when ready!`;
+      setNeoMessage(welcomeMsg);
+      setTimeout(() => speakText(welcomeMsg), 800);
+    }
+    return () => { if (audioRef.current) audioRef.current.pause(); };
+  }, [accessGranted]);
+
+  // Check typed answer
+  const checkTypedAnswer = async () => {
+    if (!typedAnswer.trim() || !currentQuestion) return;
+    setIsLoading(true);
+    
     try {
       const response = await fetch(`${API_URL}/api/neo/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `Generate 15 math equations for the topic "${topicName}" in ${subject}, Grade ${grade}. 
-          Return ONLY a JSON array. Each object: id (like "1.1"), equation (problem string), instruction (brief).
-          Progressive difficulty. Start easy, build up. Cover the full topic scope.
-          Example: [{"id":"1.1","equation":"2x + 5 = 13","instruction":"Solve for x"},{"id":"1.2","equation":"3(x - 2) = 9","instruction":"Solve for x"}]`,
+          message: `Compare the student's answer to the memorandum.
+          
+          Student's answer: "${typedAnswer.trim()}"
+          Correct answer: ${currentQuestion.answer}
+          
+          Accept equivalent forms.
+          
+          If CORRECT:
+          "CORRECT: [3 words max]"
+          
+          If WRONG:
+          "INCORRECT: [what they wrote vs correct]
+          WHY: [ONE sentence]
+          FIX: [ONE sentence]
+          AGAIN: [Try again!]"`,
           subject,
-          userId: userData?.id || userData?.email || 'student',
-        })
-      });
-
-      const data = await response.json();
-      
-      try {
-        const jsonMatch = data.reply.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          setEquations(parsed);
-        } else {
-          setEquations(generateFallbackEquations());
-        }
-      } catch {
-        setEquations(generateFallbackEquations());
-      }
-    } catch {
-      setEquations(generateFallbackEquations());
-    } finally {
-      setIsGenerating(false);
-      
-      const saved = JSON.parse(localStorage.getItem(`smartclass_equations_${subject}_${topicId}`) || '[]');
-      setCompletedEquations(saved);
-      if (saved.length > 0) setCurrentEquationIndex(saved.length);
-
-      setNeoMessage(
-        language === 'zu' ? 'Ake siqale! Yixazulule ephepheni lakho bese uthatha isithombe.' :
-        language === 'tn' ? 'A re simolole! E rarabolole mo pampiring ya gago.' :
-        'Let\'s start! Solve it on your paper, then take a photo.'
-      );
-    }
-  };
-
-  const generateFallbackEquations = () => {
-    return Array.from({ length: 15 }, (_, i) => ({
-      id: `1.${i + 1}`,
-      equation: `Solve for x: ${i + 2}x + ${(i + 1) * 3} = ${(i + 2) * 5}`,
-      instruction: 'Show all steps',
-    }));
-  };
-
-  const handleCameraClick = () => fileInputRef.current?.click();
-
-  const handleImageCapture = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setIsLoading(true);
-
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64 = reader.result.split(',')[1];
-      await checkAnswer(base64);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const checkAnswer = async (imageBase64) => {
-    const currentEquation = equations[currentEquationIndex];
-    
-    try {
-      const response = await fetch(`${API_URL}/api/neo/vision`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64,
-          subject,
-          message: `Student solved: "${currentEquation.equation}". ${currentEquation.instruction}.
-          
-          If CORRECT, respond EXACTLY: "CORRECT: Well done!"
-          
-          If WRONG, respond with "INCORRECT:" followed by a teaching breakdown. Format:
-          - First line after INCORRECT: What the student did wrong (brief)
-          - Then "STEPS:" on its own line
-          - Then each step on a new line, each starting with ">>" followed by the step text
-          - After each step line, add "HIGHLIGHT:" followed by the part of the equation to highlight
-          
-          Example:
-          INCORRECT: You forgot to divide both sides.
-          STEPS:
-          >> First, write the equation: 2x + 5 = 13 HIGHLIGHT:2x + 5 = 13
-          >> Subtract 5 from both sides HIGHLIGHT:- 5
-          >> This gives us: 2x = 8 HIGHLIGHT:2x = 8
-          >> Now divide both sides by 2 HIGHLIGHT:÷ 2
-          >> Final answer: x = 4 HIGHLIGHT:x = 4`,
+          userId: 'student',
         })
       });
 
@@ -198,121 +617,231 @@ const TopicLesson = () => {
 
       if (reply.startsWith('CORRECT:')) {
         setIsCorrect(true);
-        const newCompleted = [...completedEquations, currentEquation.id];
-        setCompletedEquations(newCompleted);
-        localStorage.setItem(`smartclass_equations_${subject}_${topicId}`, JSON.stringify(newCompleted));
-        setNeoMessage(language === 'zu' ? '✅ Kuyiqiniso! Umsebenzi omuhle!' : language === 'tn' ? '✅ Go siame!' : '✅ Correct! Great work!');
+        const praise = "Your answer is correct! Great job! Now let's do the next question.";
+        setAiCorrection(praise);
+        setNeoMessage('✅ ' + praise);
+        speakText(praise);
       } else {
         setIsCorrect(false);
+        const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
+        const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
+        const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
         
-        // Parse the teaching response
-        const afterIncorrect = reply.replace('INCORRECT:', '').trim();
-        const mistakeMatch = afterIncorrect.match(/^([\s\S]*?)STEPS:/);
-        const mistake = mistakeMatch ? mistakeMatch[1].trim() : '';
-        const stepsText = afterIncorrect.replace(/^[\s\S]*?STEPS:/, '').trim();
+        setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
+        setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : '');
+        setAiTeaching(teachingMatch ? teachingMatch[1].trim() : '');
+        setShowGraphInCorrection(true);
         
-        setStudentMistake(mistake);
-        
-        // Parse steps with highlights
-        const stepLines = stepsText.split('\n').filter(line => line.trim().startsWith('>>'));
-        const parsedSteps = stepLines.map(line => {
-          const highlightMatch = line.match(/HIGHLIGHT:(.*)$/);
-          const stepText = line
-            .replace(/^>>\s*/, '')
-            .replace(/HIGHLIGHT:.*$/, '')
-            .trim();
-          return {
-            text: stepText,
-            highlight: highlightMatch ? highlightMatch[1].trim() : '',
-          };
-        });
-
-        setTeachingSteps(parsedSteps);
-        setCurrentStepIndex(0);
-        setStepWritingComplete(false);
-        setHighlightPart('');
-        setShowStudentWork(true);
-        setShowTeaching(true);
-        
-        setNeoMessage(language === 'zu' ? 'Ake ngikubonise indlela...' : language === 'tn' ? 'A ke go bontshe tsela...' : 'Let me show you how...');
+        const speakMsg = teachingMatch ? teachingMatch[1].trim() : '';
+        if (speakMsg) {
+          setNeoMessage(speakMsg);
+          speakText(speakMsg);
+        }
       }
-    } catch {
-      setNeoMessage(language === 'zu' ? 'Nginenkinga. Zama futhi.' : 'Failed to check. Try again.');
+    } catch (error) {
+      console.error('Error:', error);
+      setNeoMessage('Failed to check. Try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleStepWritingComplete = () => {
-    setStepWritingComplete(true);
-    // Set highlight for current step
-    if (teachingSteps[currentStepIndex]?.highlight) {
-      setHighlightPart(teachingSteps[currentStepIndex].highlight);
+  // Check photo answer
+  const checkPhotoAnswer = async (imageBase64) => {
+    if (!currentQuestion) return;
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/neo/vision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageBase64,
+          subject,
+          message: `QUESTION: ${currentQuestion.prompt}
+          Correct answer: ${currentQuestion.answer}
+          
+          Compare the student's answer.
+          
+          If CORRECT: "CORRECT: [3 words max]"
+          If WRONG: "INCORRECT: [what they wrote vs correct]
+          WHY: [ONE sentence]
+          FIX: [ONE sentence]"
+          If UNCLEAR: "UNCLEAR"`,
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.reply || '';
+
+      if (reply.startsWith('CORRECT:')) {
+        setIsCorrect(true);
+        const praise = "Your answer is correct! Great job! Now let's do the next question.";
+        setAiCorrection(praise);
+        setNeoMessage('✅ ' + praise);
+        speakText(praise);
+        setMarkingView(false);
+      } else if (reply.startsWith('UNCLEAR')) {
+        setNeoMessage("I can't read that. Please type your answer instead.");
+        speakText("I can't read that. Please type your answer instead.");
+        setIsCorrect(null);
+        setMarkingView(false);
+      } else {
+        setIsCorrect(false);
+        const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
+        const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
+        const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
+        
+        setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
+        setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : '');
+        setAiTeaching(teachingMatch ? teachingMatch[1].trim() : '');
+        setShowGraphInCorrection(true);
+        setMarkingView(false);
+        
+        const speakMsg = teachingMatch ? teachingMatch[1].trim() : '';
+        if (speakMsg) {
+          setNeoMessage(speakMsg);
+          speakText(speakMsg);
+        }
+      }
+    } catch (error) {
+      console.error('Photo error:', error);
+      setNeoMessage('Failed to check. Try typing your answer.');
+      setMarkingView(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleNextStep = () => {
-    if (currentStepIndex < teachingSteps.length - 1) {
-      setCurrentStepIndex(prev => prev + 1);
-      setStepWritingComplete(false);
-      setHighlightPart('');
+  // Camera capture
+  const handleCameraClick = () => fileInputRef.current?.click();
+
+  const handleImageCapture = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMarkingView(true);
+    
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64 = reader.result.split(',')[1];
+      await checkPhotoAnswer(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Alternative approach
+  const handleAnotherApproach = async () => {
+    if (alternativeCount >= 2) return;
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/neo/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `The student doesn't understand. Give ONE short alternative explanation.
+          
+          Question: ${currentQuestion.prompt}
+          
+          MAX 2 SENTENCES. Different analogy. Keep it SHORT.`,
+          subject,
+          userId: 'student',
+        })
+      });
+
+      const data = await response.json();
+      const reply = data.reply || '';
+      
+      setAlternativeExplanation(reply);
+      setShowAnotherWay(true);
+      setAlternativeCount(prev => prev + 1);
+      setNeoMessage(reply);
+      speakText(reply);
+    } catch (error) {
+      console.error('Alternative error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleNextEquation = () => {
-    if (currentEquationIndex < equations.length - 1) {
-      setCurrentEquationIndex(prev => prev + 1);
-      setIsCorrect(null);
-      setShowTeaching(false);
-      setTeachingSteps([]);
-      setCurrentStepIndex(0);
-      setStepWritingComplete(false);
-      setHighlightPart('');
-      setShowStudentWork(false);
-      setStudentMistake('');
-      setNeoMessage(language === 'zu' ? 'Nansi elandelayo!' : 'Here\'s the next one!');
+  // Toggle graph enlarge
+  const toggleGraphEnlarge = () => setIsGraphEnlarged(!isGraphEnlarged);
+
+  // Proceed
+  const handleProceed = () => {
+    setTypedAnswer('');
+    setAiCorrection('');
+    setAiMistake('');
+    setAiTeaching('');
+    setShowGraphInCorrection(false);
+    setShowAnotherWay(false);
+    setAlternativeExplanation('');
+    setAlternativeCount(0);
+    setIsGraphEnlarged(false);
+    setIsCorrect(null);
+    setStudentImage(null);
+    setMarkingView(false);
+    
+    if (isCorrect) {
+      if (currentPartIndex < activeQuestionSet.parts.length - 1) {
+        setCurrentPartIndex(currentPartIndex + 1);
+        const nextMsg = `Now let's do the next part.`;
+        setNeoMessage(nextMsg);
+        speakText(nextMsg);
+      } else {
+        if (currentTier < 5) {
+          const nextTier = currentTier + 1;
+          setCurrentTier(nextTier);
+          setCurrentPartIndex(0);
+          setCurrentQuestionIndex(0);
+          const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+          const firstName = userData.fullName?.split(' ')[0] || 'there';
+          const doneMsg = `${firstName}, you've mastered Tier ${currentTier}! Moving to Tier ${nextTier}!`;
+          setNeoMessage(doneMsg);
+          speakText(doneMsg);
+        } else {
+          const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+          const firstName = userData.fullName?.split(' ')[0] || 'there';
+          const doneMsg = `${firstName}, you've completed ALL of Functions and Graphs! You're ready for the exam!`;
+          setNeoMessage(doneMsg);
+          speakText(doneMsg);
+          setTimeout(() => navigate(`/subjects/${subject}`), 3000);
+        }
+      }
     } else {
-      const progress = JSON.parse(localStorage.getItem(`smartclass_progress_${subject}`) || '{}');
-      progress[topicId] = 100;
-      localStorage.setItem(`smartclass_progress_${subject}`, JSON.stringify(progress));
-      navigate(`/subjects/${subject}`);
+      const nextIndex = (currentQuestionIndex + 1) % tierQuestions.length;
+      setCurrentQuestionIndex(nextIndex);
+      setCurrentPartIndex(0);
+      
+      const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+      const firstName = userData.fullName?.split(' ')[0] || 'there';
+      const msg = `${firstName}, let's try a different question. You've got this!`;
+      setNeoMessage(msg);
+      speakText(msg);
     }
   };
 
-  // Speak the current step
-  useEffect(() => {
-    if (showTeaching && teachingSteps[currentStepIndex] && !stepWritingComplete) {
-      // Neo will speak once the typewriter is done
-    }
-  }, [currentStepIndex, showTeaching, stepWritingComplete]);
-
-  const currentEquation = equations[currentEquationIndex];
-  const progressPercent = equations.length > 0 ? Math.round((completedEquations.length / equations.length) * 100) : 0;
-
-  if (isGenerating) {
-    return (
-      <div className="tl-app">
-        <header className="tl-header">
-          <button className="tl-back" onClick={() => navigate(`/subjects/${subject}`)}>
-            <FaArrowLeft /> {topicName}
-          </button>
-        </header>
-        <main className="tl-main">
-          <div className="tl-generating">
-            <FaSpinner className="tl-spinner-icon" />
-            <h2>{language === 'zu' ? 'Iyalungiselela...' : 'Preparing your equations...'}</h2>
-            <p>{language === 'zu' ? 'I-Neo yakha izibalo eziyi-15.' : 'Neo is generating 15 equations.'}</p>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (!currentEquation) {
+  // If checking access, show loading
+  if (isCheckingAccess) {
     return (
       <div className="tl-loading"><div className="tl-spinner"></div></div>
     );
   }
+
+  // If no access granted, show loading (will redirect to /paywall)
+  if (!accessGranted) {
+    return (
+      <div className="tl-loading"><div className="tl-spinner"></div></div>
+    );
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="tl-loading"><div className="tl-spinner"></div></div>
+    );
+  }
+
+  const isFourPlusMarks = currentQuestion.marks >= 4;
 
   return (
     <div className="tl-app">
@@ -322,11 +851,11 @@ const TopicLesson = () => {
         </button>
         <div className="tl-progress-mini">
           <div className="tl-progress-bar-mini">
-            <div className="tl-progress-fill-mini" style={{ width: `${progressPercent}%` }}></div>
+            <div className="tl-progress-fill-mini" style={{ width: `${(currentTier / 5) * 100}%` }}></div>
           </div>
-          <span className="tl-progress-text-mini">{completedEquations.length}/{equations.length}</span>
+          <span className="tl-progress-text-mini">Tier {currentTier}/5</span>
         </div>
-        <NeoVoiceIndicator neoMessage={neoMessage} />
+        <NeoVoiceIndicator neoMessage={neoMessage} isSpeaking={isSpeaking} />
       </header>
 
       {neoMessage && (
@@ -341,115 +870,200 @@ const TopicLesson = () => {
       )}
 
       <main className="tl-main">
-        {!showTeaching ? (
-          <div className="tl-equation-section">
-            <span className="tl-equation-label">Equation {currentEquation.id}</span>
-            <div className="tl-equation-card">
-              <h1 className="tl-equation-text">{currentEquation.equation}</h1>
-              <p className="tl-equation-instruction">{currentEquation.instruction}</p>
-            </div>
-            
-            <p className="tl-equation-hint">
-              {language === 'zu' ? 'Yixazulule ephepheni lakho, bese uthatha isithombe.' :
-               language === 'tn' ? 'E rarabolole mo pampiring ya gago.' :
-               'Solve it on your paper, then take a photo.'}
-            </p>
-
-            {isCorrect !== null && (
-              <div className={`tl-result ${isCorrect ? 'correct' : 'incorrect'}`}>
-                <div className={`tl-result-icon ${isCorrect ? 'correct' : 'incorrect'}`}>
-                  {isCorrect ? <FaCheck /> : <span className="tl-result-x">✕</span>}
-                </div>
-                {!isCorrect && (
-                  <p className="tl-result-text">
-                    {language === 'zu' ? 'Akukho lutho! Ake ngikubonise.' : 'Not quite! Let me show you.'}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {isCorrect === null && (
-              <button className="tl-camera-btn" onClick={handleCameraClick} disabled={isLoading}>
-                <FaCamera />
-                {isLoading ? 'Checking...' : language === 'zu' ? 'Thatha isithombe' : 'Take photo of your work'}
-              </button>
-            )}
-
-            <input type="file" ref={fileInputRef} onChange={handleImageCapture}
-              accept="image/*" capture="environment" style={{ display: 'none' }} />
-
-            {isCorrect && (
-              <button className="tl-next-btn" onClick={handleNextEquation}>
-                {currentEquationIndex < equations.length - 1 ? 'Next Equation' : 'Complete Topic'}
-                <FaArrowRight />
-              </button>
-            )}
+        <div className="tl-equation-section">
+          <span className="tl-equation-label">
+            Tier {currentTier} • {activeQuestionSet.source} • Part {currentQuestion.part} • {currentQuestion.marks} mark{currentQuestion.marks > 1 ? 's' : ''}
+          </span>
+          
+          <div className="tl-equation-card">
+            <h1 className="tl-equation-text">{activeQuestionSet.functionText}</h1>
+            <p className="tl-equation-instruction">{currentQuestion.prompt}</p>
           </div>
-        ) : (
-          <div className="tl-teaching-section">
-            {/* Student mistake bubble */}
-            {showStudentWork && studentMistake && (
-              <div className="tl-mistake-bubble">
-                <div className="tl-mistake-icon">💡</div>
-                <p>{studentMistake}</p>
-              </div>
-            )}
 
-            {/* Equation being taught */}
-            <div className="tl-teaching-equation">
-              <MathHighlight 
-                equation={currentEquation.equation} 
-                highlightPart={highlightPart}
-                isActive={!!highlightPart}
+          {currentQuestion.graphConfig && (
+            <div className="tl-graph-animation">
+              <AnimatedGraph
+                functionType={currentQuestion.graphConfig.functionType}
+                equation={activeQuestionSet.functionText}
+                a={currentQuestion.graphConfig.a || 1}
+                b={currentQuestion.graphConfig.b || 2}
+                c={currentQuestion.graphConfig.c || -4}
+                showAsymptote={currentQuestion.graphConfig.showAsymptote}
+                asymptote={currentQuestion.graphConfig.asymptote}
+                showXIntercept={currentQuestion.graphConfig.showXIntercept}
+                showYIntercept={currentQuestion.graphConfig.showYIntercept}
+                xIntercepts={currentQuestion.graphConfig.xIntercepts || []}
+                showLineK={currentQuestion.graphConfig.showLineK}
+                lineK={currentQuestion.graphConfig.lineK}
+                closedDotAt={currentQuestion.graphConfig.closedDotAt}
+                openDotAt={currentQuestion.graphConfig.openDotAt}
+                pointAt={currentQuestion.graphConfig.pointAt}
               />
             </div>
+          )}
 
-            {/* Animated step cards */}
-            <div className="tl-teaching-steps-container">
-              {teachingSteps.map((step, i) => (
-                <div 
-                  key={i}
-                  className={`tl-teaching-step ${i === currentStepIndex ? 'active' : i < currentStepIndex ? 'done' : 'pending'}`}
-                >
-                  <div className="tl-step-indicator">
-                    {i < currentStepIndex ? <FaCheck /> : 
-                     i === currentStepIndex ? <div className="tl-step-pulse"></div> :
-                     <span>{i + 1}</span>}
-                  </div>
-                  <div className="tl-step-content">
-                    {i === currentStepIndex ? (
-                      <Typewriter 
-                        text={step.text} 
-                        speed={25}
-                        onComplete={handleStepWritingComplete}
-                      />
-                    ) : i < currentStepIndex ? (
-                      <p>{step.text}</p>
-                    ) : (
-                      <p className="tl-step-pending-text">{step.text}</p>
-                    )}
-                  </div>
-                </div>
+          {currentQuestion.formulas && currentQuestion.formulas.length > 0 && (
+            <div className="tl-formulas-panel">
+              <span className="tl-formulas-title"><FaBook /> Formulas</span>
+              {currentQuestion.formulas.map((formula, i) => (
+                <div key={i} className="tl-formula-item">{formula}</div>
               ))}
             </div>
+          )}
 
-            {/* Navigation */}
-            <div className="tl-teaching-nav">
-              {stepWritingComplete && currentStepIndex < teachingSteps.length - 1 && (
-                <button className="tl-next-step-btn" onClick={handleNextStep}>
-                  {language === 'zu' ? 'Isinyathelo esilandelayo' : 'Next Step'} <FaArrowRight />
-                </button>
-              )}
-              {(currentStepIndex === teachingSteps.length - 1 && stepWritingComplete) && (
-                <button className="tl-next-btn" onClick={handleNextEquation}>
-                  {currentEquationIndex < equations.length - 1 ? 'Next Equation' : 'Complete Topic'}
-                  <FaArrowRight />
-                </button>
-              )}
+          {isCorrect === false && (
+            <div className="tl-correction-panel">
+              <span className="tl-panel-label">Neo's Correction</span>
+              <div className="tl-wrong-msg">
+                {showGraphInCorrection && currentQuestion.graphConfig && (
+                  <div 
+                    className={`tl-correction-graph-corner ${isGraphEnlarged ? 'enlarged' : ''}`}
+                    onClick={toggleGraphEnlarge}
+                  >
+                    <AnimatedGraph
+                      functionType={currentQuestion.graphConfig.functionType}
+                      equation={activeQuestionSet.functionText}
+                      a={currentQuestion.graphConfig.a || 1}
+                      b={currentQuestion.graphConfig.b || 2}
+                      c={currentQuestion.graphConfig.c || -4}
+                      showAsymptote={true}
+                      asymptote={currentQuestion.graphConfig.asymptote}
+                      showXIntercept={true}
+                      showYIntercept={true}
+                      xIntercepts={currentQuestion.graphConfig.xIntercepts || []}
+                      showLineK={currentQuestion.graphConfig.showLineK}
+                      lineK={currentQuestion.graphConfig.lineK}
+                      pointAt={currentQuestion.graphConfig.pointAt}
+                    />
+                    <span className="tl-graph-hint">{isGraphEnlarged ? 'Tap to close' : 'Tap to enlarge'}</span>
+                  </div>
+                )}
+                {aiCorrection && (
+                  <div className="tl-what-you-wrote">
+                    <strong>Your answer:</strong>
+                    <p>{aiCorrection}</p>
+                  </div>
+                )}
+                {aiMistake && (
+                  <div className="tl-mistake-type">
+                    <strong>💡 Why:</strong>
+                    <p>{aiMistake}</p>
+                  </div>
+                )}
+                {aiTeaching && (
+                  <div className="tl-teaching-correct">
+                    <strong>📝 Fix:</strong>
+                    <p>{aiTeaching}</p>
+                  </div>
+                )}
+                {showAnotherWay && alternativeExplanation && (
+                  <div className="tl-alternative-approach">
+                    <strong>🔄 Another way:</strong>
+                    <p>{alternativeExplanation}</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {isCorrect === null && !markingView && (
+            <div className="tl-typed-answer-area">
+              <div className="tl-input-row">
+                <textarea
+                  className="tl-typed-input"
+                  placeholder="Type your answer here..."
+                  value={typedAnswer}
+                  onChange={(e) => setTypedAnswer(e.target.value)}
+                  rows={2}
+                />
+                
+                {isFourPlusMarks && (
+                  <button className="tl-camera-icon-btn" onClick={handleCameraClick} disabled={isLoading} title="Take photo of working">
+                    <FaCamera />
+                  </button>
+                )}
+              </div>
+              
+              <button 
+                className="tl-submit-answer-btn"
+                onClick={checkTypedAnswer}
+                disabled={!typedAnswer.trim() || isLoading}
+              >
+                {isLoading ? 'Checking...' : 'Submit Answer'} <FaArrowRight />
+              </button>
+              
+              <input type="file" ref={fileInputRef} onChange={handleImageCapture}
+                accept="image/*" capture="environment" style={{ display: 'none' }} />
+            </div>
+          )}
+
+          {markingView && (
+            <div className="tl-checking">
+              <FaSpinner className="tl-spinner-icon" />
+              <p>Neo is checking your work...</p>
+            </div>
+          )}
+
+          {isCorrect === true && (
+            <div className="tl-correct-msg">
+              <span className="tl-correct-icon">✅</span>
+              <p>{aiCorrection}</p>
+            </div>
+          )}
+
+          {isCorrect !== null && (
+            <div className="tl-action-buttons">
+              {isCorrect === false && alternativeCount < 2 && (
+                <button className="tl-another-way-btn" onClick={handleAnotherApproach}>
+                  <FaSync /> Explain Another Way
+                </button>
+              )}
+              <button className="tl-proceed-btn" onClick={handleProceed}>
+                {isCorrect ? 'Next Question' : 'Try Another Question'} <FaArrowRight />
+              </button>
+            </div>
+          )}
+        </div>
       </main>
+
+      <AnimatePresence>
+        {isGraphEnlarged && (
+          <motion.div
+            className="tl-graph-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={toggleGraphEnlarge}
+          >
+            <motion.div
+              className="tl-graph-overlay-content"
+              initial={{ scale: 0.5 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.5 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button className="tl-graph-close-btn" onClick={toggleGraphEnlarge}>
+                <FaTimes />
+              </button>
+              <AnimatedGraph
+                functionType={currentQuestion?.graphConfig?.functionType || 'exponential'}
+                equation={activeQuestionSet.functionText}
+                a={currentQuestion?.graphConfig?.a || 1}
+                b={currentQuestion?.graphConfig?.b || 2}
+                c={currentQuestion?.graphConfig?.c || -4}
+                showAsymptote={true}
+                asymptote={currentQuestion?.graphConfig?.asymptote}
+                showXIntercept={true}
+                showYIntercept={true}
+                xIntercepts={currentQuestion?.graphConfig?.xIntercepts || []}
+                showLineK={currentQuestion?.graphConfig?.showLineK}
+                lineK={currentQuestion?.graphConfig?.lineK}
+                pointAt={currentQuestion?.graphConfig?.pointAt}
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

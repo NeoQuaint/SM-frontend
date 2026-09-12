@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { FaMicrophone, FaMicrophoneSlash, FaVolumeUp, FaVolumeMute } from 'react-icons/fa';
+import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa';
 
 const NeoVoice = ({ onSpeechResult, neoMessage }) => {
   const [isListening, setIsListening] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [recognition, setRecognition] = useState(null);
 
-  // Initialize speech recognition
+  // Initialize speech recognition (voice INPUT only)
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -28,30 +27,6 @@ const NeoVoice = ({ onSpeechResult, neoMessage }) => {
     }
   }, [onSpeechResult]);
 
-  // Speak Neo's message
-  useEffect(() => {
-    if (neoMessage && !isMuted && 'speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-
-      const utterance = new SpeechSynthesisUtterance(neoMessage);
-      
-      const voices = speechSynthesis.getVoices();
-      const preferredVoice = voices.find(v => 
-        v.name.includes('Female') || 
-        v.name.includes('Google UK English Female') ||
-        v.name.includes('Microsoft Zira') ||
-        v.name.includes('Samantha')
-      );
-      
-      if (preferredVoice) utterance.voice = preferredVoice;
-      utterance.rate = 0.95;
-      utterance.pitch = 1.05;
-      utterance.volume = 1;
-
-      window.speechSynthesis.speak(utterance);
-    }
-  }, [neoMessage, isMuted]);
-
   const toggleListening = useCallback(() => {
     if (!recognition) return;
     
@@ -72,13 +47,6 @@ const NeoVoice = ({ onSpeechResult, neoMessage }) => {
         title={isListening ? 'Stop listening' : 'Ask Neo with your voice'}
       >
         {isListening ? <FaMicrophoneSlash /> : <FaMicrophone />}
-      </button>
-      <button 
-        className={`neo-voice-btn ${isMuted ? 'muted' : ''}`}
-        onClick={() => setIsMuted(!isMuted)}
-        title={isMuted ? 'Unmute Neo' : 'Mute Neo'}
-      >
-        {isMuted ? <FaVolumeMute /> : <FaVolumeUp />}
       </button>
     </div>
   );
