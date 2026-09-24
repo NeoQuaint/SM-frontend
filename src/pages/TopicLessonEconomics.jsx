@@ -1,409 +1,475 @@
+// ================================================================
+// src/pages/TopicLessonEconomics.jsx
+// Economics P1 + P2 — 12 topics, queue-based teaching
+// Locked SmartClass 4-layer architecture
+// ================================================================
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useNeo } from '../context/NeoContext';
 import NeoVoiceIndicator from '../components/NeoVoiceIndicator';
+import ConceptTeaching from '../components/ConceptTeaching';
+import AutoPlayMode from '../components/AutoPlayMode';
 import AnimatedCircularFlow from '../components/AnimatedCircularFlow';
 import AnimatedMultiplierGraph from '../components/AnimatedMultiplierGraph';
-import { FaArrowLeft, FaArrowRight, FaSpinner, FaSync, FaBook, FaLightbulb } from 'react-icons/fa';
+import { prefetchSpeech, createSpeakText, stopSpeaking } from '../utils/speakHelpers';
+import { FaArrowLeft, FaArrowRight, FaSync, FaLightbulb } from 'react-icons/fa';
 import '../css/TopicLesson.css';
 
-// ==========================================
-// ECONOMICS - MEGA-TOPIC #1: MACROECONOMIC CORE
-// LEVEL 1: 5 Easy Questions (2 marks each)
-// LEVEL 2: 5 Medium Questions (4 marks each)
-// LEVEL 3: 5 Hard Questions (8 marks each) - "Stepping It Up"
-// LEVEL 4: 5 Analysis Questions (8 marks each)
-// LEVEL 5: 5 Essay Questions (36 marks each)
-// SEAMLESS TRANSITION - No "Level Complete!" message
-// ==========================================
+// ================================================================
+// TOPIC CONFIG
+// ================================================================
+const DEFAULT_TOPIC = 'circular-flow';
+
+const PAPER_1_TOPICS = new Set([
+  'circular-flow', 'business-cycles', 'public-sector',
+  'foreign-trade', 'growth-development', 'economic-indicators',
+]);
+
+const TOPIC_NAMES = {
+  'circular-flow': 'Circular Flow & Multiplier',
+  'business-cycles': 'Business Cycles',
+  'public-sector': 'Public Sector & Fiscal Policy',
+  'foreign-trade': 'International Trade & BOP',
+  'growth-development': 'Growth & Development',
+  'economic-indicators': 'Economic & Social Indicators',
+  'perfect-market': 'Perfect Competition',
+  'imperfect-markets': 'Imperfect Markets',
+  'market-failure': 'Market Failure',
+  'inflation': 'Inflation',
+  'environment': 'Environmental Sustainability',
+  'tourism': 'Tourism',
+};
+
+const TOPIC_CONCEPTS = {
+  'circular-flow': ['circular-flow-markets', 'circular-flow-leakages-injections', 'multiplier'],
+  'business-cycles': ['business-cycles-phases', 'business-cycles-indicators', 'business-cycles-forecasting'],
+  'public-sector': ['public-sector-objectives', 'public-sector-failure', 'fiscal-policy'],
+  'foreign-trade': ['international-trade-reasons', 'balance-of-payments', 'exchange-rates', 'trade-policies'],
+  'growth-development': ['growth-vs-development', 'sa-policies-since-1994', 'regional-development', 'industrial-development'],
+  'economic-indicators': ['economic-indicators-types', 'social-indicators', 'inflation-indicators'],
+  'perfect-market': ['perfect-market-characteristics', 'perfect-market-short-run', 'perfect-market-long-run'],
+  'imperfect-markets': ['monopolistic-competition', 'oligopoly', 'monopoly', 'competition-policy'],
+  'market-failure': ['market-failure-causes', 'externalities', 'merit-demerit-goods', 'cost-benefit-analysis', 'price-controls'],
+  'inflation': ['inflation-types-causes', 'inflation-consequences', 'inflation-combating', 'phillips-curve'],
+  'environment': ['environmental-sustainability', 'international-protocols', 'climate-change'],
+  'tourism': ['tourism-effects', 'tourism-types', 'tourism-promotion'],
+};
+
+// ================================================================
+// QUESTION BANK — 12 topics, levels 1-5
+// ================================================================
 const QuestionBank = {
   level1: [
-    // Q1: Factors of Production (2023 NSC P1, Q2.1.1)
+    // ——— CIRCULAR FLOW (P1 Topic 1) ———
     {
       id: 'L1Q1',
-      source: '2023 NSC P1, Q2.1.1',
+      source: '2023 NSC Econ P1, Q2.1.1',
       topicText: 'Factors of Production',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.1.1',
-          prompt: 'Name any TWO factors of production.',
-          clue: 'Think about what goes INTO producing something: natural resources, people, machines, and the person who organizes it all.',
-          answer: 'Labour, Capital, Land, Entrepreneurship',
-          marks: 2,
-          acceptAnyTwo: true,
-          memoFullAnswer: `Labour / Human resources
+      teachTopic: 'circular-flow-markets',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.1.1',
+        prompt: 'Name any TWO factors of production.',
+        answer: 'Labour, Capital, Land, Entrepreneurship',
+        marks: 2, acceptAnyTwo: true,
+        clue: 'What goes INTO producing things: natural resources, people, machines, and the organiser.',
+        memoFullAnswer: `Labour / Human resources
 Capital
 Land / Natural resources
 Entrepreneurship
 (Any TWO)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'ANY TWO correct factors. 1 mark per correct factor. Total 2 marks.',
-            commonMistake: 'Learners list "money" or "raw materials" or "profit" – these are NOT factors of production.',
-            examinerHint: 'Memorandum accepts: Land, Labour, Capital, Entrepreneurship. Any 2 = full marks.',
-            alternativeAccept: ['Labour and Capital', 'Land and Entrepreneurship', 'Capital and Land', 'Labour and Land', 'Capital and Entrepreneurship', 'Labour and Entrepreneurship'],
-            memoryTrick: '🧠 Remember: "Lucky Cats Love Eating" - Land, Capital, Labour, Entrepreneurship',
-            mergedCorrection: `🧠 Memory Trick: "Lucky Cats Love Eating"
-• L - Land (natural resources)
-• C - Capital (machines, tools, buildings)
-• L - Labour (human effort)
-• E - Entrepreneurship (the organiser)
-
-📋 NSC Memo Answer:
-Labour / Human resources
-Capital
-Land / Natural resources
-Entrepreneurship
-(Any TWO)`
-          }
-        }
-      ]
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'ANY TWO correct factors. 1 mark per factor.',
+          commonMistake: 'Learners say "money" or "profit" — these are NOT factors of production.',
+          examinerHint: 'Land, Labour, Capital, Entrepreneurship. Any 2 = full marks.',
+          alternativeAccept: ['Labour and Capital', 'Land and Entrepreneurship', 'Capital and Land'],
+          memoryTrick: '🧠 "Lucky Cats Love Eating" — Land, Capital, Labour, Entrepreneurship',
+          mergedCorrection: `🧠 "Lucky Cats Love Eating"\n• L — Land\n• C — Capital\n• L — Labour\n• E — Entrepreneurship\n\n📋 NSC Memo Answer:\nLabour / Capital / Land / Entrepreneurship\n(Any TWO)`,
+        },
+      }],
     },
-    // Q2: MPS from Diagram (2022 NSC P1, Q4.2.1)
+    // ——— BUSINESS CYCLES (P1 Topic 2) ———
     {
       id: 'L1Q2',
-      source: '2022 NSC P1, Q4.2.1',
-      topicText: 'Marginal Propensity to Save (MPS)',
-      diagramConfig: {
-        type: 'circularFlow',
-        labels: {
-          households: 'CONSUMERS',
-          businesses: 'FIRMS',
-          financialMarket: 'FINANCIAL MARKET',
-          savings: 'Savings S = R20m',
-          investment: 'Investments I = R100m',
-          consumption: 'Consumption (C) = R80m',
-          income: 'Income (Y) = R100m',
-          mps: '0.2',
-          mpc: '0.8'
+      source: '2023 NSC Econ P1, Q1.1.2',
+      topicText: 'Business Cycle Types',
+      teachTopic: 'business-cycles-phases',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.2',
+        prompt: 'Business cycles that last from 7 to 11 years, caused by changes in net investments, are known as ... cycles.',
+        answer: 'Jugler',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Fixed investment cycles — 7 to 11 years. Named after a French economist.',
+        memoFullAnswer: `Jugler`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be exactly "Jugler".',
+          commonMistake: 'Learners confuse with Kitchin (3-5 years), Kuznets (15-25), Kondratieff (45-60).',
+          examinerHint: 'Kitchin = short. Jugler = fixed investment. Kuznets = infrastructure. Kondratieff = long waves.',
+          alternativeAccept: ['Jugler'],
+          memoryTrick: '🧠 "Jug-ler" sounds like "juggle" — firms juggle investment every 7-11 years.',
+          mergedCorrection: `🧠 "Jug-ler" = firms juggle investment (7-11 years)\n\n📋 NSC Memo Answer:\nJugler`,
         },
-        highlight: 'savings'
-      },
-      parts: [
-        {
-          part: '4.2.1',
-          prompt: 'Identify the value of marginal propensity to save (mps) from the diagram.',
-          clue: 'Look at the savings arrow - it shows S = R20m. Total income is R100m. Divide savings by income.',
-          answer: '0.2',
-          marks: 1,
-          memoFullAnswer: `0.2`,
-          formulas: [
-            'MPS = Change in Savings / Change in Income',
-            'MPS = 20/100 = 0.2',
-            'MPS + MPC = 1',
-          ],
-          memoCorrection: {
-            whatToCheck: 'Value must be exactly 0.2 (or 0,2).',
-            commonMistake: 'Learners confuse MPS with MPC. If MPC = 0.8, then MPS = 1 - 0.8 = 0.2.',
-            examinerHint: 'Memorandum: MPS = 20/100 = 0.2',
-            alternativeAccept: ['0.2', '0,2', '20/100', '1/5'],
-            memoryTrick: '🧠 Remember: "MPS = Savings ÷ Income" - R20m ÷ R100m = 0.2',
-            mergedCorrection: `🧠 Memory Trick: "MPS = Savings ÷ Income"
-• Savings = R20m
-• Income = R100m
-• MPS = 20/100 = 0.2
-
-📋 NSC Memo Answer:
-0.2`
-          }
-        }
-      ]
+      }],
     },
-    // Q3: Macroeconomic Objectives (2022 NSC P1, Q2.1.1)
+    // ——— PUBLIC SECTOR (P1 Topic 3) ———
     {
       id: 'L1Q3',
-      source: '2022 NSC P1, Q2.1.1',
-      topicText: 'Macroeconomic Objectives',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.1.1',
-          prompt: 'Name any TWO macroeconomic objectives of the public sector.',
-          clue: 'Think of the country\'s goals: jobs for all, stable prices, growth, or fair trade.',
-          answer: 'Economic growth, Full employment, Price stability, Exchange rate stability, Balance of payments equilibrium, Economic equity',
-          marks: 2,
-          acceptAnyTwo: true,
-          memoFullAnswer: `Economic growth
-Full employment
-Price stability
-Exchange rate stability
-Balance of payments equilibrium
-Economic equity / Equal distribution of income and wealth
-(Accept any other correct relevant response)
+      source: '2023 NSC Econ P1, Q3.1.1',
+      topicText: 'Basic Government Services',
+      teachTopic: 'public-sector-objectives',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.1.1',
+        prompt: 'Give any TWO examples of basic services provided by the government.',
+        answer: 'Electricity, Water supply, Refuse removal, Sanitation',
+        marks: 2, acceptAnyTwo: true,
+        clue: 'What does your municipality deliver to your house?',
+        memoFullAnswer: `Electricity
+Water supply
+Refuse removal
+Sanitation
 (Any TWO)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'ANY TWO correct objectives. 1 mark per correct objective. Total 2 marks.',
-            commonMistake: 'Learners list microeconomic goals (like profit maximisation) instead of macroeconomic objectives.',
-            examinerHint: 'Think of the country\'s goals: jobs for all, stable prices, growth, or fair trade.',
-            alternativeAccept: ['Economic growth', 'Full employment', 'Price stability', 'Exchange rate stability', 'Economic equity'],
-            memoryTrick: '🧠 Remember: "Greedy Friends Prefer Eating Big Eclairs" - Growth, Full employment, Price stability, Exchange rate stability, Balance of payments, Economic equity',
-            mergedCorrection: `🧠 Memory Trick: "Greedy Friends Prefer Eating Big Eclairs"
-• G - Economic Growth
-• F - Full employment
-• P - Price stability
-• E - Exchange rate stability
-• B - Balance of payments equilibrium
-• E - Economic equity
-
-📋 NSC Memo Answer:
-Economic growth
-Full employment
-Price stability
-Exchange rate stability
-Balance of payments equilibrium
-Economic equity / Equal distribution of income and wealth`
-          }
-        }
-      ]
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'ANY TWO correct basic services.',
+          commonMistake: 'Learners list "roads" and "hospitals" — these are also valid but not the four basic ones usually accepted.',
+          examinerHint: 'Electricity, water, refuse, sanitation. Any 2 = full marks.',
+          alternativeAccept: ['Electricity and Water', 'Water and Sanitation', 'Refuse removal and Electricity'],
+          memoryTrick: '🧠 "EWRS" — Electricity, Water, Refuse, Sanitation',
+          mergedCorrection: `🧠 "EWRS"\n• E — Electricity\n• W — Water supply\n• R — Refuse removal\n• S — Sanitation\n\n📋 NSC Memo Answer:\nElectricity / Water / Refuse removal / Sanitation\n(Any TWO)`,
+        },
+      }],
     },
-    // Q4: Methods to Calculate GDP (2024 NSC P1, Q2.1.1)
+    // ——— FOREIGN TRADE (P1 Topic 4) ———
     {
       id: 'L1Q4',
-      source: '2024 NSC P1, Q2.1.1',
-      topicText: 'Methods to Calculate GDP',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.1.1',
-          prompt: 'Name any TWO methods used to calculate gross domestic product (GDP).',
-          clue: 'There are 3 ways to measure GDP: what we make, what we earn, or what we spend.',
-          answer: 'Production / GDP(P) / Gross value added, Income / GDP(I), Expenditure / GDP(E)',
-          marks: 2,
-          acceptAnyTwo: true,
-          memoFullAnswer: `Production / GDP(P) / Gross value added
-Income / GDP(I)
-Expenditure / GDP(E)
-(Any TWO)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'ANY TWO correct methods. 1 mark per correct method. Total 2 marks.',
-            commonMistake: 'Learners list specific taxes or indicators instead of the 3 main methods.',
-            examinerHint: 'Memorandum accepts: Production, Income, Expenditure. Any 2 = full marks.',
-            alternativeAccept: ['Production method', 'Income method', 'Expenditure method', 'GDP(P)', 'GDP(I)', 'GDP(E)'],
-            memoryTrick: '🧠 Remember: "PIE" - Production, Income, Expenditure',
-            mergedCorrection: `🧠 Memory Trick: "PIE"
-• P - Production method (GDP(P))
-• I - Income method (GDP(I))
-• E - Expenditure method (GDP(E))
-
-📋 NSC Memo Answer:
-Production / GDP(P) / Gross value added
-Income / GDP(I)
-Expenditure / GDP(E)
-(Any TWO)`
-          }
-        }
-      ]
+      source: '2024 NSC Econ P1, Q1.1.4',
+      topicText: 'Terms of Trade',
+      teachTopic: 'foreign-trade',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.4',
+        prompt: 'The ratio of a country\'s export price index to its import price index is known as the ...',
+        answer: 'Terms of trade',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Export prices ÷ Import prices × 100.',
+        memoFullAnswer: `Terms of trade`,
+        formulas: ['ToT = (Export price index ÷ Import price index) × 100'],
+        memoCorrection: {
+          whatToCheck: 'Must be "terms of trade".',
+          commonMistake: 'Learners say "trade balance" or "exchange rate".',
+          examinerHint: 'Terms of trade = ratio of export to import prices. Not the same as trade balance (which is a value).',
+          alternativeAccept: ['Terms of trade'],
+          memoryTrick: '🧠 "ToT" = Trade of Terms — export price over import price.',
+          mergedCorrection: `🧠 ToT = Export price index ÷ Import price index\n\n📋 NSC Memo Answer:\nTerms of trade`,
+        },
+      }],
     },
-    // Q5: Economic Indicators - Employment (2024 NSC P1, Q4.1.1)
+    // ——— GROWTH & DEVELOPMENT (P1 Topic 5) ———
     {
       id: 'L1Q5',
-      source: '2024 NSC P1, Q4.1.1',
-      topicText: 'Economic Indicators (Employment)',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '4.1.1',
-          prompt: 'Name any TWO economic indicators that relate to employment.',
-          clue: 'Think about who is working, who can work, and who is not working.',
-          answer: 'Economically active population (EAP), Employment rate, Unemployment rate',
-          marks: 2,
-          acceptAnyTwo: true,
-          memoFullAnswer: `Economically active population (EAP)
+      source: '2023 NSC Econ P1, Q1.1.6',
+      topicText: 'ASGISA',
+      teachTopic: 'growth-development',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.6',
+        prompt: 'A growth and development strategy that was intended to halve unemployment and poverty by 2014 was known as ...',
+        answer: 'Accelerated and Shared Growth Initiative for South Africa (ASGISA)',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Launched in 2006. Target: halve poverty and unemployment by 2014. Six-year plan.',
+        memoFullAnswer: `Accelerated and Shared Growth Initiative for South Africa (ASGISA)`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be ASGISA or full name.',
+          commonMistake: 'Learners confuse with GEAR (1996) or NGP (2010).',
+          examinerHint: 'ASGISA = 2006, halve poverty/unemployment by 2014. RDP = 1994. GEAR = 1996. NGP = 2010. NDP = 2012.',
+          alternativeAccept: ['ASGISA', 'Accelerated and Shared Growth Initiative for South Africa'],
+          memoryTrick: '🧠 "A-S-G-I-S-A" — A South African Growth Initiative (2006).',
+          mergedCorrection: `🧠 ASGISA = 2006, halve poverty by 2014\n\n📋 NSC Memo Answer:\nAccelerated and Shared Growth Initiative for South Africa (ASGISA)`,
+        },
+      }],
+    },
+    // ——— ECONOMIC INDICATORS (P1 Topic 6) ———
+    {
+      id: 'L1Q6',
+      source: '2024 NSC Econ P1, Q4.1.1',
+      topicText: 'Employment Indicators',
+      teachTopic: 'economic-indicators-types',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.1.1',
+        prompt: 'Name any TWO economic indicators that relate to employment.',
+        answer: 'Economically active population (EAP), Employment rate, Unemployment rate',
+        marks: 2, acceptAnyTwo: true,
+        clue: 'Who is working, who can work, who is not working.',
+        memoFullAnswer: `Economically active population (EAP)
 Employment rate
 Unemployment rate
-(Accept any other correct relevant response)
 (Any TWO)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'ANY TWO correct indicators. 1 mark per correct indicator. Total 2 marks.',
-            commonMistake: 'Learners list population size or life expectancy – these are demographic indicators, NOT employment indicators.',
-            examinerHint: 'Memorandum accepts: EAP, Employment rate, Unemployment rate. Any 2 = full marks.',
-            alternativeAccept: ['EAP', 'Employment rate', 'Unemployment rate', 'Economically active population'],
-            memoryTrick: '🧠 Remember: "E-E-U" - Everyone Employed or Unemployed',
-            mergedCorrection: `🧠 Memory Trick: "E-E-U"
-• E - Economically Active Population (EAP)
-• E - Employment rate
-• U - Unemployment rate
-
-📋 NSC Memo Answer:
-Economically active population (EAP)
-Employment rate
-Unemployment rate
-(Any TWO)`
-          }
-        }
-      ]
-    }
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'ANY TWO correct employment indicators.',
+          commonMistake: 'Learners list population size or life expectancy — those are demographic indicators.',
+          examinerHint: 'EAP, employment rate, unemployment rate. Any 2 = full marks.',
+          alternativeAccept: ['EAP and Unemployment rate', 'Employment rate and EAP', 'Unemployment rate and Employment rate'],
+          memoryTrick: '🧠 "E-E-U" — Everyone Employed or Unemployed',
+          mergedCorrection: `🧠 "E-E-U"\n• E — Economically Active Population\n• E — Employment rate\n• U — Unemployment rate\n\n📋 NSC Memo Answer:\nEAP / Employment rate / Unemployment rate\n(Any TWO)`,
+        },
+      }],
+    },
+    // ——— PERFECT MARKET (P2 Topic 1) ———
+    {
+      id: 'L1Q7',
+      source: '2024 NSC Econ P2, Q1.1.1',
+      topicText: 'Price Taker',
+      teachTopic: 'perfect-market-characteristics',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.1',
+        prompt: 'A business that has no influence over the market price is called a price ...',
+        answer: 'taker',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'The firm accepts the market price. It cannot set its own.',
+        memoFullAnswer: `taker`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be "taker".',
+          commonMistake: 'Learners say "maker" — that is a monopoly.',
+          examinerHint: 'Perfect competition = price taker. Monopoly = price maker.',
+          alternativeAccept: ['taker', 'price taker'],
+          memoryTrick: '🧠 Perfect competitors TAKE the price. Monopolists MAKE the price.',
+          mergedCorrection: `🧠 Taker = perfect competition. Maker = monopoly.\n\n📋 NSC Memo Answer:\ntaker`,
+        },
+      }],
+    },
+    // ——— IMPERFECT MARKETS (P2 Topic 2) ———
+    {
+      id: 'L1Q8',
+      source: '2023 NSC Econ P2, Q1.3.1',
+      topicText: 'Monopoly',
+      teachTopic: 'monopoly',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.3.1',
+        prompt: 'Give ONE term for: A market structure that produces a unique product with no close substitutes.',
+        answer: 'Monopoly',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'One firm. Unique product. No substitutes.',
+        memoFullAnswer: `Monopoly`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be "monopoly".',
+          commonMistake: 'Learners say "oligopoly" — that is few firms, not one.',
+          examinerHint: 'One firm + unique product = monopoly.',
+          alternativeAccept: ['Monopoly'],
+          memoryTrick: '🧠 "Mono" = one. One firm = monopoly.',
+          mergedCorrection: `🧠 Mono = one. One firm = monopoly.\n\n📋 NSC Memo Answer:\nMonopoly`,
+        },
+      }],
+    },
+    // ——— MARKET FAILURE (P2 Topic 3) ———
+    {
+      id: 'L1Q9',
+      source: '2023 NSC Econ P2, Q1.1.3',
+      topicText: 'Positive Externality',
+      teachTopic: 'externalities',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.3',
+        prompt: 'The benefit gained by a third party which is not included in the market price is known as ... externality.',
+        answer: 'positive',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Third party benefit. Not in the price. Good spill-over.',
+        memoFullAnswer: `positive`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be "positive".',
+          commonMistake: 'Learners say "negative" — that is when third party suffers a cost.',
+          examinerHint: 'Positive externality = third party benefits. Negative = third party suffers.',
+          alternativeAccept: ['positive'],
+          memoryTrick: '🧠 Positive externality = society gains. Negative = society loses.',
+          mergedCorrection: `🧠 Positive = third party gains. Negative = third party loses.\n\n📋 NSC Memo Answer:\npositive`,
+        },
+      }],
+    },
+    // ——— INFLATION (P2 Topic 4) ———
+    {
+      id: 'L1Q10',
+      source: '2024 NSC Econ P2, Q1.1.5',
+      topicText: 'Inflation Target Range',
+      teachTopic: 'inflation-combating',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.5',
+        prompt: 'The inflation target range used by the South African Reserve Bank (SARB) is ...',
+        answer: '3% - 6%',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'SARB targets a band. Not a single number.',
+        memoFullAnswer: `3% - 6%`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be 3% - 6%.',
+          commonMistake: 'Learners say 2% - 6% or 1% - 3%.',
+          examinerHint: 'SARB inflation target = 3% to 6%. Midpoint = 4.5%.',
+          alternativeAccept: ['3% - 6%', '3-6%', '3 to 6 percent'],
+          memoryTrick: '🧠 "3-6-9" — SARB watches 3 to 6.',
+          mergedCorrection: `🧠 "3-6-9" — SARB watches 3 to 6.\n\n📋 NSC Memo Answer:\n3% - 6%`,
+        },
+      }],
+    },
+    // ——— ENVIRONMENT (P2 Topic 5) ———
+    {
+      id: 'L1Q11',
+      source: '2023 NSC Econ P2, Q1.3.6',
+      topicText: 'Marketable Permit',
+      teachTopic: 'environmental-sustainability',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.3.6',
+        prompt: 'Give ONE term for: A licence given to businesses to pollute to a certain limit.',
+        answer: 'Marketable permit',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'The government sells it. It limits pollution.',
+        memoFullAnswer: `Marketable permit`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be "marketable permit".',
+          commonMistake: 'Learners say "green tax" — that is a charge, not a permit.',
+          examinerHint: 'Permit = licence to pollute up to a set level. Firms can trade them.',
+          alternativeAccept: ['Marketable permit', 'Marketable permits'],
+          memoryTrick: '🧠 "Permit to pollute" — sold by government, tradeable.',
+          mergedCorrection: `🧠 Permit to pollute — sold by government, tradeable.\n\n📋 NSC Memo Answer:\nMarketable permit`,
+        },
+      }],
+    },
+    // ——— TOURISM (P2 Topic 6) ———
+    {
+      id: 'L1Q12',
+      source: '2024 NSC Econ P2, Q1.1.6',
+      topicText: 'Minimum Length of Stay',
+      teachTopic: 'tourism-types',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '1.1.6',
+        prompt: 'The minimum length of stay for tourism activities should be ... day(s).',
+        answer: 'one',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Not a day trip. Overnight.',
+        memoFullAnswer: `one`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be "one".',
+          commonMistake: 'Learners say "three" or "seven".',
+          examinerHint: 'Tourism = at least one night away from home.',
+          alternativeAccept: ['one', '1'],
+          memoryTrick: '🧠 One night away = tourist. Day trip = not counted.',
+          mergedCorrection: `🧠 One night away = tourist. Day trip = not counted.\n\n📋 NSC Memo Answer:\none`,
+        },
+      }],
+    },
   ],
 
   level2: [
-    // Q1: Income Tax Payable (2022 NSC P1, Q2.2.5)
+    // ——— CIRCULAR FLOW ———
     {
       id: 'L2Q1',
-      source: '2022 NSC P1, Q2.2.5',
-      topicText: 'Income Tax Calculation',
-      diagramConfig: null,
-      tableConfig: {
-        title: 'RATES OF TAX FOR INDIVIDUALS (2021/22)',
-        headers: ['Taxable Income (R)', 'Rate of Tax'],
-        rows: [
-          ['1 - 216 200', '18% of taxable income'],
-          ['216 201 - 337 800', '38 916 + 26% above 216 200'],
-          ['337 801 - 467 500', '70 532 + 31% above 337 800'],
-          ['467 501 - 613 600', '110 739 + 36% above 467 500'],
-          ['613 601 - 782 200', '163 335 + 39% above 613 600'],
-          ['782 201 - 1 656 600', '229 089 + 41% above 782 200'],
-          ['1 656 601+', '587 593 + 45% above 1 656 600']
-        ]
-      },
-      parts: [
-        {
-          part: '2.2.5',
-          prompt: 'Calculate the income tax payable for an annual income of R480 000.',
-          clue: 'Find the tax bracket for 467 501 - 613 600. Base = R110 739. Rate = 36% of amount above R467 500.',
-          answer: 'R110 739 + 36% of (480 000 - 467 500) = R110 739 + R4 500 = R115 239',
-          marks: 4,
-          memoFullAnswer: `R110 739 + 36% of (480 000 - 467 500)
-= R110 739 + 36% of 12 500
-= R110 739 + 4 500
-= R115 239`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must calculate: R110 739 + 36% of (480 000 - 467 500) = R115 239',
-            commonMistake: 'Learners forget to add the base amount (R110 739) or use the wrong tax bracket.',
-            examinerHint: 'Find the tax bracket: 467 501 - 613 600 = R110 739 + 36% above 467 500.',
-            alternativeAccept: ['R115 239', '115 239'],
-            memoryTrick: '🧠 Remember: "Base + (Rate × Excess)"',
-            mergedCorrection: `🧠 Memory Trick: "Base + (Rate × Excess)"
-• Base = R110 739
-• Excess = R480 000 - R467 500 = R12 500
-• Tax = R110 739 + (36% × R12 500) = R115 239
-
-📋 NSC Memo Answer:
-R110 739 + 36% of (480 000 - 467 500)
-= R110 739 + 36% of 12 500
-= R110 739 + 4 500
-= R115 239`
-          }
-        }
-      ]
-    },
-    // Q2: GVA at Basic Prices (2023 NSC P1, Q2.3.5)
-    {
-      id: 'L2Q2',
-      source: '2023 NSC P1, Q2.3.5',
-      topicText: 'Calculating GVA',
-      diagramConfig: null,
-      tableConfig: {
-        title: 'NATIONAL ACCOUNTS FOR SOUTH AFRICA',
-        subtitle: 'At current prices',
-        headers: ['Item', '2021 (R billion)'],
-        rows: [
-          ['Compensation of employees', '2 861'],
-          ['Net operating surplus', '1 795'],
-          ['Consumption of fixed capital', '797'],
-          ['Gross value added at factor cost', '5 453'],
-          ['Taxes on production', '132'],
-          ['Subsidies on production', '12'],
-          ['Gross value added at basic prices', '(A)'],
-          ['Taxes on products', '634'],
-          ['Subsidies on products', '14'],
-          ['Gross domestic product at market prices', '6 193']
-        ]
-      },
-      parts: [
-        {
-          part: '2.3.5',
-          prompt: 'Calculate the gross value added (GVA) at basic prices (A). Show ALL calculations.',
-          clue: 'Use the formula: GVA at basic prices = GVA at factor cost + Taxes on production - Subsidies on production.',
-          answer: 'R5 453 + R132 - R12 = R5 573 billion',
-          marks: 4,
-          memoFullAnswer: `GVA at basic prices (A) = 5 453 + 132 - 12
-= R5 573 billion`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must calculate: R5 453 + R132 - R12 = R5 573 billion',
-            commonMistake: 'Learners forget to subtract subsidies or add taxes incorrectly.',
-            examinerHint: 'Look at the table: GVA at factor cost (5 453) + Taxes on production (132) - Subsidies on production (12).',
-            alternativeAccept: ['R5 573 billion', '5 573', 'R5573bn'],
-            memoryTrick: '🧠 Remember: "Factor Cost + Taxes - Subsidies = Basic Prices"',
-            mergedCorrection: `🧠 Memory Trick: "Factor Cost + Taxes - Subsidies = Basic Prices"
-• GVA at factor cost = R5 453bn
-• Taxes on production = R132bn
-• Subsidies on production = R12bn
-• GVA at basic prices = R5 453 + R132 - R12 = R5 573bn
-
-📋 NSC Memo Answer:
-GVA at basic prices (A) = 5 453 + 132 - 12
-= R5 573 billion`
-          }
-        }
-      ]
-    },
-    // Q3: Change in National Income (2024 NSC P1, Q2.3.5)
-    {
-      id: 'L2Q3',
-      source: '2024 NSC P1, Q2.3.5',
-      topicText: 'Change in National Income',
-      diagramConfig: {
-        type: 'multiplierGraph',
-        labels: {
-          title: 'MULTIPLIER EFFECT IN A TWO-SECTOR ECONOMY',
-          expenditureAxis: 'Expenditure (E) (Billion rands)',
-          incomeAxis: 'Income (Y)',
-          eLine: 'E = 20 + 0.5Y',
-          e1Line: 'E₁ = 30 + 0.5Y',
-          yAxis: 'E = Y',
-          equilibrium: 'e',
-          equilibrium1: 'e₁',
-          autonomousSpending: '20',
-          autonomousSpending1: '30',
-          incomeY: 'Y',
-          incomeY1: 'Y₁'
-        },
-        highlight: 'mpc'
-      },
-      parts: [
-        {
-          part: '2.3.5',
-          prompt: 'Use the graph to calculate the change in national income (ΔY). Show ALL calculations.',
-          clue: 'Find the gap between the two lines (30 - 20 = 10). Then multiply by 2 (because slope is 0.5, so multiplier = 1/0.5 = 2).',
-          answer: 'ΔY = 20 billion',
-          marks: 4,
-          memoFullAnswer: `ΔY = (30 - 20) × (1 / (1 - 0.5))
+      source: '2024 NSC Econ P1, Q2.3.5',
+      topicText: 'Change in National Income (Multiplier)',
+      teachTopic: 'multiplier',
+      diagramConfig: { type: 'multiplierGraph' }, tableConfig: null,
+      parts: [{
+        part: '2.3.5',
+        prompt: 'Use the graph to calculate the change in national income (ΔY). Show ALL calculations.',
+        answer: 'ΔY = R20 billion',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'Gap between the two intercepts = 10. Slope = 0.5, so K = 2. ΔY = 10 × 2.',
+        memoFullAnswer: `ΔY = (30 − 20) × (1 / (1 − 0.5))
 = 10 × 2
 = 20 billion`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must calculate: ΔY = 20 billion.',
-            commonMistake: 'Learners forget to multiply by the multiplier or use wrong MPC value.',
-            examinerHint: 'Look at the graph: gap = 10, slope = 0.5, so 10 × 2 = 20.',
-            alternativeAccept: ['20', 'R20 billion', '20 billion'],
-            memoryTrick: '💡 SIMPLE: "Gap × 2 = Answer" → 10 × 2 = 20',
-            mergedCorrection: `🧠 Memory Trick: "Gap × 2 = Answer"
-• Gap = 10
-• 10 × 2 = 20
-
-📋 NSC Memo Answer:
-ΔY = (30 - 20) × (1 / (1 - 0.5))
-= 10 × 2
-= 20 billion`
-          }
-        }
-      ]
+        formulas: ['K = 1 / (1 − MPC)', 'ΔY = ΔJ × K'],
+        memoCorrection: {
+          whatToCheck: 'Must calculate ΔY = R20 billion.',
+          commonMistake: 'Learners forget the multiplier or use the wrong MPC.',
+          examinerHint: 'Gap = 10. MPC = 0.5, K = 2. ΔY = 10 × 2 = 20.',
+          alternativeAccept: ['20', 'R20 billion', '20 billion'],
+          memoryTrick: '🧠 "Gap × 2 = Answer" → 10 × 2 = 20.',
+          mergedCorrection: `🧠 Gap × 2 = Answer\n• Gap = 10\n• K = 2\n• ΔY = 20\n\n📋 NSC Memo Answer:\nΔY = (30 − 20) × (1 / (1 − 0.5))\n= 10 × 2\n= 20 billion`,
+        },
+      }],
     },
-    // Q4: Reserve Assets (2025 NSC P1, Q2.2.5)
+    // ——— BUSINESS CYCLES ———
     {
-      id: 'L2Q4',
-      source: '2025 NSC P1, Q2.2.5',
-      topicText: 'Reserve Assets',
+      id: 'L2Q2',
+      source: '2024 NSC Econ P1, Q4.2.1',
+      topicText: 'Longest Downswing',
+      teachTopic: 'business-cycles-forecasting',
       diagramConfig: null,
       tableConfig: {
-        title: 'FINANCIAL ACCOUNT OF BALANCE OF PAYMENTS (BOP) - 2024',
-        headers: ['ITEMS', 'R millions'],
+        title: 'BUSINESS CYCLES OF SOUTH AFRICA SINCE 1999',
+        headers: ['Upswing', 'Duration (months)', 'Downswing', 'Duration (months)'],
+        rows: [
+          ['Sept 1999 – Nov 2007', '99', 'Dec 2007 – Aug 2009', '21'],
+          ['Sept 2009 – Nov 2013', '51', 'Dec 2013 – Apr 2017', '41'],
+          ['May 2017 – June 2019', '26', 'July 2019 – Apr 2020', '10'],
+        ],
+      },
+      parts: [{
+        part: '4.2.1',
+        prompt: 'Identify the period in which South Africa experienced the longest downswing.',
+        answer: 'December 2013 to April 2017',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Look at the Downswing column. Find the longest duration in months.',
+        memoFullAnswer: `December 2013 to April 2017`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must identify Dec 2013 to April 2017.',
+          commonMistake: 'Learners pick the most recent downswing.',
+          examinerHint: 'Longest downswing = 41 months. Dec 2013 to Apr 2017.',
+          alternativeAccept: ['December 2013 to April 2017', 'Dec 2013 to Apr 2017'],
+          memoryTrick: '🧠 Longest = 41 months = Dec 2013 to Apr 2017.',
+          mergedCorrection: `🧠 Longest = 41 months = Dec 2013 to Apr 2017\n\n📋 NSC Memo Answer:\nDecember 2013 to April 2017`,
+        },
+      }],
+    },
+    // ——— PUBLIC SECTOR ———
+    {
+      id: 'L2Q3',
+      source: '2024 NSC Econ P1, Q2.2.3',
+      topicText: 'Accountability',
+      teachTopic: 'public-sector-failure',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.2.3',
+        prompt: 'Briefly describe the term accountability.',
+        answer: 'The duty of an individual or organisation to explain their decisions, actions, expenditure and accept responsibility for their behaviour.',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'Explain your decisions. Take responsibility.',
+        memoFullAnswer: `The duty of an individual or organisation to explain their decisions, actions, expenditure and accept responsibility for their behaviour.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must mention explanation of decisions AND accepting responsibility.',
+          commonMistake: 'Learners give a one-word answer.',
+          examinerHint: 'Accountability = explain + accept responsibility.',
+          alternativeAccept: ['explain decisions and accept responsibility', 'taking responsibility for actions'],
+          memoryTrick: '🧠 "Account" = answer for what you did.',
+          mergedCorrection: `🧠 Account = answer for what you did.\n\n📋 NSC Memo Answer:\nThe duty of an individual or organisation to explain their decisions, actions, expenditure and accept responsibility for their behaviour.`,
+        },
+      }],
+    },
+    // ——— FOREIGN TRADE ———
+    {
+      id: 'L2Q4',
+      source: '2025 NSC Econ P1, Q2.2.5',
+      topicText: 'Reserve Assets',
+      teachTopic: 'balance-of-payments',
+      diagramConfig: null,
+      tableConfig: {
+        title: 'FINANCIAL ACCOUNT OF BOP – 2024',
+        headers: ['Items', 'R millions'],
         rows: [
           ['Net direct investment', '68 622'],
           ['Net portfolio investment', '-23 348'],
@@ -411,1536 +477,1524 @@ GVA at basic prices (A) = 5 453 + 132 - 12
           ['Net other investment', '13 481'],
           ['Reserve assets', 'A'],
           ['Balance on financial account', '62 869'],
-          ['Memo: excluding reserve assets', '63 066'],
-          ['Unrecorded transactions', '-18 613']
+          ['Memo: excl. reserve assets', '63 066'],
+          ['Unrecorded transactions', '-18 613'],
         ],
-        note: 'An increase in reserve assets is indicated by a negative (-) sign.'
+        note: 'Increase in reserve assets shown by negative (-) sign.',
       },
-      parts: [
-        {
-          part: '2.2.5',
-          prompt: 'Determine whether there is an increase or decrease in the reserve assets (A). Show ALL calculations.',
-          clue: 'Reserve assets = Balance on financial account - Memo (excluding reserve assets). A negative sign means an INCREASE in reserve assets.',
-          answer: 'Reserve assets = 62 869 - 63 066 = -197. There is an increase in reserve assets because the value has a negative sign.',
-          marks: 4,
-          memoFullAnswer: `Reserve assets = 62 869 - 63 066 = -197
-There is an increase in the reserve assets because the value of reserve assets has a negative sign.`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must calculate: Reserve assets = -197 and state that it shows an increase.',
-            commonMistake: 'Learners get the sign wrong or forget to state whether it is an increase or decrease.',
-            examinerHint: 'A negative sign means an INCREASE in reserve assets.',
-            alternativeAccept: ['-197', 'Increase in reserve assets'],
-            memoryTrick: '🧠 Remember: "Negative = Increase" for reserve assets',
-            mergedCorrection: `🧠 Memory Trick: "Negative = Increase"
-• Reserve assets = 62 869 - 63 066 = -197
-• Negative sign = INCREASE in reserve assets
-
-📋 NSC Memo Answer:
-Reserve assets = 62 869 - 63 066 = -197
-There is an increase in the reserve assets because the value of reserve assets has a negative sign.`
-          }
-        }
-      ]
+      parts: [{
+        part: '2.2.5',
+        prompt: 'Determine whether there is an increase or decrease in the reserve assets (A). Show ALL calculations.',
+        answer: 'Reserve assets = 62 869 − 63 066 = −197. There is an increase because the value is negative.',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'Balance on financial account − Memo (excluding reserve assets). Negative = increase.',
+        memoFullAnswer: `Reserve assets = 62 869 − 63 066 = −197
+There is an increase in reserve assets because the value has a negative sign.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must calculate −197 AND state increase.',
+          commonMistake: 'Learners forget the sign convention.',
+          examinerHint: 'Negative sign on reserve assets = increase.',
+          alternativeAccept: ['-197', 'Increase in reserve assets'],
+          memoryTrick: '🧠 Negative = increase (for reserve assets only).',
+          mergedCorrection: `🧠 Negative = increase (reserve assets)\n• 62 869 − 63 066 = −197\n• Negative = increase\n\n📋 NSC Memo Answer:\nReserve assets = −197, increase.`,
+        },
+      }],
     },
-    // Q5: Multiplier Calculation (2022 NSC P1, Q4.2.5)
+    // ——— GROWTH & DEVELOPMENT ———
     {
       id: 'L2Q5',
-      source: '2022 NSC P1, Q4.2.5',
-      topicText: 'Calculating the Multiplier',
-      diagramConfig: {
-        type: 'circularFlow',
-        labels: {
-          households: 'CONSUMERS',
-          businesses: 'FIRMS',
-          financialMarket: 'FINANCIAL MARKET',
-          savings: 'Savings S = R20m',
-          investment: 'Investments I = R100m',
-          consumption: 'Consumption (C) = R80m',
-          income: 'Income (Y) = R100m',
-          mps: '0.2',
-          mpc: '0.8'
+      source: '2024 NSC Econ P1, Q2.1.2',
+      topicText: 'Competition and Aggregate Supply',
+      teachTopic: 'growth-vs-development',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.1.2',
+        prompt: 'How can competition stimulate aggregate supply in the economy?',
+        answer: 'Competition improves production efficiency, encouraging businesses to innovate and produce more goods and services, increasing total output.',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'Competition → efficiency → innovation → more output.',
+        memoFullAnswer: `Competition may improve production efficiency resulting in more goods and services being produced.
+Businesses may become more innovative, use new production techniques with higher productivity, and increase aggregate supply.
+More businesses may be established which helps to increase the total output in the economy.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must explain how competition increases output.',
+          commonMistake: 'Learners just say "more businesses" without the causal chain.',
+          examinerHint: 'Competition → efficiency → innovation → more output.',
+          alternativeAccept: ['improves efficiency', 'encourages innovation', 'more businesses established'],
+          memoryTrick: '🧠 Competition = efficiency + innovation + more firms.',
+          mergedCorrection: `🧠 Competition = efficiency + innovation + more firms.\n\n📋 NSC Memo Answer:\nCompetition improves efficiency, encourages innovation, and increases total output.`,
         },
-        highlight: 'savings'
+      }],
+    },
+    // ——— ECONOMIC INDICATORS ———
+    {
+      id: 'L2Q6',
+      source: '2024 NSC Econ P1, Q3.3.1',
+      topicText: 'Labour Productivity Growth',
+      teachTopic: 'economic-indicators-types',
+      diagramConfig: null,
+      tableConfig: {
+        title: 'SA LABOUR PRODUCTIVITY GROWTH',
+        headers: ['Quarter', '% change'],
+        rows: [
+          ['Q1 2022', '+3'],
+          ['Q2 2022', '-4'],
+          ['Q3 2022', '-6'],
+          ['Q4 2022', '-8'],
+          ['Q1 2023', '-8'],
+          ['Q2 2023', '-3'],
+        ],
       },
-      parts: [
-        {
-          part: '4.2.5',
-          prompt: 'Use the MPC (0.8) to determine the value of the multiplier. Show the formula and ALL calculations.',
-          clue: 'Use the formula: K = 1 / (1 - MPC). MPC = 0.8 from the diagram.',
-          answer: 'Multiplier (K) = 1 / (1 - 0.8) = 1 / 0.2 = 5',
-          marks: 4,
-          memoFullAnswer: `Multiplier (K) = 1 / (1 - mpc)
-= 1 / (1 - 0.8)
-= 1 / 0.2
-= 5`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must show: Formula + substitution + final answer = 5',
-            commonMistake: 'Learners forget the formula or substitute MPC incorrectly.',
-            examinerHint: 'MPC = 0.8 from the diagram. K = 1 / (1 - 0.8) = 1 / 0.2 = 5.',
-            alternativeAccept: ['K = 5', 'Multiplier = 5', '5'],
-            memoryTrick: '🧠 Remember: "K = 1 / (1 - MPC)"',
-            mergedCorrection: `🧠 Memory Trick: "K = 1 / (1 - MPC)"
-• MPC = 0.8
-• K = 1 / (1 - 0.8)
-• K = 1 / 0.2
-• K = 5
-
-📋 NSC Memo Answer:
-Multiplier (K) = 1 / (1 - mpc)
-= 1 / (1 - 0.8)
-= 1 / 0.2
-= 5`
-          }
-        }
-      ]
-    }
+      parts: [{
+        part: '3.3.1',
+        prompt: 'Identify the percentage change in South Africa\'s labour productivity in the fourth quarter of 2022.',
+        answer: '-8%',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Read the Q4 2022 row.',
+        memoFullAnswer: `-8%`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be −8%.',
+          commonMistake: 'Learners pick −6% or −4%.',
+          examinerHint: 'Q4 2022 row = −8%.',
+          alternativeAccept: ['-8%', '-8', '8% decline'],
+          memoryTrick: '🧠 Q4 2022 = −8%. Biggest drop.',
+          mergedCorrection: `🧠 Q4 2022 = −8%. Biggest drop.\n\n📋 NSC Memo Answer:\n-8%`,
+        },
+      }],
+    },
+    // ——— PERFECT MARKET ———
+    {
+      id: 'L2Q7',
+      source: '2025 NSC Econ P2, Q2.2.5',
+      topicText: 'Marginal Cost Calculation',
+      teachTopic: 'perfect-market-short-run',
+      diagramConfig: null,
+      tableConfig: {
+        title: 'COST AND REVENUE SCHEDULE',
+        headers: ['Q', 'TR', 'MR', 'MC', 'TC'],
+        rows: [
+          ['0', '0', '—', '—', '100'],
+          ['2', '40', '20', '10', '120'],
+          ['4', '80', '20', '8', '136'],
+          ['6', '120', '20', '10', '156'],
+          ['8', '160', '20', '20', '196'],
+          ['10', '200', '20', 'A', '256'],
+        ],
+      },
+      parts: [{
+        part: '2.2.5',
+        prompt: 'Use the information in the table to calculate the marginal cost (A) if 10 units are produced. Show ALL calculations.',
+        answer: 'MC = ΔTC / ΔQ = (256 − 196) / (10 − 8) = 60 / 2 = R30',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'MC = change in total cost ÷ change in quantity.',
+        memoFullAnswer: `MC = ΔTC / ΔQ
+= (256 − 196) / (10 − 8)
+= 60 / 2
+= R30`,
+        formulas: ['MC = ΔTC / ΔQ'],
+        memoCorrection: {
+          whatToCheck: 'Must show ΔTC = 60 and ΔQ = 2, giving R30.',
+          commonMistake: 'Learners divide TC by Q instead of ΔTC by ΔQ.',
+          examinerHint: 'MC = ΔTC / ΔQ = 60 / 2 = R30.',
+          alternativeAccept: ['R30', '30'],
+          memoryTrick: '🧠 MC = change in TC ÷ change in Q.',
+          mergedCorrection: `🧠 MC = ΔTC ÷ ΔQ\n• ΔTC = 256 − 196 = 60\n• ΔQ = 10 − 8 = 2\n• MC = 30\n\n📋 NSC Memo Answer:\nMC = R30`,
+        },
+      }],
+    },
+    // ——— IMPERFECT MARKETS ———
+    {
+      id: 'L2Q8',
+      source: '2024 NSC Econ P2, Q2.2.2',
+      topicText: 'Long-run Profit in Monopolistic Competition',
+      teachTopic: 'monopolistic-competition',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.2.2',
+        prompt: 'Name the type of profit earned by a monopolistic competitor in the long run.',
+        answer: 'Normal profit',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Free entry erodes economic profit in the long run.',
+        memoFullAnswer: `Normal profit`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be "normal profit".',
+          commonMistake: 'Learners say "economic profit" — but free entry removes that.',
+          examinerHint: 'Monopolistic competition long run = normal profit (AR = AC).',
+          alternativeAccept: ['Normal profit'],
+          memoryTrick: '🧠 Free entry → normal profit (AR = AC).',
+          mergedCorrection: `🧠 Free entry → normal profit.\n\n📋 NSC Memo Answer:\nNormal profit`,
+        },
+      }],
+    },
+    // ——— MARKET FAILURE ———
+    {
+      id: 'L2Q9',
+      source: '2025 NSC Econ P2, Q2.3.2',
+      topicText: 'Direct Tax Example',
+      teachTopic: 'merit-demerit-goods',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.3.2',
+        prompt: 'Give any ONE example of a direct tax.',
+        answer: 'Pay As You Earn (PAYE), Personal income tax, Corporate tax, Capital Gains Tax',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Tax on income or wealth — paid directly by the person or business.',
+        memoFullAnswer: `Pay As You Earn / PAYE
+Personal income tax
+Corporate tax / Company tax
+Capital Gains Tax / CGT
+(Any ONE)`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be a direct tax (on income or wealth).',
+          commonMistake: 'Learners say "VAT" — that is indirect tax.',
+          examinerHint: 'Direct = income/wealth. Indirect = goods and services (VAT, excise).',
+          alternativeAccept: ['PAYE', 'Personal income tax', 'Corporate tax', 'Capital Gains Tax'],
+          memoryTrick: '🧠 Direct = income/wealth. Indirect = goods and services.',
+          mergedCorrection: `🧠 Direct = income/wealth\n• PAYE\n• Personal income tax\n• Corporate tax\n• CGT\n\n📋 NSC Memo Answer:\nPAYE / Personal income tax / Corporate tax / CGT`,
+        },
+      }],
+    },
+    // ——— INFLATION ———
+    {
+      id: 'L2Q10',
+      source: '2024 NSC Econ P2, Q3.2.3',
+      topicText: 'Stagflation',
+      teachTopic: 'inflation-types-causes',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.2.3',
+        prompt: 'Briefly describe the term stagflation.',
+        answer: 'Occurs when the economy experiences low levels of economic growth with high levels of unemployment as well as high rate of inflation.',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'Stagnation + inflation. Low growth + high unemployment + high inflation.',
+        memoFullAnswer: `Occurs when the economy experiences low levels of economic growth with high levels of unemployment as well as high rate of inflation.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must mention low growth AND high inflation (AND usually high unemployment).',
+          commonMistake: 'Learners say only "high inflation".',
+          examinerHint: 'Stagflation = stagnation (low growth) + inflation.',
+          alternativeAccept: ['low growth with high inflation', 'stagnation and inflation together'],
+          memoryTrick: '🧠 "Stag" + "flation" = stagnation + inflation.',
+          mergedCorrection: `🧠 Stag + flation = stagnation + inflation.\n\n📋 NSC Memo Answer:\nLow growth, high unemployment, high inflation together.`,
+        },
+      }],
+    },
+    // ——— ENVIRONMENT ———
+    {
+      id: 'L2Q11',
+      source: '2025 NSC Econ P2, Q3.3.3',
+      topicText: 'Marketable Permit',
+      teachTopic: 'environmental-sustainability',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.3.3',
+        prompt: 'Briefly describe the term marketable permit.',
+        answer: 'A licence that is sold by the government to a business to allow it to pollute the environment to a certain degree.',
+        marks: 4, acceptAnyTwo: false,
+        clue: 'A licence to pollute up to a limit. Can be traded.',
+        memoFullAnswer: `A licence that is sold by the government to a business to allow it to pollute the environment to a certain degree.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must mention licence, government, and pollution limit.',
+          commonMistake: 'Learners describe a tax instead.',
+          examinerHint: 'Permit = licence. Sold by government. Tradeable.',
+          alternativeAccept: ['licence to pollute', 'tradeable pollution permit'],
+          memoryTrick: '🧠 Permit = licence to pollute up to a limit.',
+          mergedCorrection: `🧠 Permit = licence to pollute up to a limit.\n\n📋 NSC Memo Answer:\nA licence sold by government allowing business to pollute to a certain degree.`,
+        },
+      }],
+    },
+    // ——— TOURISM ———
+    {
+      id: 'L2Q12',
+      source: '2025 NSC Econ P2, Q3.2.1',
+      topicText: 'Tourism Transformation Fund',
+      teachTopic: 'tourism-promotion',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.2.1',
+        prompt: 'Identify a government initiative that provides financial assistance to tourism investments in the extract above.',
+        answer: 'Tourism Transformation Fund (TTF)',
+        marks: 2, acceptAnyTwo: false,
+        clue: 'Established with the National Empowerment Fund. Provides grants, debt, equity.',
+        memoFullAnswer: `Tourism Transformation Fund / TTF`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must be TTF or Tourism Transformation Fund.',
+          commonMistake: 'Learners say "NEF" — that administers it, not the fund itself.',
+          examinerHint: 'TTF = Tourism Transformation Fund.',
+          alternativeAccept: ['TTF', 'Tourism Transformation Fund'],
+          memoryTrick: '🧠 TTF = Tourism Transformation Fund.',
+          mergedCorrection: `🧠 TTF = Tourism Transformation Fund.\n\n📋 NSC Memo Answer:\nTourism Transformation Fund / TTF`,
+        },
+      }],
+    },
   ],
 
   level3: [
-    // Q1: Problems Faced by Government (2022 NSC P1, Q2.5)
+    // ——— CIRCULAR FLOW ———
     {
       id: 'L3Q1',
-      source: '2022 NSC P1, Q2.5',
-      topicText: 'Public Sector Problems',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.5',
-          prompt: 'Analyse the problems faced by the South African government in providing public goods and services.',
-          clue: 'Think about the problems governments face: not enough money, corruption, no accountability, too much bureaucracy, and failing state-owned companies.',
-          answer: 'The South African government faces challenges such as inadequate financial and physical resources, corruption and nepotism, lack of accountability, difficulty in accessing needs, insufficient revenue, state-owned enterprise losses, bureaucracy, and lack of skills.',
-          marks: 8,
-          memoFullAnswer: `The South African government faces the following challenges in providing public goods and services:
-
-Some local authorities or municipalities do not have adequate financial and physical resources to provide quality services to their residents. E.g. old water supply infrastructure.
-
-Corruption and nepotism have resulted in several government institutions having incompetent employees who cannot successfully deliver services.
-
-Most government officials are not held accountable for their actions which results in some public projects not delivered.
-
-It is difficult for the government to effectively access the needs of the citizens, resulting in over-supply and under-supply of some public services.
-
-The revenue collected by the government from the provision of public goods and services is insufficient to finance their provision.
-
-Several state-owned enterprises make losses that require bail-out from the government.
-
-Issues of privatisation of some state-owned enterprises such as Eskom and SAA have resulted in confusion in terms of the provision and pricing of public services.
-
-Bureaucracy within government institutions have resulted in public servants concentrating in the rules and procedures instead of delivering services to citizens.
-
-It is difficult for the state to come with a pricing policy, hence public goods may be over or undersupplied.
-
-Lack of knowledge, qualifications, and management skills may result to the failure of the public sector.
-
-Lack of interest, and motivation in the form of incentives may lead to lower levels of productivity, and poor provision of services.
-
-An increase in the population not accompanied by the payment of rates and taxes may lead to an undersupply of public goods and services.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must analyse at least 4 problems. 2 marks per well-explained problem.',
-            commonMistake: 'Learners list problems without explaining them. Listing alone = 0 marks.',
-            examinerHint: 'Think about: money, corruption, accountability, skills, bureaucracy, and state-owned enterprise losses.',
-            alternativeAccept: [
-              'Lack of financial resources',
-              'Corruption and nepotism',
-              'Lack of accountability',
-              'Bureaucracy',
-              'State-owned enterprise losses'
-            ],
-            memoryTrick: '🧠 Remember: "M-C-A-B-S" - Money, Corruption, Accountability, Bureaucracy, State-owned losses',
-            mergedCorrection: `🧠 Memory Trick: "M-C-A-B-S"
-• M - Money (insufficient resources)
-• C - Corruption (incompetent employees)
-• A - Accountability (officials not held responsible)
-• B - Bureaucracy (too many rules, no service)
-• S - State-owned losses (Eskom, SAA bailouts)
-
-📋 NSC Memo Answer:
-The South African government faces the following challenges in providing public goods and services:
-- Some local authorities or municipalities do not have adequate financial and physical resources to provide quality services to their residents.
-- Corruption and nepotism have resulted in several government institutions having incompetent employees who cannot successfully deliver services.
-- Most government officials are not held accountable for their actions which results in some public projects not delivered.
-- It is difficult for the government to effectively access the needs of the citizens, resulting in over-supply and under-supply of some public services.
-- The revenue collected by the government from the provision of public goods and services is insufficient to finance their provision.
-- Several state-owned enterprises make losses that require bail-out from the government.
-- Bureaucracy within government institutions have resulted in public servants concentrating in the rules and procedures instead of delivering services to citizens.`
-          }
-        }
-      ]
+      source: '2023 NSC Econ P1, Q4.5',
+      topicText: 'Financial Sector in Circular Flow',
+      teachTopic: 'circular-flow-markets',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.5',
+        prompt: 'Analyse the relationship between the financial sector and other participants in the circular-flow model.',
+        answer: 'The financial sector acts as an intermediary — accepting savings from households, lending to businesses, facilitating stock exchange and foreign exchange transactions, and paying taxes to government.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Savings → loans → stock market → forex → taxes.',
+        memoFullAnswer: `- Financial sector includes banks and other institutions that provide borrowing and lending services.
+- Financial institutions act as intermediaries between savers and borrowers.
+- Commercial banks accept deposits from households and pay interest.
+- Banks lend to producers for expansion.
+- Households borrow for houses and vehicles.
+- Banks profit from the interest rate spread.
+- Banks act as stock brokers on the JSE.
+- Banks facilitate foreign exchange.
+- Financial markets coordinate demand and supply of forex.
+- Government may save or borrow through financial institutions.
+- Banks pay tax to government.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 relationships. 2 marks each.',
+          commonMistake: 'Learners describe the financial sector in isolation.',
+          examinerHint: 'Think: savings, loans, stocks, forex, taxes.',
+          alternativeAccept: ['accepts deposits from households', 'provides loans to businesses', 'facilitates forex', 'pays taxes'],
+          memoryTrick: '🧠 "S-L-S-F-T" — Savings, Loans, Stocks, Forex, Taxes.',
+          mergedCorrection: `🧠 "S-L-S-F-T"\n• S — Savings from households\n• L — Loans to businesses\n• S — Stocks (JSE)\n• F — Forex\n• T — Taxes to government\n\n📋 NSC Memo Answer:\nFinancial sector intermediates savings and loans, facilitates JSE and forex, and pays taxes.`,
+        },
+      }],
     },
-    // Q2: Business Cycles and Fiscal Policy (2023 NSC P1, Q2.5)
+    // ——— BUSINESS CYCLES ———
     {
       id: 'L3Q2',
-      source: '2023 NSC P1, Q2.5',
+      source: '2023 NSC Econ P1, Q2.5',
       topicText: 'Business Cycles and Fiscal Policy',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.5',
-          prompt: 'How can business cycles influence the use of fiscal policy in the economy?',
-          clue: 'Think about the two phases: Downswing (recession) → LOWER taxes, MORE spending. Upswing (boom) → HIGHER taxes, LESS spending.',
-          answer: 'During a downswing, the government uses expansionary fiscal policy (lower taxes, higher spending). During an upswing, the government uses restrictive fiscal policy (higher taxes, lower spending).',
-          marks: 8,
-          memoFullAnswer: `During a downswing, fiscal changes may be influenced as follows:
-- The government implements expansionary fiscal policy to stimulate economic activity and avoid high unemployment.
-- Personal income tax rates may be reduced to increase households' disposable income and stimulate consumer spending.
-- Corporate tax may be reduced to increase profit prospects of businesses which will encourage them to produce more goods and services.
-- Indirect taxes such as VAT may be reduced to encourage spending thereby increasing production of goods and services.
-- The government may increase its expenditure on infrastructure development which will increase demand for and production of capital goods.
-- The government may increase welfare expenditure such as social grants which will stimulate consumer spending.
-- The government may provide more subsidies and incentives to encourage production of goods and services.
-
-During an upswing, fiscal changes may be influenced as follows:
-- During a prosperity phase the government implements restrictive fiscal policy to dampen the economy and avoid high inflation.
-- Personal income tax rates may increase to reduce households' disposable income thereby reducing excess demand.
-- Increase in indirect taxes such as VAT may increase prices of goods and services which will help to reduce aggregate demand.
-- The government may postpone or cancel some infrastructure development projects which will reduce demand for capital goods.
-- The government may reduce welfare expenditure such as social grants which will reduce excess demand in the economy.
-
-(Accept any other correct relevant response)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must explain BOTH downswing (expansionary) and upswing (restrictive) policies. 4 marks each.',
-            commonMistake: 'Learners only discuss one phase (downswing) and miss the upswing.',
-            examinerHint: 'Downswing = stimulate (lower taxes, increase spending). Upswing = dampen (raise taxes, reduce spending).',
-            alternativeAccept: [
-              'Lower taxes during recession',
-              'Increase government spending during recession',
-              'Higher taxes during boom',
-              'Reduce government spending during boom'
-            ],
-            memoryTrick: '🧠 Remember: "Down = Down with taxes, Up = Up with taxes"',
-            mergedCorrection: `🧠 Memory Trick: "Down = Down with taxes, Up = Up with taxes"
-• Downswing: ↓ taxes, ↑ spending
-• Upswing: ↑ taxes, ↓ spending
-
-📋 NSC Memo Answer:
-During a downswing:
-- The government implements expansionary fiscal policy to stimulate economic activity and avoid high unemployment.
-- Personal income tax rates may be reduced to increase households' disposable income.
-- The government may increase its expenditure on infrastructure development.
-
-During an upswing:
-- The government implements restrictive fiscal policy to dampen the economy and avoid high inflation.
-- Personal income tax rates may increase to reduce households' disposable income.
-- The government may postpone or cancel some infrastructure development projects.`
-          }
-        }
-      ]
+      teachTopic: 'fiscal-policy',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.5',
+        prompt: 'How can business cycles influence the use of fiscal policy in the economy?',
+        answer: 'During a downswing, government uses expansionary fiscal policy (lower taxes, more spending). During an upswing, it uses restrictive fiscal policy (higher taxes, less spending).',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Downswing: stimulate. Upswing: dampen.',
+        memoFullAnswer: `Downswing: expansionary fiscal policy — lower taxes, more spending, higher subsidies, more welfare.
+Upswing: restrictive fiscal policy — higher taxes, less spending, postpone projects, reduce welfare.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH phases. 4 marks each.',
+          commonMistake: 'Learners only discuss one phase.',
+          examinerHint: 'Downswing = stimulate. Upswing = dampen.',
+          alternativeAccept: ['lower taxes during recession', 'higher taxes during boom'],
+          memoryTrick: '🧠 "Down = Down with taxes. Up = Up with taxes."',
+          mergedCorrection: `🧠 "Down = Down with taxes. Up = Up with taxes."\n• Downswing: ↓ taxes, ↑ spending\n• Upswing: ↑ taxes, ↓ spending\n\n📋 NSC Memo Answer:\nExpansionary in downswing, restrictive in upswing.`,
+        },
+      }],
     },
-    // Q3: Price Stability Benefits (2024 NSC P1, Q2.5)
+    // ——— PUBLIC SECTOR ———
     {
       id: 'L3Q3',
-      source: '2024 NSC P1, Q2.5',
-      topicText: 'Price Stability Benefits',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.5',
-          prompt: 'How can the macroeconomic objective of price stability positively influence the South African economy?',
-          clue: 'Think about consumers, businesses, savers, and exporters. How does stable prices help each?',
-          answer: 'Price stability encourages consumer spending, promotes job creation, encourages savings, maintains purchasing power, keeps exports competitive, avoids extreme business cycle fluctuations, keeps inflation expectations low, helps planning, and improves credit rating.',
-          marks: 8,
-          memoFullAnswer: `Price stability ensures that prices remain relatively stable which encourages consumer spending and stimulates economic growth.
-Stable prices promote job creation and reduce unemployment rate in the economy through more foreign direct investments.
-Savings may be encouraged which ensures availability of loanable funds for private investments.
-Interest rates may remain stable and encourage spending on durable goods, such as taking mortgage bonds to purchase houses.
-Price stability maintains the purchasing power of money, since the real incomes of households are better preserved.
-Stable prices help to maintain demand for South African exports on global markets, thereby ensuring exchange rate stability.
-Extreme fluctuations on business cycles may be avoided which promotes more sustainable economic growth.
-Price stability helps to keep inflation expectations low which reduces wage demands by workers and maintain industrial peace.
-Price stability helps consumers and businesses to plan and make informed decisions concerning saving, spending and investments.
-The credit rating of South Africa may improve which could lead to increased investments in the country.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must explain at least 4 benefits. 2 marks per benefit.',
-            commonMistake: 'Learners say "prices stay the same" without explaining the economic impact.',
-            examinerHint: 'Think about consumers, businesses, savers, and exporters. How does stable prices help each?',
-            alternativeAccept: [
-              'Consumers can plan spending',
-              'Businesses can plan investments',
-              'Value of money maintained',
-              'Exports remain competitive',
-              'Credit rating improves'
-            ],
-            memoryTrick: '🧠 Remember: "S-S-P-E-C" - Spending, Savings, Purchasing power, Exports, Credit rating',
-            mergedCorrection: `🧠 Memory Trick: "S-S-P-E-C"
-• S - Spending (consumers buy more)
-• S - Savings (people save more)
-• P - Purchasing power (money keeps value)
-• E - Exports (stay competitive)
-• C - Credit rating (improves)
-
-📋 NSC Memo Answer:
-- Price stability ensures that prices remain relatively stable which encourages consumer spending and stimulates economic growth.
-- Stable prices promote job creation and reduce unemployment rate.
-- Savings may be encouraged which ensures availability of loanable funds for private investments.
-- Price stability maintains the purchasing power of money.
-- Stable prices help to maintain demand for South African exports on global markets.`
-          }
-        }
-      ]
+      source: '2023 NSC Econ P1, Q2.5',
+      topicText: 'Problems in Public Sector',
+      teachTopic: 'public-sector-failure',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.5',
+        prompt: 'Analyse the problems faced by the South African government in providing public goods and services.',
+        answer: 'Inadequate financial and physical resources, corruption and nepotism, lack of accountability, difficulty accessing needs, insufficient revenue, SOE losses, bureaucracy, lack of skills.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Money, corruption, accountability, bureaucracy, SOE losses.',
+        memoFullAnswer: `- Municipalities lack resources.
+- Corruption and nepotism.
+- Lack of accountability.
+- Difficulty accessing needs.
+- Insufficient revenue.
+- SOE losses requiring bailouts.
+- Bureaucracy.
+- Lack of skills.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 problems. 2 marks each.',
+          commonMistake: 'Learners list problems without explaining.',
+          examinerHint: 'M-C-A-B-S: Money, Corruption, Accountability, Bureaucracy, SOE losses.',
+          alternativeAccept: ['lack of financial resources', 'corruption', 'lack of accountability', 'bureaucracy', 'SOE losses'],
+          memoryTrick: '🧠 "M-C-A-B-S" — Money, Corruption, Accountability, Bureaucracy, SOE losses.',
+          mergedCorrection: `🧠 "M-C-A-B-S"\n• M — Money\n• C — Corruption\n• A — Accountability\n• B — Bureaucracy\n• S — SOE losses\n\n📋 NSC Memo Answer:\nInsufficient resources, corruption, lack of accountability, bureaucracy, SOE losses.`,
+        },
+      }],
     },
-    // Q4: Appreciation of the Rand (2025 NSC P1, Q2.5)
+    // ——— FOREIGN TRADE ———
     {
       id: 'L3Q4',
-      source: '2025 NSC P1, Q2.5',
-      topicText: 'Appreciation of the Rand',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '2.5',
-          prompt: 'How can the appreciation of the rand impact the South African economy?',
-          clue: 'Think: stronger rand = cheaper imports (good) but exports become expensive (bad).',
-          answer: 'Positive: cheaper imports, lower inflation, more foreign investment, improved terms of trade. Negative: exports become expensive, tourism decreases, unemployment may increase, balance of payments deficit may increase.',
-          marks: 8,
-          memoFullAnswer: `POSITIVE IMPACT:
-- Importing production inputs such as crude oil, agricultural chemicals and vehicle parts will become less expensive curbing cost-push inflation.
-- Lower cost of importing production inputs may increase domestic production which will stimulate economic growth and lower prices for goods and services.
-- Foreign investors may be attracted to invest more in the economy because a stronger rand increases the returns on their investments.
-- Import payments will decrease which may increase welfare as more resources may be used to produce more exports to finance higher cost of import.
-- Export earnings will increase, resulting in an improvement in trade balance.
-- In the short-term, the terms of trade will improve as the prices of exports will be higher than import prices.
-- Outbound tourism activities will increase as more South African tourists will visit other countries due to the stronger rand.
-
-NEGATIVE IMPACT:
-- Demand for South African exports such as base metals and mineral products will decrease as they become relatively expensive.
-- Local businesses will suffer in terms of profits due to their products becoming less competitive in global markets.
-- Unemployment levels may increase as local businesses will be forced to reduce their production due to reduced exports.
-- Inbound tourism activities will decrease as less tourists visit the country due to the stronger rand.
-- Balance of payments deficit will increase as less goods are exported while more goods are imported due to a stronger currency.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss BOTH positive AND negative impacts. 4 marks each.',
-            commonMistake: 'Learners only discuss one side (positive or negative). A balanced answer is required.',
-            examinerHint: 'Think: stronger rand = cheaper imports (good) but exports become expensive (bad).',
-            alternativeAccept: [
-              'Cheaper imports (positive)',
-              'Higher inflation (negative)',
-              'More foreign investment (positive)',
-              'Less exports (negative)',
-              'Improved terms of trade (positive)'
-            ],
-            memoryTrick: '🧠 Remember: "Cheap In, Expensive Out" - Imports get cheaper, exports get expensive',
-            mergedCorrection: `🧠 Memory Trick: "Cheap In, Expensive Out"
-• Cheap In: Imports are cheaper
-• Expensive Out: Exports are more expensive
-
-📋 NSC Memo Answer:
-POSITIVE:
-- Importing production inputs such as crude oil will become less expensive curbing cost-push inflation.
-- Foreign investors may be attracted to invest more because a stronger rand increases returns.
-- Export earnings will increase, resulting in an improvement in trade balance.
-
-NEGATIVE:
-- Demand for South African exports will decrease as they become relatively expensive.
-- Unemployment levels may increase as local businesses reduce production due to reduced exports.
-- Balance of payments deficit will increase as less goods are exported while more goods are imported.`
-          }
-        }
-      ]
+      source: '2024 NSC Econ P1, Q3.4',
+      topicText: 'Advantages of Import Substitution',
+      teachTopic: 'trade-policies',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.4',
+        prompt: 'Discuss the advantages of import substitution for the South African economy.',
+        answer: 'Local employment, industrial expansion, reduced imports improve BOP, wider variety of goods, increased tax base, less vulnerability to foreign actions, diversification.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Jobs, industry, BOP, tax base, diversification.',
+        memoFullAnswer: `- Tariffs and quotas encourage local employment.
+- Expansion of domestic industries.
+- Reduced imports improve the BOP.
+- Wider variety of goods produced.
+- Increased tax base.
+- Less vulnerable to foreign actions.
+- Available forex used for other imports.
+- Promotes diversification.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss at least 4 advantages. 2 marks each.',
+          commonMistake: 'Learners list without explaining.',
+          examinerHint: 'Jobs, industry, BOP, tax, diversification.',
+          alternativeAccept: ['local employment', 'industrial expansion', 'improved BOP', 'diversification'],
+          memoryTrick: '🧠 "J-I-B-T-D" — Jobs, Industry, BOP, Tax, Diversification.',
+          mergedCorrection: `🧠 "J-I-B-T-D"\n• J — Jobs\n• I — Industry\n• B — BOP improvement\n• T — Tax base\n• D — Diversification\n\n📋 NSC Memo Answer:\nLocal jobs, industrial expansion, BOP improvement, tax base growth, diversification.`,
+        },
+      }],
     },
-    // Q5: Regional Development Policies (2022 NSC P1, Q3.5)
+    // ——— GROWTH & DEVELOPMENT ———
     {
       id: 'L3Q5',
-      source: '2022 NSC P1, Q3.5',
-      topicText: 'Regional Development Policies',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '3.5',
-          prompt: 'Evaluate South Africa\'s regional development policies in terms of the international benchmark criteria.',
-          clue: 'Think: What does South Africa do well? What does it fail at?',
-          answer: 'South Africa complies with international benchmarks through good governance, integration, partnership, resource provision, competitive businesses, healthy competition, education and training, addressing grassroots issues, inclusive development, and supporting SMMEs. However, it fails in some areas due to corruption, lack of resources, poor education investment, and collusion.',
-          marks: 8,
-          memoFullAnswer: `South Africa's regional development policies COMPLY with international benchmark criteria because:
-- Spatial Development Initiatives (SDIs) and Special Economic Zones (SEZs) are managed through transparent, ethical and efficient governance to decentralize economic activity.
-- The government ensures that no region is developed at the cost of another region's potential through integration between different areas by means of spill-over benefits.
-- Partnership between all role players in the economy is encouraged by the government as it builds a more inclusive economy.
-- Provision of resources is ensured by prioritising infrastructure development projects in all provinces so that regional development is achieved.
-- Competitive businesses that are not in need of ongoing financial aid from government have been established.
-- Healthy competition in the economy is promoted through the competition policy as well as the Competition Commission, Competition Tribunal and Competition Appeal Court.
-- People from different regions are involved in education and training, to improve productivity and ensure development of people by people.
-- Issues at grass roots level such as poverty and inequality, are addressed to ensure that development starts from below.
-- More emphasis is put on total development covering all human life to achieve inclusive development, e.g. education, health and nutrition.
-- Various programmes were implemented by the Department of Trade, Industry and Competition (DTIC) to render support to SMMEs and entrepreneurship in an effort to remain market oriented.
+      source: '2024 NSC Econ P1, Q3.5',
+      topicText: 'Industrial Development Challenges',
+      teachTopic: 'industrial-development',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.5',
+        prompt: 'Analyse the challenges faced by South Africa in promoting industrial development.',
+        answer: 'Skills shortages, inadequate infrastructure, burdensome regulations, limited access to capital, global demand fluctuations, energy constraints, labour challenges, trade barriers.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'S-I-R-C-E-L-T: Skills, Infrastructure, Regulations, Capital, Energy, Labour, Trade.',
+        memoFullAnswer: `- Skills shortages hinder growth.
+- Inadequate infrastructure raises costs.
+- Burdensome regulations discourage investment.
+- Limited SMME capital access.
+- Global demand fluctuations.
+- Energy constraints (load shedding).
+- Labour challenges (strikes).
+- International trade barriers.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 challenges. 2 marks each.',
+          commonMistake: 'Learners list without explaining.',
+          examinerHint: 'S-I-R-C-E-L-T.',
+          alternativeAccept: ['skills shortages', 'inadequate infrastructure', 'regulations', 'capital access', 'energy constraints', 'labour challenges', 'trade barriers'],
+          memoryTrick: '🧠 "S-I-R-C-E-L-T" — Skills, Infrastructure, Regulations, Capital, Energy, Labour, Trade.',
+          mergedCorrection: `🧠 "S-I-R-C-E-L-T"\n• S — Skills shortages\n• I — Infrastructure\n• R — Regulations\n• C — Capital access\n• E — Energy (load shedding)\n• L — Labour\n• T — Trade barriers\n\n📋 NSC Memo Answer:\nSkills, infrastructure, regulations, capital, energy, labour, trade barriers.`,
+        },
+      }],
+    },
+    // ——— ECONOMIC INDICATORS ———
+    {
+      id: 'L3Q6',
+      source: '2024 NSC Econ P1, Q4.4',
+      topicText: 'Social Indicators — Nutrition',
+      teachTopic: 'social-indicators',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.4',
+        prompt: 'Discuss the social indicators that relate to nutrition.',
+        answer: 'Child malnutrition (underweight, stunting) and obesity — both affect productivity and public health.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Malnutrition (under-weight, stunting) and obesity.',
+        memoFullAnswer: `Child malnutrition — weight for age (under-weight) and height for age (stunting). Leading cause of child deaths. Causes: household food insecurity, inadequate care, lack of health services.
+Overweight/obesity — associated with diabetes and psychological disorders. Strains public health sector. SA's rate is above global average.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH malnutrition AND obesity.',
+          commonMistake: 'Learners only discuss malnutrition.',
+          examinerHint: 'Two sides: under-nutrition and over-nutrition.',
+          alternativeAccept: ['malnutrition', 'obesity', 'stunting', 'underweight'],
+          memoryTrick: '🧠 Two sides: too little food (malnutrition) and too much (obesity).',
+          mergedCorrection: `🧠 Two sides: malnutrition + obesity.\n\n📋 NSC Memo Answer:\nMalnutrition: under-weight and stunting. Obesity: diabetes, heart disease. Both strain public health.`,
+        },
+      }],
+    },
+    // ——— PERFECT MARKET ———
+    {
+      id: 'L3Q7',
+      source: '2025 NSC Econ P2, Q2.4',
+      topicText: 'Immobility and Information',
+      teachTopic: 'perfect-market-long-run',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.4',
+        prompt: 'Briefly discuss the immobility of factors of production and lack of information as factors that may lead to misallocation of resources.',
+        answer: 'Labour takes time to move (skills, relocation). Physical capital cannot move easily. Lack of information leads to wrong decisions by consumers, workers, and entrepreneurs.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Labour is slow to move. Information is imperfect.',
+        memoFullAnswer: `Immobility:
+- Most markets do not adjust rapidly due to immobility.
+- Labour takes time to move — skills need upgrading.
+- Geographic relocation costly.
+- Physical capital cannot be moved easily.
+- Technology change takes time to adapt.
 
-South Africa's regional development policies DO NOT COMPLY with international benchmarks criteria because:
-- Corruption, nepotism and mismanagement of public funds have occurred in many provinces and municipalities resulting in poor governance.
-- Lack of resources, especially infrastructure, has resulted in some parts of the countries failing to attract investments and unemployment remained higher.
-- Ignorance towards education and training opportunities has resulted in poor investment in human capital.
-- While South Africa encourages competition, there are many occurrences of collusion that have been investigated by the Competition Commission.
+Lack of information:
+- Consumers, workers, entrepreneurs lack info.
+- Consumers pay higher prices.
+- Workers unaware of job opportunities.
+- Entrepreneurs lack cost/productivity info.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH immobility AND lack of information. 4 marks each.',
+          commonMistake: 'Learners only discuss one factor.',
+          examinerHint: 'Immobility = slow adjustment. Information = wrong decisions.',
+          alternativeAccept: ['labour immobility', 'lack of information'],
+          memoryTrick: '🧠 Immobility = slow. Information = wrong decisions.',
+          mergedCorrection: `🧠 Immobility = slow. Information = wrong decisions.\n\n📋 NSC Memo Answer:\nImmobility slows adjustment. Lack of info causes wrong decisions. Both misallocate resources.`,
+        },
+      }],
+    },
+    // ——— IMPERFECT MARKETS ———
+    {
+      id: 'L3Q8',
+      source: '2024 NSC Econ P2, Q5',
+      topicText: 'Oligopoly and Competition Policy',
+      teachTopic: 'competition-policy',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5',
+        prompt: 'How has the competition policy helped to reduce anti-competitive behaviour in South Africa?',
+        answer: 'Prevented abuse of economic power, regulated mergers, established Competition Commission, Tribunal, and Appeal Court, imposed penalties, protected consumers, promoted equity and foreign competition.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Three institutions. Fines. Consumer protection. Equity.',
+        memoFullAnswer: `- Prevented abuse of economic power.
+- Regulated mergers and takeovers.
+- Commission investigates restrictive practices.
+- Tribunal imposes fines.
+- Appeal Court reviews decisions.
+- Consumers protected from unfair prices.
+- Equity improved.
+- Foreign competition allowed.
+- Healthy competition promoted.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss at least 4 ways. 2 marks each.',
+          commonMistake: 'Learners only mention the three institutions.',
+          examinerHint: 'Commission + Tribunal + Appeal Court + fines + consumer protection + equity.',
+          alternativeAccept: ['prevents abuse of power', 'regulates mergers', 'imposes fines', 'protects consumers', 'promotes equity'],
+          memoryTrick: '🧠 3 institutions, fines, consumer protection, equity.',
+          mergedCorrection: `🧠 Competition Commission, Tribunal, Appeal Court + fines + consumer protection + equity.\n\n📋 NSC Memo Answer:\nCommission investigates, Tribunal fines, Appeal Court reviews. Consumers protected. Equity promoted.`,
+        },
+      }],
+    },
+    // ——— MARKET FAILURE ———
+    {
+      id: 'L3Q9',
+      source: '2024 NSC Econ P2, Q2.5',
+      topicText: 'Lack of Information and Misallocation',
+      teachTopic: 'market-failure-causes',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.5',
+        prompt: 'How can a lack of information by various market participants lead to the misallocation of resources?',
+        answer: 'Consumers pay higher prices, workers earn less, businesses incur higher costs, investors choose less profitable ventures, government policies may be ineffective.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Everyone makes wrong decisions because they lack information.',
+        memoFullAnswer: `- Consumers pay higher prices.
+- Consumers buy harmful products.
+- Workers earn less (unaware of alternatives).
+- Workers stay unemployed.
+- Businesses incur higher costs.
+- Producers face input disruptions.
+- Investors choose poor opportunities.
+- Government policies may be ineffective.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss at least 4 ways. 2 marks each.',
+          commonMistake: 'Learners give one or two examples.',
+          examinerHint: 'Consumers, workers, businesses, investors, government.',
+          alternativeAccept: ['higher prices', 'lower wages', 'poor investment', 'ineffective policy'],
+          memoryTrick: '🧠 Wrong info = wrong decisions by everyone.',
+          mergedCorrection: `🧠 Wrong info = wrong decisions by everyone.\n\n📋 NSC Memo Answer:\nConsumers overpay, workers earn less, businesses overpay for inputs, investors choose poorly, government policies fail.`,
+        },
+      }],
+    },
+    // ——— INFLATION ———
+    {
+      id: 'L3Q10',
+      source: '2025 NSC Econ P2, Q2.3.5',
+      topicText: 'Producer Subsidies',
+      teachTopic: 'inflation-combating',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.3.5',
+        prompt: 'How can producer subsidies positively influence the economy?',
+        answer: 'Lower production costs reduce inflation, encourage more production, create jobs, lower consumer prices.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Subsidies → lower costs → lower prices → more production → jobs.',
+        memoFullAnswer: `- Producers incur lower costs, reducing inflation.
+- More goods and services produced, stimulating growth.
+- More jobs created, reducing unemployment.
+- Consumers pay lower prices, increasing spending.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss at least 4 effects. 2 marks each.',
+          commonMistake: 'Learners only say "lower prices".',
+          examinerHint: 'Subsidy → lower cost → lower prices → more output → jobs.',
+          alternativeAccept: ['lower inflation', 'higher output', 'more jobs', 'lower prices'],
+          memoryTrick: '🧠 Subsidy → cost down → price down → output up → jobs up.',
+          mergedCorrection: `🧠 Subsidy → cost down → price down → output up → jobs up.\n\n📋 NSC Memo Answer:\nLower production costs reduce inflation, increase output, create jobs, lower consumer prices.`,
+        },
+      }],
+    },
+    // ——— ENVIRONMENT ———
+    {
+      id: 'L3Q11',
+      source: '2025 NSC Econ P2, Q3.3.4',
+      topicText: 'Loss of Indigenous Knowledge',
+      teachTopic: 'international-protocols',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.3.4',
+        prompt: 'Explain the impact of the loss of indigenous knowledge on the environment.',
+        answer: 'Environmental damage increases as future generations cannot co-exist with the environment. Over-exploitation of natural resources results.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'No traditional knowledge → over-use → damage.',
+        memoFullAnswer: `- Environmental damage increases as future generations cannot co-exist.
+- Loss of indigenous knowledge leads to over-exploitation of natural resources.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must explain the link between lost knowledge and environmental damage.',
+          commonMistake: 'Learners just say "damage to environment".',
+          examinerHint: 'Indigenous knowledge = traditional conservation. Lost = over-exploitation.',
+          alternativeAccept: ['over-exploitation', 'increased environmental damage'],
+          memoryTrick: '🧠 No traditional knowledge → over-use → damage.',
+          mergedCorrection: `🧠 No traditional knowledge → over-use → damage.\n\n📋 NSC Memo Answer:\nLoss of indigenous knowledge increases environmental damage and over-exploitation of resources.`,
+        },
+      }],
+    },
+    // ——— TOURISM ———
+    {
+      id: 'L3Q12',
+      source: '2025 NSC Econ P2, Q3.4',
+      topicText: 'Tourism, GDP, and Poverty',
+      teachTopic: 'tourism-effects',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.4',
+        prompt: 'Briefly discuss the effects of tourism on gross domestic product (GDP) and poverty.',
+        answer: 'Tourism contributes directly and indirectly to GDP. It is a fast redistribution mechanism, brings development to rural areas, offers entrepreneurial opportunities.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'GDP contribution + poverty reduction.',
+        memoFullAnswer: `GDP:
+- Direct contribution from tourist spending.
+- Indirect contribution through suppliers.
 
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss BOTH compliance and non-compliance. 4 marks each.',
-            commonMistake: 'Learners only discuss one side (compliance) and miss the non-compliance.',
-            examinerHint: 'Think: What does South Africa do well? What does it fail at?',
-            alternativeAccept: [
-              'Good governance (compliance)',
-              'Integration (compliance)',
-              'Partnership (compliance)',
-              'Corruption (non-compliance)',
-              'Lack of infrastructure (non-compliance)'
-            ],
-            memoryTrick: '🧠 Remember: "G-I-P-R-C" vs "C-L-I-C"',
-            mergedCorrection: `🧠 Memory Trick: "G-I-P-R-C" vs "C-L-I-C"
-✅ G - Good governance
-✅ I - Integration
-✅ P - Partnership
-✅ R - Resources
-✅ C - Competition
-
-❌ C - Corruption
-❌ L - Lack of resources
-❌ I - Ignorance
-❌ C - Collusion
-
-📋 NSC Memo Answer:
-COMPLIANCE:
-- SDIs and SEZs are managed through transparent, ethical and efficient governance.
-- The government ensures integration between different areas through spill-over benefits.
-- Partnership between all role players is encouraged.
-- Provision of resources is ensured by prioritising infrastructure development projects.
-- Healthy competition is promoted through the competition policy.
-
-NON-COMPLIANCE:
-- Corruption, nepotism and mismanagement of public funds have occurred in many provinces and municipalities.
-- Lack of resources, especially infrastructure, has resulted in some parts of the country failing to attract investments.
-- Ignorance towards education and training opportunities has resulted in poor investment in human capital.
-- While South Africa encourages competition, there are many occurrences of collusion.`
-          }
-        }
-      ]
-    }
+Poverty:
+- Fast redistribution mechanism.
+- Alternative to urbanisation.
+- Diversifies rural income.
+- Allows SMME establishment.
+- Skills training opportunities.
+- Partnerships with mainstream business.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH GDP AND poverty. 4 marks each.',
+          commonMistake: 'Learners only discuss GDP or only poverty.',
+          examinerHint: 'GDP = direct + indirect. Poverty = redistribution + rural development.',
+          alternativeAccept: ['direct GDP contribution', 'indirect GDP contribution', 'poverty reduction', 'rural development'],
+          memoryTrick: '🧠 GDP = direct + indirect. Poverty = redistribution + rural.',
+          mergedCorrection: `🧠 GDP = direct + indirect. Poverty = redistribution + rural.\n\n📋 NSC Memo Answer:\nDirect and indirect GDP contribution. Fast redistribution to rural poor. SMME opportunities.`,
+        },
+      }],
+    },
   ],
 
   level4: [
-    // Q1: Impact of Low Economic Growth (2023 NSC P1, Q3.5)
+    // ——— CIRCULAR FLOW ———
     {
       id: 'L4Q1',
-      source: '2023 NSC P1, Q3.5',
-      topicText: 'Impact of Low Economic Growth',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '3.5',
-          prompt: 'Analyse the impact of low economic growth on the South African economy.',
-          clue: 'Think about: unemployment, household income, investment, exports, tax revenue, state debt, and inflation.',
-          answer: 'Low economic growth leads to increased unemployment, decreased household income, reduced investment, lower export earnings, decreased tax revenue, increased welfare spending, higher state debt, limited public services, and inflation.',
-          marks: 8,
-          memoFullAnswer: `Low economic growth has the following impact on the South African economy:
-- South Africa's unemployment rate will increase due to the decrease in production of goods and services.
-- Households' income levels will decrease resulting in low consumer spending and savings.
-- The economy will fail to attract direct investments which contributes to less employment opportunities.
-- Export earnings will decrease contributing to the depreciation of local currency and decrease in trade balance.
-- Tax revenue for the government will decrease which reduces the capacity of the government to implement public projects such as infrastructure development.
-- Many people lose their jobs which increases the fiscal burden for the government in terms of welfare expenditure such as social grants.
-- State debt will increase as the government borrows more funds from international organisations and other governments to finance its expenditure.
-- Low public finances will limit the ability of the government to increase its investment in socio-economic services delivery such as electricity and water supply.
-- Inflation rate may increase due to the decrease in supply of goods and services.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must analyse at least 4 impacts. 2 marks per well-explained impact.',
-            commonMistake: 'Learners list impacts without explaining how they affect the economy.',
-            examinerHint: 'Think about: unemployment, household income, investment, exports, tax revenue, state debt, and inflation.',
-            alternativeAccept: [
-              'Higher unemployment',
-              'Lower household income',
-              'Less investment',
-              'Lower tax revenue',
-              'Higher state debt',
-              'Higher inflation'
-            ],
-            memoryTrick: '🧠 Remember: "U-I-L-T-D-I" - Unemployment, Income, Investment, Tax, Debt, Inflation',
-            mergedCorrection: `🧠 Memory Trick: "U-I-L-T-D-I"
-• U - Unemployment increases
-• I - Income decreases
-• L - Less investment
-• T - Tax revenue drops
-• D - Debt increases
-• I - Inflation rises
-
-📋 NSC Memo Answer:
-- South Africa's unemployment rate will increase due to the decrease in production of goods and services.
-- Households' income levels will decrease resulting in low consumer spending and savings.
-- The economy will fail to attract direct investments which contributes to less employment opportunities.
-- Export earnings will decrease contributing to the depreciation of local currency.
-- Tax revenue for the government will decrease which reduces the capacity to implement public projects.
-- State debt will increase as the government borrows more funds.
-- Inflation rate may increase due to the decrease in supply of goods and services.`
-          }
-        }
-      ]
+      source: '2025 NSC Econ P1, Q5',
+      topicText: 'Markets in Four-Sector Circular Flow',
+      teachTopic: 'circular-flow-markets',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1 (main)',
+        prompt: 'Discuss in detail the markets within the four-sector circular-flow model.',
+        answer: 'Goods market, factor market, financial market (money + capital), foreign exchange market.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'G-F-F-F: Goods, Factor, Financial, Forex.',
+        memoFullAnswer: `(a) Goods market — products bought and sold. Durable, semi-durable, non-durable, capital goods.
+(b) Factor market — labour, land, capital, entrepreneurship. Wages, rent, interest, profit.
+(c) Financial market — money market (short-term, SARB) + capital market (long-term, JSE).
+(d) Foreign exchange market — currencies traded. Rand value determined by demand and supply.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss all 4 markets.',
+          commonMistake: 'Learners forget the forex market.',
+          examinerHint: 'G-F-F-F: Goods, Factor, Financial, Forex.',
+          alternativeAccept: ['goods market', 'factor market', 'financial market', 'forex market'],
+          memoryTrick: '🧠 "G-F-F-F" — Goods, Factor, Financial, Forex.',
+          mergedCorrection: `🧠 "G-F-F-F"\n• G — Goods\n• F — Factor\n• F — Financial (money + capital)\n• F — Forex\n\n📋 NSC Memo Answer:\nFour markets: Goods, Factor, Financial (money + capital), Forex.`,
+        },
+      }],
     },
-    // Q2: Challenges in Industrial Development (2024 NSC P1, Q3.5)
+    // ——— BUSINESS CYCLES ———
     {
       id: 'L4Q2',
-      source: '2024 NSC P1, Q3.5',
-      topicText: 'Industrial Development Challenges',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '3.5',
-          prompt: 'Analyse the challenges faced by South Africa in promoting industrial development through the various policies.',
-          clue: 'Think about: skills, infrastructure, regulations, capital, energy, labour, and trade barriers.',
-          answer: 'South Africa faces skills shortages, inadequate infrastructure, burdensome regulations, limited access to capital, global demand fluctuations, energy constraints, labour challenges, and international trade barriers.',
-          marks: 8,
-          memoFullAnswer: `- Skills shortages and mismatches hinder the growth of industries which require specialised knowledge and expertise, affecting their competitiveness on a global scale.
-- Inadequate and unreliable infrastructure, including transportation, energy, and water supply leads to increased production costs and supply disruptions that hinder the expansion of industries.
-- Burdensome regulations, bureaucracy, and uncertainty discourage investment and limit the establishment of new businesses.
-- Limited access to capital by many Small, Medium and Micro Enterprises (SMMEs) delays the ability of businesses to invest in new technologies, upgrade facilities, and compete effectively.
-- Fluctuations in global demand, trade tensions, and economic downturns of key trading partners negatively affect export-oriented industries and the overall economic stability.
-- Energy constraints, including load shedding and high energy costs, disrupt industrial operations, leading to decreased productivity and competitiveness.
-- Labour-related challenges, such as industrial strikes, wage disputes, and labour market rigidities, negatively impact on industrial stability.
-- International trade barriers may limit export volumes by South African industries which limits the expansion of industries.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must analyse at least 4 challenges. 2 marks per well-explained challenge.',
-            commonMistake: 'Learners list challenges without explaining how they affect industrial development.',
-            examinerHint: 'Think about: skills, infrastructure, regulations, capital, energy, labour, and trade barriers.',
-            alternativeAccept: [
-              'Skills shortages',
-              'Inadequate infrastructure',
-              'Burdensome regulations',
-              'Limited access to capital',
-              'Energy constraints',
-              'Labour challenges'
-            ],
-            memoryTrick: '🧠 Remember: "S-I-R-C-E-L-T" - Skills, Infrastructure, Regulations, Capital, Energy, Labour, Trade',
-            mergedCorrection: `🧠 Memory Trick: "S-I-R-C-E-L-T"
-• S - Skills shortages
-• I - Inadequate infrastructure
-• R - Burdensome regulations
-• C - Limited access to capital
-• E - Energy constraints (load shedding)
-• L - Labour challenges
-• T - Trade barriers
-
-📋 NSC Memo Answer:
-- Skills shortages and mismatches hinder the growth of industries which require specialised knowledge and expertise.
-- Inadequate and unreliable infrastructure, including transportation, energy, and water supply leads to increased production costs.
-- Burdensome regulations, bureaucracy, and uncertainty discourage investment.
-- Limited access to capital by many SMMEs delays the ability of businesses to invest in new technologies.
-- Energy constraints, including load shedding and high energy costs, disrupt industrial operations.
-- Labour-related challenges, such as industrial strikes, wage disputes, and labour market rigidities, negatively impact industrial stability.
-- International trade barriers may limit export volumes by South African industries.`
-          }
-        }
-      ]
+      source: '2023 NSC Econ P1, Q3.5',
+      topicText: 'Impact of Low Economic Growth',
+      teachTopic: 'business-cycles-phases',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.5',
+        prompt: 'Analyse the impact of low economic growth on the South African economy.',
+        answer: 'Unemployment rises, household income falls, investment drops, exports fall, tax revenue drops, welfare spending rises, state debt rises, public services suffer, inflation may rise.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'U-I-L-T-D-I: Unemployment, Income, Investment, Tax, Debt, Inflation.',
+        memoFullAnswer: `- Unemployment rises.
+- Household income falls.
+- Investment drops.
+- Export earnings fall.
+- Tax revenue drops.
+- Welfare burden rises.
+- State debt rises.
+- Public services suffer.
+- Inflation may rise.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 impacts. 2 marks each.',
+          commonMistake: 'Learners list impacts without explaining.',
+          examinerHint: 'U-I-L-T-D-I.',
+          alternativeAccept: ['unemployment rises', 'household income falls', 'investment drops', 'tax revenue drops', 'state debt rises', 'inflation rises'],
+          memoryTrick: '🧠 "U-I-L-T-D-I" — Unemployment, Income, Investment, Tax, Debt, Inflation.',
+          mergedCorrection: `🧠 "U-I-L-T-D-I"\n• U — Unemployment up\n• I — Income down\n• L — Less investment\n• T — Tax revenue down\n• D — Debt up\n• I — Inflation up\n\n📋 NSC Memo Answer:\nUnemployment up, income down, investment down, tax down, debt up, inflation up.`,
+        },
+      }],
     },
-    // Q3: Fiscal Policy to Dampen Economy (2025 NSC P1, Q4.5)
+    // ——— PUBLIC SECTOR ———
     {
       id: 'L4Q3',
-      source: '2025 NSC P1, Q4.5',
+      source: '2025 NSC Econ P1, Q4.5',
       topicText: 'Fiscal Policy to Dampen Economy',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '4.5',
-          prompt: 'Analyse the fiscal policy measures that can be used to dampen the economy.',
-          clue: 'Think: how do you SLOW DOWN an overheated economy? Cut spending, raise taxes, reduce grants.',
-          answer: 'Restrictive fiscal policy measures include decreasing government expenditure, cutting public sector wages, raising taxes on businesses, increasing personal income tax, increasing indirect taxes, reducing social spending, decreasing subsidies, and providing savings incentives.',
-          marks: 8,
-          memoFullAnswer: `Restrictive or contractionary fiscal policy is used during the prosperity phase of the business cycle to dampen the economy.
-- Decreasing government expenditure on infrastructural projects reduce demand for goods and services.
-- Cutting down on public sector wages (compensation of employees), may help to reduce aggregate demand for goods and services and discourage production.
-- Raising taxes on businesses will decrease profit prospects in the economy leading to an overall decline in the economic activity.
-- Increasing personal income tax may reduce disposable income, leading to a decline in consumer spending.
-- Increasing indirect taxes such as VAT, excise duties, etc. will increase the price of goods and services which reduces expenditure.
-- Reduction in social spending, such as welfare grants, may reduce the households' income level which leads to lower consumption expenditure.
-- A decrease in subsidies and incentives offered to businesses may lead to lower production output as the actual production cost incurred by producers increases.
-- The government can provide incentives for savings, such as tax-free savings accounts, to encourage people to save rather than to spend.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must analyse at least 4 measures. 2 marks per well-explained measure.',
-            commonMistake: 'Learners confuse expansionary (stimulate) with contractionary (dampen) policy.',
-            examinerHint: 'Think: how do you SLOW DOWN an overheated economy? Cut spending, raise taxes, reduce grants.',
-            alternativeAccept: [
-              'Decrease government spending',
-              'Increase taxes',
-              'Reduce social grants',
-              'Cut public sector wages',
-              'Provide savings incentives'
-            ],
-            memoryTrick: '🧠 Remember: "C-T-R-S-S" - Cut spending, Taxes up, Reduce grants, Save incentives',
-            mergedCorrection: `🧠 Memory Trick: "C-T-R-S-S"
-• C - Cut government spending
-• T - Taxes up (VAT, income tax)
-• R - Reduce social grants
-• S - Save incentives (tax-free savings)
-• S - Stop subsidies
-
-📋 NSC Memo Answer:
-- Decreasing government expenditure on infrastructural projects reduce demand for goods and services.
-- Cutting down on public sector wages may help to reduce aggregate demand.
-- Raising taxes on businesses will decrease profit prospects in the economy.
-- Increasing personal income tax may reduce disposable income, leading to a decline in consumer spending.
-- Increasing indirect taxes such as VAT will increase the price of goods and services which reduces expenditure.
-- Reduction in social spending, such as welfare grants, may reduce the households' income level.
-- A decrease in subsidies and incentives offered to businesses may lead to lower production output.
-- The government can provide incentives for savings, such as tax-free savings accounts, to encourage people to save rather than to spend.`
-          }
-        }
-      ]
+      teachTopic: 'fiscal-policy',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.5',
+        prompt: 'Analyse the fiscal policy measures that can be used to dampen the economy.',
+        answer: 'Decrease government spending, cut public wages, raise business taxes, raise personal income tax, raise indirect taxes, reduce social spending, decrease subsidies, encourage savings.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'C-T-R-S-S: Cut spending, Taxes up, Reduce grants, Save incentives, Stop subsidies.',
+        memoFullAnswer: `Restrictive fiscal policy is used during the prosperity phase:
+- Decrease government expenditure.
+- Cut public sector wages.
+- Raise taxes on businesses.
+- Increase personal income tax.
+- Increase indirect taxes (VAT, excise).
+- Reduce social spending.
+- Decrease subsidies and incentives.
+- Encourage savings (tax-free savings accounts).`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 measures. 2 marks each.',
+          commonMistake: 'Learners confuse expansionary with contractionary.',
+          examinerHint: 'C-T-R-S-S.',
+          alternativeAccept: ['decrease government spending', 'increase taxes', 'reduce grants', 'provide savings incentives'],
+          memoryTrick: '🧠 "C-T-R-S-S" — Cut spending, Taxes up, Reduce grants, Save incentives, Stop subsidies.',
+          mergedCorrection: `🧠 "C-T-R-S-S"\n• C — Cut spending\n• T — Taxes up\n• R — Reduce grants\n• S — Save incentives\n• S — Stop subsidies\n\n📋 NSC Memo Answer:\nCut spending, raise taxes, reduce social spending, encourage saving, reduce subsidies.`,
+        },
+      }],
     },
-    // Q4: Regional Development Policies (2022 NSC P1, Q3.5)
+    // ——— FOREIGN TRADE ———
     {
       id: 'L4Q4',
-      source: '2022 NSC P1, Q3.5',
-      topicText: 'Regional Development Policies',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '3.5',
-          prompt: 'Evaluate South Africa\'s regional development policies in terms of the international benchmark criteria.',
-          clue: 'Think: What does South Africa do well? What does it fail at?',
-          answer: 'South Africa complies with international benchmarks through good governance, integration, partnership, resource provision, competitive businesses, healthy competition, education and training, addressing grassroots issues, inclusive development, and supporting SMMEs. However, it fails in some areas due to corruption, lack of resources, poor education investment, and collusion.',
-          marks: 8,
-          memoFullAnswer: `South Africa's regional development policies COMPLY with international benchmark criteria because:
-- Spatial Development Initiatives (SDIs) and Special Economic Zones (SEZs) are managed through transparent, ethical and efficient governance to decentralize economic activity.
-- The government ensures that no region is developed at the cost of another region's potential through integration between different areas by means of spill-over benefits.
-- Partnership between all role players in the economy is encouraged by the government as it builds a more inclusive economy.
-- Provision of resources is ensured by prioritising infrastructure development projects in all provinces so that regional development is achieved.
-- Competitive businesses that are not in need of ongoing financial aid from government have been established.
-- Healthy competition in the economy is promoted through the competition policy as well as the Competition Commission, Competition Tribunal and Competition Appeal Court.
-- People from different regions are involved in education and training, to improve productivity and ensure development of people by people.
-- Issues at grass roots level such as poverty and inequality, are addressed to ensure that development starts from below.
-- More emphasis is put on total development covering all human life to achieve inclusive development, e.g. education, health and nutrition.
-- Various programmes were implemented by the Department of Trade, Industry and Competition (DTIC) to render support to SMMEs and entrepreneurship in an effort to remain market oriented.
-
-South Africa's regional development policies DO NOT COMPLY with international benchmarks criteria because:
-- Corruption, nepotism and mismanagement of public funds have occurred in many provinces and municipalities resulting in poor governance.
-- Lack of resources, especially infrastructure, has resulted in some parts of the countries failing to attract investments and unemployment remained higher.
-- Ignorance towards education and training opportunities has resulted in poor investment in human capital.
-- While South Africa encourages competition, there are many occurrences of collusion that have been investigated by the Competition Commission.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss BOTH compliance and non-compliance. 4 marks each.',
-            commonMistake: 'Learners only discuss one side (compliance) and miss the non-compliance.',
-            examinerHint: 'Think: What does South Africa do well? What does it fail at?',
-            alternativeAccept: [
-              'Good governance (compliance)',
-              'Integration (compliance)',
-              'Partnership (compliance)',
-              'Corruption (non-compliance)',
-              'Lack of infrastructure (non-compliance)'
-            ],
-            memoryTrick: '🧠 Remember: "G-I-P-R-C" vs "C-L-I-C"',
-            mergedCorrection: `🧠 Memory Trick: "G-I-P-R-C" vs "C-L-I-C"
-✅ G - Good governance
-✅ I - Integration
-✅ P - Partnership
-✅ R - Resources
-✅ C - Competition
-
-❌ C - Corruption
-❌ L - Lack of resources
-❌ I - Ignorance
-❌ C - Collusion
-
-📋 NSC Memo Answer:
-COMPLIANCE:
-- SDIs and SEZs are managed through transparent, ethical and efficient governance.
-- The government ensures integration between different areas through spill-over benefits.
-- Partnership between all role players is encouraged.
-- Provision of resources is ensured by prioritising infrastructure development projects.
-- Healthy competition is promoted through the competition policy.
-
-NON-COMPLIANCE:
-- Corruption, nepotism and mismanagement of public funds have occurred in many provinces and municipalities.
-- Lack of resources, especially infrastructure, has resulted in some parts of the country failing to attract investments.
-- Ignorance towards education and training opportunities has resulted in poor investment in human capital.
-- While South Africa encourages competition, there are many occurrences of collusion.`
-          }
-        }
-      ]
+      source: '2025 NSC Econ P1, Q3.5',
+      topicText: 'Economic Indicators and Performance',
+      teachTopic: 'economic-indicators-types',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.5',
+        prompt: 'How can changes in the various economic indicators be used to show improvement in the performance of the economy?',
+        answer: 'Lower CPI = lower cost of living. Lower PPI = lower production costs. Improved terms of trade = more export income. Higher employment = more tax revenue. Higher productivity = higher GDP. Weaker rand = competitive exports.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Every indicator has a direction that means "improvement".',
+        memoFullAnswer: `- Decrease in CPI shows lower cost of living.
+- Decline in PPI indicates lower production costs.
+- Improved terms of trade means more export income.
+- Surplus on current account = healthy economy.
+- Higher employment rate = stability and growth.
+- Higher labour productivity = efficiency and GDP growth.
+- Lower interest rates encourage spending.
+- Higher interest rates curb inflation and attract FDI.
+- Weaker exchange rate = competitive exports.
+- Stronger exchange rate = cheaper imports.
+- Higher money supply = liquidity and spending.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 indicators. 2 marks each.',
+          commonMistake: 'Learners list indicators without explaining direction.',
+          examinerHint: 'Each indicator has an improving direction.',
+          alternativeAccept: ['lower CPI', 'improved terms of trade', 'higher employment', 'higher productivity'],
+          memoryTrick: '🧠 CPI down, PPI down, ToT up, employment up, productivity up.',
+          mergedCorrection: `🧠 CPI ↓ = better. PPI ↓ = better. ToT ↑ = better. Employment ↑ = better. Productivity ↑ = better.\n\n📋 NSC Memo Answer:\nLower CPI, lower PPI, improved ToT, higher employment, higher productivity all signal improvement.`,
+        },
+      }],
     },
-    // Q5: Financial Sector in Circular Flow (2023 NSC P1, Q4.5)
+    // ——— GROWTH & DEVELOPMENT ———
     {
       id: 'L4Q5',
-      source: '2023 NSC P1, Q4.5',
-      topicText: 'Financial Sector in Circular Flow',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '4.5',
-          prompt: 'Analyse the relationship between the financial sector and other participants in the circular-flow model.',
-          clue: 'Think about: savings, loans, stock market, foreign exchange, and tax payments.',
-          answer: 'The financial sector acts as an intermediary between households, businesses, and the government. It accepts deposits, provides loans, facilitates stock market investments, enables foreign exchange transactions, and collects taxes.',
-          marks: 8,
-          memoFullAnswer: `- Financial sector includes banks and other institutions that provide borrowing and lending services to the other participants on the circular flow model.
-- Financial institutions act as intermediaries between the households who want to save money and businesses that want to borrow money to finance their investments.
-- Commercial banks accept deposits of money from households as savings and pay interests on the savings.
-- The financial sector lends money in form of loans to producers that need to expand their operations for example buy more land and buildings or machinery and equipment.
-- Households may borrow money from financial institutions to purchase goods and services such as houses and vehicles.
-- The financial sector makes profit from the difference between the interest rate paid to depositors and that which is charged to borrowers.
-- Financial institutions may act as stock brokers by assisting households who may need to invest their surplus funds for example buying shares at the Johannesburg Securities Exchange (JSE).
-- Commercial banks facilitate the exchange of different currencies which allows other participants to make payments for their imports.
-- Financial markets coordinate the demand for and supply of foreign exchange to determine different exchange rates.
-- Government institutions such as state-owned businesses and local municipalities may save or invest their surplus fund with the financial institutions.
-- The government may borrow funds from different financial institution to cover the spending needs.
-- Financial institution such as commercial banks and insurance companies pay tax to the government from the income that they generate.
+      source: '2025 NSC Econ P1, Q4.5',
+      topicText: 'Fiscal Policy Measures (Advanced)',
+      teachTopic: 'fiscal-policy',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.5',
+        prompt: 'Analyse the fiscal policy measures that can be used to dampen the economy.',
+        answer: 'Restrictive fiscal policy — cut spending, raise taxes, reduce grants, stop subsidies, encourage saving.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'C-T-R-S-S: Cut spending, Taxes up, Reduce grants, Save incentives, Stop subsidies.',
+        memoFullAnswer: `- Decreasing government expenditure reduces demand.
+- Cutting public sector wages reduces aggregate demand.
+- Raising business taxes decreases profit.
+- Increasing personal income tax reduces disposable income.
+- Increasing indirect taxes raises prices, reduces spending.
+- Reducing social spending reduces household income.
+- Decreasing subsidies and incentives lowers output.
+- Providing savings incentives encourages saving.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 measures. 2 marks each.',
+          commonMistake: 'Learners describe expansionary policy.',
+          examinerHint: 'Dampen = contractionary. C-T-R-S-S.',
+          alternativeAccept: ['cut spending', 'raise taxes', 'reduce grants', 'stop subsidies'],
+          memoryTrick: '🧠 "C-T-R-S-S" — Cut spending, Taxes up, Reduce grants, Save incentives, Stop subsidies.',
+          mergedCorrection: `🧠 "C-T-R-S-S"\n• C — Cut spending\n• T — Taxes up\n• R — Reduce grants\n• S — Save incentives\n• S — Stop subsidies\n\n📋 NSC Memo Answer:\nContractionary fiscal policy: cut spending, raise taxes, reduce grants, encourage saving.`,
+        },
+      }],
+    },
+    // ——— ECONOMIC INDICATORS ———
+    {
+      id: 'L4Q6',
+      source: '2025 NSC Econ P1, Q3.4',
+      topicText: 'BBBEE and NSDS',
+      teachTopic: 'economic-indicators-types',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.4',
+        prompt: 'Briefly discuss BBBEE and NSDS as South African growth and development policies and strategic initiatives.',
+        answer: 'BBBEE promotes inclusive participation and transformation. NSDS improves skills, reduces unemployment, promotes equity.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'BBBEE = transformation. NSDS = skills.',
+        memoFullAnswer: `BBBEE:
+- Promotes inclusive economic participation.
+- Legal basis for transformation.
+- Redress and affirmative action.
+- Preferential procurement, enterprise development.
 
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(4 x 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must analyse at least 4 relationships. 2 marks per well-explained relationship.',
-            commonMistake: 'Learners describe the financial sector in isolation without explaining how it connects to households, businesses, and government.',
-            examinerHint: 'Think about: savings, loans, stock market, foreign exchange, and tax payments.',
-            alternativeAccept: [
-              'Accepts deposits from households',
-              'Provides loans to businesses',
-              'Facilitates stock market investments',
-              'Enables foreign exchange transactions',
-              'Collects taxes from banks and insurance companies'
-            ],
-            memoryTrick: '🧠 Remember: "S-L-S-F-T" - Savings, Loans, Stocks, Forex, Taxes',
-            mergedCorrection: `🧠 Memory Trick: "S-L-S-F-T"
-• S - Savings from households
-• L - Loans to businesses
-• S - Stocks (JSE)
-• F - Forex (foreign exchange)
-• T - Taxes to government
+NSDS:
+- Improves skills of labour force.
+- Reduces unemployment, promotes equity.
+- Identifies and trains scarce skills.
+- Partnerships between education, employers, SETAs.
+- Focuses on historically disadvantaged groups.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH BBBEE AND NSDS. 4 marks each.',
+          commonMistake: 'Learners only discuss one policy.',
+          examinerHint: 'BBBEE = transformation. NSDS = skills.',
+          alternativeAccept: ['BBBEE transformation', 'NSDS skills training'],
+          memoryTrick: '🧠 BBBEE = ownership. NSDS = skills.',
+          mergedCorrection: `🧠 BBBEE = ownership. NSDS = skills.\n\n📋 NSC Memo Answer:\nBBBEE promotes inclusive participation. NSDS improves skills and reduces unemployment.`,
+        },
+      }],
+    },
+    // ——— PERFECT MARKET ———
+    {
+      id: 'L4Q7',
+      source: '2025 NSC Econ P2, Q4.4',
+      topicText: 'Economic Loss for Perfect Competitor',
+      teachTopic: 'perfect-market-short-run',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.4',
+        prompt: 'With the aid of a correctly labelled graph, explain economic loss for a perfectly competitive firm.',
+        answer: 'Firm minimises loss at MR = MC. If AR < AC at that point, economic loss results. Loss = (AC − AR) × Q.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Loss = (AC − AR) × Q. Shut down if AR < AVC.',
+        memoFullAnswer: `A firm minimises loss where MR = MC.
+If AR < AC at that point, the firm makes economic loss.
+Economic loss = (AC − AR) × Q.
+If AR < AVC, the firm shuts down.`,
+        formulas: ['Economic loss = (AC − AR) × Q'],
+        memoCorrection: {
+          whatToCheck: 'Must include graph + explanation + shut-down rule.',
+          commonMistake: 'Learners describe profit, not loss.',
+          examinerHint: 'Loss = (AC − AR) × Q. Shut down if AR < AVC.',
+          alternativeAccept: ['loss at MR = MC', 'AR < AC', 'shut down if AR < AVC'],
+          memoryTrick: '🧠 Loss = (AC − AR) × Q. Shut down if AR < AVC.',
+          mergedCorrection: `🧠 Loss = (AC − AR) × Q\n• Shut down if AR < AVC\n• Minimise loss at MR = MC\n\n📋 NSC Memo Answer:\nFirm minimises loss at MR = MC. Loss = (AC − AR) × Q. Shut down if AR < AVC.`,
+        },
+      }],
+    },
+    // ——— IMPERFECT MARKETS ———
+    {
+      id: 'L4Q8',
+      source: '2025 NSC Econ P2, Q5',
+      topicText: 'Monopoly and Abuse of Power',
+      teachTopic: 'monopoly',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1 (main)',
+        prompt: 'Discuss in detail the characteristics of a monopoly market structure, including a graph showing long-run economic profit.',
+        answer: 'One firm, unique product, complete barriers, price maker, downward-sloping demand. Long-run economic profit possible. Graph: LMC, LAC, MR, AR, economic profit region.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'One firm. Unique product. Complete barriers. Price maker. Long-run economic profit.',
+        memoFullAnswer: `- Only supplier — no competition.
+- Unique product, no close substitutes.
+- Complete barriers to entry.
+- Price maker.
+- Downward-sloping demand.
+- MR below AR.
+- Natural monopolies (high development costs).
+- Artificial monopolies (patents, licences).
+- Long-run economic profit.
+- Graph shows LMC, LAC, MR, AR with profit region.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss all characteristics + graph.',
+          commonMistake: 'Learners describe perfect competition.',
+          examinerHint: 'One firm, unique product, barriers, price maker, long-run profit.',
+          alternativeAccept: ['one supplier', 'unique product', 'barriers to entry', 'price maker', 'economic profit'],
+          memoryTrick: '🧠 One firm. Unique. Barriers. Price maker. Profit.',
+          mergedCorrection: `🧠 One firm. Unique. Barriers. Price maker. Profit.\n\n📋 NSC Memo Answer:\nMonopoly: one firm, unique product, complete barriers, price maker, long-run economic profit.`,
+        },
+      }],
+    },
+    // ——— MARKET FAILURE ———
+    {
+      id: 'L4Q9',
+      source: '2023 NSC Econ P2, Q4.5',
+      topicText: 'Inflation Targeting Success',
+      teachTopic: 'inflation-combating',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.5',
+        prompt: 'Evaluate the success of inflation targeting in combating inflation in the country.',
+        answer: 'Success: SARB kept inflation below 6%, improved credibility, controlled expectations, lower interest rates. Failure: focused on inflation at expense of employment, repo rate hikes during COVID, external shocks pushed inflation above target.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Success AND failure — balanced answer.',
+        memoFullAnswer: `Success:
+- Kept inflation below 6% since introduction.
+- Improved SARB credibility.
+- Controlled inflation expectations.
+- Lower interest rates, improved growth.
+- Achieved primary objective of price stability.
 
-📋 NSC Memo Answer:
-- Financial institutions act as intermediaries between the households who want to save money and businesses that want to borrow money.
-- Commercial banks accept deposits of money from households as savings and pay interests on the savings.
-- The financial sector lends money in form of loans to producers that need to expand their operations.
-- Households may borrow money from financial institutions to purchase goods and services such as houses and vehicles.
-- Financial institutions may act as stock brokers by assisting households who may need to invest their surplus funds.
-- Commercial banks facilitate the exchange of different currencies which allows other participants to make payments for their imports.
-- Financial markets coordinate the demand for and supply of foreign exchange to determine different exchange rates.
-- Financial institution such as commercial banks and insurance companies pay tax to the government.`
-          }
-        }
-      ]
-    }
+Failure:
+- Focused too much on inflation.
+- Ignored employment and growth.
+- Raised repo rate during COVID.
+- External shocks pushed inflation above target.
+- Target range 3-6% criticised as too wide.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH success AND failure.',
+          commonMistake: 'Learners only discuss one side.',
+          examinerHint: 'Balanced — successes and failures.',
+          alternativeAccept: ['kept inflation below 6%', 'improved credibility', 'focused too much on inflation', 'raised repo during COVID'],
+          memoryTrick: '🧠 Both sides: kept below 6%, but ignored employment.',
+          mergedCorrection: `🧠 Success: below 6%, credibility. Failure: ignored employment, repo hikes.\n\n📋 NSC Memo Answer:\nSuccess: below 6%, credibility. Failure: ignored employment, raised repo during COVID.`,
+        },
+      }],
+    },
+    // ——— INFLATION ———
+    {
+      id: 'L4Q10',
+      source: '2023 NSC Econ P2, Q2.5',
+      topicText: 'Subsidies to Producers',
+      teachTopic: 'inflation-combating',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '2.5',
+        prompt: 'How would the provision of subsidies to producers positively influence the economy?',
+        answer: 'Lower production costs → more output → lower prices → more jobs → higher tax revenue → improved BOP.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Cost down → output up → prices down → jobs up → tax up.',
+        memoFullAnswer: `- Firms produce more due to lower costs.
+- Consumers buy at lower prices.
+- Production levels increase, creating jobs.
+- Total income and aggregate demand rise.
+- Government collects more tax revenue.
+- Export subsidies improve BOP.
+- Currency may appreciate.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must explain the causal chain. 2 marks each.',
+          commonMistake: 'Learners only say "lower prices".',
+          examinerHint: 'Cost down → output up → prices down → jobs up → tax up.',
+          alternativeAccept: ['lower prices', 'higher output', 'more jobs', 'higher tax revenue'],
+          memoryTrick: '🧠 Subsidy → cost down → output up → jobs up → tax up.',
+          mergedCorrection: `🧠 Subsidy → cost down → output up → jobs up → tax up.\n\n📋 NSC Memo Answer:\nLower costs, higher output, lower prices, more jobs, higher tax revenue, improved BOP.`,
+        },
+      }],
+    },
+    // ——— ENVIRONMENT ———
+    {
+      id: 'L4Q11',
+      source: '2024 NSC Econ P2, Q3.5',
+      topicText: 'Negative Tourism Impacts',
+      teachTopic: 'tourism-effects',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '3.5',
+        prompt: 'How can tourism activities negatively impact South Africa?',
+        answer: 'Environmental restructuring, traffic congestion, wildlife loss, water shortages, noise pollution, product shortages, price rises, infrastructure strain, waste, population shifts.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Environment, traffic, wildlife, water, noise, prices, infrastructure.',
+        memoFullAnswer: `- Infrastructure development causes environmental restructuring.
+- Traffic congestion during peak seasons.
+- Wildlife loss from safari hunting.
+- Water shortages in dry areas.
+- Noise pollution from aircraft.
+- Product shortages on local market.
+- Local price increases.
+- Infrastructure strain during peak seasons.
+- Waste products damage the environment.
+- Population shifts to tourist areas.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 negative impacts. 2 marks each.',
+          commonMistake: 'Learners only discuss environmental damage.',
+          examinerHint: 'Environment, traffic, wildlife, water, noise, prices, infrastructure.',
+          alternativeAccept: ['environmental damage', 'traffic congestion', 'wildlife loss', 'water shortages', 'noise pollution', 'price rises'],
+          memoryTrick: '🧠 Environment, traffic, wildlife, water, noise, prices, infrastructure.',
+          mergedCorrection: `🧠 Environment, traffic, wildlife, water, noise, prices, infrastructure.\n\n📋 NSC Memo Answer:\nEnvironmental damage, traffic, wildlife loss, water shortages, noise, price rises, infrastructure strain.`,
+        },
+      }],
+    },
+    // ——— TOURISM ———
+    {
+      id: 'L4Q12',
+      source: '2024 NSC Econ P2, Q5',
+      topicText: 'Competition Policy and Anti-Competitive Behaviour',
+      teachTopic: 'competition-policy',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5',
+        prompt: 'How has the competition policy helped to reduce anti-competitive behaviour in South Africa?',
+        answer: 'Prevented abuse of power, regulated mergers, established 3 institutions, imposed fines, protected consumers, promoted equity, allowed foreign competition, promoted healthy competition.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Commission + Tribunal + Appeal Court + fines + consumer protection + equity.',
+        memoFullAnswer: `- Prevented abuse of economic power.
+- Regulated mergers and takeovers.
+- Commission investigates restrictive practices.
+- Tribunal imposes fines and penalties.
+- Appeal Court reviews decisions.
+- Consumers protected from unfair prices.
+- Equity improved.
+- Foreign competition allowed.
+- Healthy competition promoted.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss at least 4 ways. 2 marks each.',
+          commonMistake: 'Learners only mention institutions.',
+          examinerHint: 'Commission + Tribunal + Appeal Court + fines + consumer protection + equity.',
+          alternativeAccept: ['prevents abuse', 'regulates mergers', 'fines imposed', 'consumer protection', 'equity promoted'],
+          memoryTrick: '🧠 Commission + Tribunal + Appeal Court + fines + consumer protection + equity.',
+          mergedCorrection: `🧠 Commission + Tribunal + Appeal Court + fines + consumer protection + equity.\n\n📋 NSC Memo Answer:\nPrevents abuse, regulates mergers, fines imposed, consumers protected, equity promoted.`,
+        },
+      }],
+    },
   ],
 
   level5: [
-    // Q1: Forecasting Business Cycles (2022 NSC P1, Q5)
+    // ——— CIRCULAR FLOW ———
     {
       id: 'L5Q1',
-      source: '2022 NSC P1, Q5',
-      topicText: 'Forecasting Business Cycles',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '5.1',
-          prompt: 'Discuss in detail the features underpinning forecasting of business cycles. (26 marks) Analyse the challenges that an economic recession poses for different participants in the economy. (10 marks)',
-          clue: 'Features include: leading indicators, coincident indicators, lagging indicators, composite indicators, amplitude, trend line, length/duration, extrapolation, and moving averages.',
-          answer: 'Business cycles can be described as successive periods of contraction and expansion of economic activities. The features include leading indicators, coincident indicators, lagging indicators, composite indicators, amplitude, trend line, length/duration, extrapolation, and moving averages.',
-          marks: 36,
-          memoFullAnswer: `INTRODUCTION
-Business cycles can be described as successive periods of contraction and expansion of economic activities.
-(Accept any other correct relevant introduction)
-(Max 2)
-
-BODY: MAIN PART
-
-LEADING INDICATORS
-- Leading indicators are indicators that change before the economy changes.
-- Leading indicators give consumers, business leaders and policy makers a glimpse (advance warnings) of where the economy might be heading.
-- These indicators peak before a business cycle has reached a peak.
-- Most important type of indicator in helping economists to predict what the economy will be like in the future.
-- When these indicators rise, the level of economic activities will also rise in a few months' time.
-- When they decline it also means the level of economic activity will decline in the near future.
-- Examples: include the number of residential plans passed, number of job advertisements, number of new companies.
-
-COINCIDENT INDICATORS
-- Coincident indicators are indicators that change at the same time as the economy changes.
-- Coincident indicators show the actual state of the economy.
-- A downturn is shown by a decrease in these indicators while an upswing is shown as an increase in these indicators.
-- Coincident indicators confirm the changes predicted by the leading indicators.
-- The value of retail sales will reach a peak and then begin to decline at the same time as the business cycle.
-- Examples: are usage of capacity in manufacturing, registered unemployment, real GDP.
-
-LAGGING INDICATORS
-- Lagging indicators change after the economy has already changed.
-- Lagging indicators reach the turning point after the business cycle has already turned.
-- Lagging indicators serve to confirm the behaviour of co-incident indicators.
-- Examples: number of commercial vehicles sold, real investment in machinery, unit labour costs in manufacturing.
-
-COMPOSITE INDICATORS
-- Composite indicators summarise a group of indicators of the same type into a single value.
-- The single figure forms a norm for a country's economic performance.
-- Composite indicators can be consolidated into single values of a composite leading, coincident and lagging indicator.
-
-AMPLITUDE
-- It is the difference between the value of total output between peak and trough measured from the trend line to the peak and trough.
-- Amplitude reflects the intensity of the upswing and downswing in economic activity.
-- The amplitude shows two things:
-  - The power of the underlying forces such as interest rates, exports or consumer spending.
-  - A large amplitude during the upswing signifies strong underlying forces.
-  - The duration of a cycle with larger amplitude is usually longer than one with a small amplitude.
-- The extent of change such a decrease in unemployment of 50% or increase in inflation of 100% during the upswing.
-- The larger the amplitude, the more extreme the changes that may occur.
-
-TREND LINE
-- The trend line indicates the general direction in which the economy is moving.
-- When the economy is growing, there is an upward trend, but when the economy is contracting there is a downward trend.
-- The trend will change when the time series data change their behavioural patterns of the past.
-- The trend line normally has a positive slope because the production capacity of the economy increases over time.
-
-LENGTH/DURATION OF A CYCLE
-- Length is measured from peak to peak or from trough to trough.
-- Longer cycles show strength and shorter cycles show weakness with regard to economic activities.
-- Cycles may overshoot which means that whenever activity in terms of some composite indicators increase to beyond its normal level.
-- The contraction in the growth of output may overshoot the level where it should naturally stop.
-
-EXTRAPOLATION
-- Extrapolation refers to the estimation of something unknown from the facts that are known.
-- Past data is used when predictions are made about the future based on assumptions related to trends.
-- Extending a trend into the future may provide information on what is likely to happen.
-- Economists may predict that the economy will grow in few months to come if a business cycle has passed through a trough and entered into an upswing.
-- Extrapolation techniques are sometimes used to predict future share prices.
-
-MOVING AVERAGES
-- They are calculated along the time series so that a smoother business cycle can be established.
-- Moving averages are used to analyse the changes in a series of data over a certain period of time.
-- Economists use moving averages to eliminate the effect of sharp fluctuation in the business cycle.
-
-(Accept any other correct relevant response)
-(A maximum of 8 marks may be allocated for mere listing of headings/examples)
-(Max 26)
-
-ADDITIONAL PART
-An economic recession may pose the following challenges on the different participants in the economy:
-- The tax base for the government may shrink as some businesses may shut-down their operation and workers lose jobs.
-- Government will collect less tax revenue from businesses and households resulting in postponement of some public projects due to lack of funds.
-- Social expenditure by the government may increase as poverty and unemployment levels increase during the recession.
-- State debt may increase as the government tries to raise funds for some of its critical expenditure.
-- Households may lose their jobs and fail to find new employment as production of goods and services decrease.
-- Consumers' confidence will decrease resulting in less expenditure on goods and services.
-- Businesses may experience low demand for goods and services as consumers postpone some of their expenditures.
-- Business may generate less revenue resulting in less profits.
-- Business confidence may decrease thereby discouraging them from investing in the economy.
-- The foreign sector will have less supply of South African exports as domestic production decreases.
-- Foreign investors will lose confidence with the economy resulting in less capital inflow.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(Max 10)
-
-CONCLUSION
-The country can be enabled to prepare suitable policies to deal with different changes in the economy reflected by the indicators and features.
-(Accept any other correct relevant higher order conclusion)
-(Max 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss at least 6 features in detail. Each feature requires explanation + example. Essay structure: Introduction (2) + Body (26) + Conclusion (2).',
-            commonMistake: 'Learners list features without explaining them or giving examples. Listing alone = 0 marks.',
-            examinerHint: 'Each feature needs: explanation + example. E.g., "Leading indicators change before the economy e.g., building plans".',
-            alternativeAccept: [
-              'Leading indicators change before the economy',
-              'Coincident indicators change at the same time',
-              'Lagging indicators change after the economy',
-              'Amplitude measures the intensity of the cycle',
-              'Trend line shows the general direction',
-              'Extrapolation extends the trend into the future',
-              'Moving averages smooth out fluctuations'
-            ],
-            memoryTrick: '🧠 Remember: "L-C-L-C-A-T-L-E-M" - Leading, Coincident, Lagging, Composite, Amplitude, Trend, Length, Extrapolation, Moving averages',
-            mergedCorrection: `🧠 Memory Trick: "L-C-L-C-A-T-L-E-M"
-• L - Leading indicators (change before)
-• C - Coincident indicators (change at same time)
-• L - Lagging indicators (change after)
-• C - Composite indicators (summary)
-• A - Amplitude (intensity)
-• T - Trend line (direction)
-• L - Length (duration)
-• E - Extrapolation (extend trend)
-• M - Moving averages (smooth out)
-
-📋 NSC Memo Answer:
-INTRODUCTION
-Business cycles can be described as successive periods of contraction and expansion of economic activities.
-
-BODY: MAIN PART
-LEADING INDICATORS
-- Leading indicators are indicators that change before the economy changes.
-- They give consumers, business leaders and policy makers a glimpse of where the economy might be heading.
-- Examples: number of residential plans passed, number of job advertisements.
-
-COINCIDENT INDICATORS
-- Coincident indicators are indicators that change at the same time as the economy changes.
-- They show the actual state of the economy.
-- Examples: usage of capacity in manufacturing, registered unemployment, real GDP.
-
-LAGGING INDICATORS
-- Lagging indicators change after the economy has already changed.
-- They serve to confirm the behaviour of co-incident indicators.
-- Examples: number of commercial vehicles sold, real investment in machinery.
-
-AMPLITUDE
-- It is the difference between the value of total output between peak and trough.
-- Amplitude reflects the intensity of the upswing and downswing.
-
-TREND LINE
-- The trend line indicates the general direction in which the economy is moving.
-- When the economy is growing, there is an upward trend.
-
-CONCLUSION
-The country can be enabled to prepare suitable policies to deal with different changes in the economy reflected by the indicators and features.`
-          }
-        }
-      ]
+      source: '2023 NSC Econ P1, Q4.5 (essay-length)',
+      topicText: 'Financial Sector in Circular Flow (Essay)',
+      teachTopic: 'circular-flow-markets',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.5',
+        prompt: 'Analyse the relationship between the financial sector and other participants in the circular-flow model. (8 marks)',
+        answer: 'Financial sector intermediates savings and loans between households, firms, and government. Facilitates JSE, forex, and tax payments.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'S-L-S-F-T: Savings, Loans, Stocks, Forex, Taxes.',
+        memoFullAnswer: `- Financial sector includes banks and institutions.
+- Acts as intermediary between savers and borrowers.
+- Accepts deposits from households.
+- Lends to producers for expansion.
+- Households borrow for houses and vehicles.
+- Profits from interest rate spread.
+- Acts as stock brokers on the JSE.
+- Facilitates foreign exchange.
+- Coordinates demand and supply of forex.
+- Government saves or borrows through institutions.
+- Banks pay tax to government.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 relationships.',
+          commonMistake: 'Learners describe financial sector in isolation.',
+          examinerHint: 'S-L-S-F-T.',
+          alternativeAccept: ['accepts deposits', 'provides loans', 'facilitates JSE', 'facilitates forex', 'pays taxes'],
+          memoryTrick: '🧠 "S-L-S-F-T" — Savings, Loans, Stocks, Forex, Taxes.',
+          mergedCorrection: `🧠 "S-L-S-F-T"\n• S — Savings\n• L — Loans\n• S — Stocks\n• F — Forex\n• T — Taxes\n\n📋 NSC Memo Answer:\nFinancial sector intermediates savings and loans, facilitates JSE and forex, pays taxes.`,
+        },
+      }],
     },
-    // Q2: Public Sector Objectives (2023 NSC P1, Q5)
+    // ——— BUSINESS CYCLES ———
     {
       id: 'L5Q2',
-      source: '2023 NSC P1, Q5',
-      topicText: 'Public Sector Objectives',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '5.1',
-          prompt: 'Discuss in detail the main objectives of the public sector in the economy. (26 marks) Evaluate the impact of privatisation of state-owned enterprises (parastatals) on the South African economy. (10 marks)',
-          clue: 'The 5 main objectives are: economic growth, full employment, price stability, exchange rate stability, and economic equity.',
-          answer: 'The public sector aims for economic growth, full employment, price stability, exchange rate stability, and economic equity. Privatisation has both positive and negative impacts on the economy.',
-          marks: 36,
-          memoFullAnswer: `INTRODUCTION
-Public sector is the part of the economy that is made up of all entities that are owned and controlled by the government.
-Macroeconomic objectives are the goals or targets that the public sector wants to achieve for the whole economy.
-(Accept any other correct relevant introduction)
-(Max. 2)
+      source: '2023 NSC Econ P1, Q5 (essay)',
+      topicText: 'Public Sector Objectives (Essay)',
+      teachTopic: 'public-sector-objectives',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1',
+        prompt: 'Discuss in detail the main objectives of the public sector in the economy. (26 marks) Evaluate the impact of privatisation of state-owned enterprises on the South African economy. (10 marks)',
+        answer: 'Five objectives: economic growth, full employment, price stability, exchange rate stability, economic equity. Privatisation has both positive and negative impacts.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'G-F-P-E-E: Growth, Full employment, Price stability, Exchange rate, Equity.',
+        memoFullAnswer: `OBJECTIVES:
+1. Economic growth — real GDP increase.
+2. Full employment — all who want work find work.
+3. Exchange rate stability — steady rand.
+4. Price stability — inflation target 3-6%.
+5. Economic equity — fair distribution.
 
-BODY: MAIN PART
-
-1. ECONOMIC GROWTH
-- Economic growth is the increase in the production of goods and services by the economy.
-- It is measured in terms of an increase in the real gross domestic product (GDP).
-- Economic development occurs when the economic growth rate is higher than the population growth rate.
-- High economic growth rate means there will be fewer people who are dependent on the state.
-- The state tries to ensure that there is continuous economic growth because it leads to an improvement in the standard of living.
-- In South Africa, economic growth has been extremely low due to factors such as natural disasters, power cuts and lack of investments.
-
-2. FULL EMPLOYMENT
-- The objective of the governments is to ensure that all persons who are willing to work and looking for work, should be able to find work or create work for themselves.
-- Informal sector activities must be promoted because they have the potential to increase employment.
-- GEAR was implemented to create a positive climate that was conducive to employment creation by the private sector.
-- The government accelerates employment creation through direct employment schemes, targeted subsidies and expansionary macroeconomic policies.
-- Labour-intensive activities in the agricultural and light manufacturing sectors are also used to create employment.
-- In South Africa, unemployment rate increased over the past few years due to the effects Covid-19 pandemic.
-
-3. EXCHANGE RATE STABILITY / BALANCE OF PAYMENTS EQUILIBRIUM
-- Exchange rate stability occurs when the exchange rate remains stable so as to reduce uncertainty in foreign trade.
-- Depreciation and appreciation of a currency create uncertainties for investors, producers and traders.
-- Volatile exchange rate causes the price of imports and exports to be erratic which could cause Balance of Payments disequilibria.
-- Exchange rate stability helps to control the inflation rate and achieve higher economic growth.
-- The South African Reserve Bank replaced the managed floating exchange system with a free-floating exchange rate system.
-
-4. PRICE STABILITY
-- Price stability occurs when the general price of goods and services remains relatively constant over time.
-- When prices are stable and inflation is low, markets can function optimally.
-- In South Africa relative price stability means that the inflation rate remains within the inflation target of 3-6%.
-- Interest Rates, based on the Repo Rate are the main instruments used to achieve price stability.
-- Inflation targeting helps to create a greater degree of transparency in monetary policy.
-
-5. ECONOMIC EQUITY / EQUAL DISTRIBUTION OF INCOME / ECONOMIC JUSTICE
-- Economic equity exists when the resources of a country are fairly distributed amongst the population.
-- A redistribution of income and wealth is essential in market economies.
-- South Africa uses a progressive income tax system where higher income earners pay higher tax rates than lower income earners.
-- Free basic education, free basic healthcare, basic economic services and cash grants to the poor, will enhance economic equity.
-- The government also tries to compensate for the human rights abuses of the past by implementing redress policies such as employment equity and black economic empowerment.
-
-(Accept any other correct relevant response)
-(Allocate a maximum of 8 marks for a mere listing of facts/examples)
-(Max. 26)
-
-ADDITIONAL PART
-
-Privatisation of State-owned enterprises (parastatals) may impact positively on the South African economy as follows:
-- Efficiency in service delivery will improve as privately owned businesses will provide better quality services due to the profit motive.
-- The government may raise extra income from the sales of public assets which will help to finance strategic public projects.
-- The tax base will expand which will allow the government to raise more tax revenue.
-- Fiscal burden in term of financial bail-outs will be decreased which will help to reduce public debt.
-- Privatisation may attract foreign direct investments which will create capital inflow thereby improving the Balance of Payments.
-
-Privatisation of State-owned enterprises (parastatals) may impact negatively on the South African economy as follows:
-- Goods and services will become more expensive due to the profit motive and lack of public interest in the private sector.
-- Consumers may pay higher prices for essential services which may increase the cost of living.
-- Privatisation may increase unemployment by shifting to less labour-intensive production.
-- Privatisation of State-owned enterprises such as Eskom may lead to the creation of monopolies that may exploit consumers.
-
-(Accept any other correct relevant response)
-(Max. 10)
-
-CONCLUSION
-It is very important that the state improves its functioning from time to time to avoid economic instabilities so as to bring about desired development.
-(Accept any other relevant higher order conclusion.)
-(Max. 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss at least 5 objectives in detail. Each objective requires explanation + example. Essay structure: Introduction (2) + Body (26) + Conclusion (2).',
-            commonMistake: 'Learners list objectives without explaining them. Listing alone = 0 marks.',
-            examinerHint: 'Each objective needs: explanation + policy example. E.g., "Price stability: SARB uses interest rates to keep inflation low".',
-            alternativeAccept: [
-              'Economic growth means producing more goods and services',
-              'Full employment means all who want work can find jobs',
-              'Price stability means keeping inflation low',
-              'Exchange rate stability helps international trade',
-              'Economic equity means fair distribution of income'
-            ],
-            memoryTrick: '🧠 Remember: "G-F-P-E-E" - Growth, Full employment, Price stability, Exchange rate stability, Economic equity',
-            mergedCorrection: `🧠 Memory Trick: "G-F-P-E-E"
-• G - Economic Growth
-• F - Full employment
-• P - Price stability
-• E - Exchange rate stability
-• E - Economic equity
-
-📋 NSC Memo Answer:
-INTRODUCTION
-Public sector is the part of the economy that is made up of all entities that are owned and controlled by the government.
-
-BODY: MAIN PART
-
-1. ECONOMIC GROWTH
-- Economic growth is the increase in the production of goods and services by the economy.
-- It is measured in terms of an increase in the real gross domestic product (GDP).
-
-2. FULL EMPLOYMENT
-- The objective of the governments is to ensure that all persons who are willing to work and looking for work, should be able to find work or create work for themselves.
-
-3. EXCHANGE RATE STABILITY
-- Exchange rate stability occurs when the exchange rate remains stable so as to reduce uncertainty in foreign trade.
-
-4. PRICE STABILITY
-- Price stability occurs when the general price of goods and services remains relatively constant over time.
-
-5. ECONOMIC EQUITY
-- Economic equity exists when the resources of a country are fairly distributed amongst the population.
-
-CONCLUSION
-It is very important that the state improves its functioning from time to time to avoid economic instabilities.`
-          }
-        }
-      ]
+PRIVATISATION:
+Positive: efficiency, revenue, expanded tax base, less bailout burden, FDI.
+Negative: higher prices, job losses, private monopolies.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss at least 5 objectives. Essay structure: Intro (2) + Body (26) + Conclusion (2).',
+          commonMistake: 'Learners list objectives without explaining.',
+          examinerHint: 'G-F-P-E-E.',
+          alternativeAccept: ['economic growth', 'full employment', 'price stability', 'exchange rate stability', 'economic equity'],
+          memoryTrick: '🧠 "G-F-P-E-E" — Growth, Full employment, Price, Exchange, Equity.',
+          mergedCorrection: `🧠 "G-F-P-E-E"\n• G — Growth\n• F — Full employment\n• P — Price stability\n• E — Exchange rate stability\n• E — Economic equity\n\n📋 NSC Memo Answer:\nFive objectives + privatisation analysis.`,
+        },
+      }],
     },
-    // Q3: Reasons for International Trade (2024 NSC P1, Q5)
+    // ——— PUBLIC SECTOR ———
     {
       id: 'L5Q3',
-      source: '2024 NSC P1, Q5',
-      topicText: 'Reasons for International Trade',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '5.1',
-          prompt: 'Discuss in detail the reasons for international trade. (26 marks) Analyse the impact of a weaker currency (rand) on the South African economy. (10 marks)',
-          clue: 'Demand reasons = why consumers want imports. Supply reasons = why countries can export.',
-          answer: 'International trade occurs due to demand reasons (population size, income levels, wealth, preferences, consumption patterns) and supply reasons (natural resources, climate, labour, technology, specialisation, capital). A weaker rand has both positive and negative impacts.',
-          marks: 36,
-          memoFullAnswer: `INTRODUCTION
-International trade refers to the exchange of goods and services between two countries or more.
-(Accept any other correct relevant introduction)
-(Max 2)
+      source: '2024 NSC Econ P1, Q5 (essay)',
+      topicText: 'Reasons for International Trade (Essay)',
+      teachTopic: 'international-trade-reasons',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1',
+        prompt: 'Discuss in detail the reasons for international trade. (26 marks) Analyse the impact of a weaker currency (rand) on the South African economy. (10 marks)',
+        answer: 'Demand reasons: population, income, wealth, tastes, consumption. Supply reasons: resources, climate, labour, technology, specialisation, capital. Weaker rand: exports cheaper, imports expensive.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'Demand: P-I-W-P-C. Supply: N-C-L-T-S-C.',
+        memoFullAnswer: `DEMAND:
+- Size of population.
+- Income levels.
+- Wealth of population.
+- Preferences and tastes.
+- Consumption patterns.
 
-BODY: MAIN PART
+SUPPLY:
+- Natural resources.
+- Climate conditions.
+- Labour resources.
+- Technological resources.
+- Specialisation.
+- Capital.
 
-DEMAND REASONS
-
-1. Size of population
-- If there is an increase in population growth, it causes an increase in demand, as more people's needs must be satisfied.
-- Local suppliers may not be able to satisfy this demand and consumers will be forced to import from other countries.
-
-2. Income levels
-- Changes in income cause a change in the demand for goods and services.
-- An increase in the per capita income of people results in more disposable income that can be spent on local goods and services, some of which may then have to be imported.
-- Local supply may be insufficient to satisfy the demand, thereby creating a demand for imports.
-
-3. Changes in the wealth of the population
-- An increase in the wealth of the population leads to greater demand for goods.
-- People have access to loans and can spend more on luxury goods, many of which are produced in other countries.
-- In case where luxury goods and services cannot be produced locally, people will have to import them from other countries.
-
-4. Preferences and tastes
-- Preferences and tastes play a part in the determination of prices.
-- Customers in Australia prefer a specific product which they do not produce and need to import.
-- People's taste and preferences evolve and are often influenced by social media and globalization.
-- Changes in preference create markets for goods and services that are not always manufactured domestically.
-
-5. Difference in consumption patterns
-- The difference in consumption patterns is determined by the level of economic development in the country.
-- In countries where the level of disposable income is high, demand for luxury goods is high.
-- A poorly developed country will have a high demand for basic goods and services.
-
-SUPPLY REASONS
-
-1. Natural resources
-- Natural resources are not evenly distributed across all countries of the world.
-- They vary from country to country and can only be exploited in places where these resources exist.
-- South Africa has large deposits of gold while Nigeria has crude oil.
-- The availability of natural resources creates a platform for specialisation and an opportunity to earn valuable export revenue.
-
-2. Climate conditions
-- Every country has a unique climate which allows it to grow specific crops.
-- Specialisation is promoted in production which empowers countries to produce at lower cost per unit.
-- Brazil is the biggest producer of coffee in the world because its climate conditions are favourable for coffee production.
-
-3. Labour resources
-- Labour resources differ in quality, quantity and cost between countries.
-- Some countries have highly skilled and well-paid workers with high productivity levels such as Switzerland.
-- Germany has the most skilled labour in the production of BMW, VW, Mercedes Benz cars.
-
-4. Technological resources
-- Technological resources are available in some countries that enable them to produce certain goods and services at a low unit cost.
-- Japan and Singapore are considered to be technologically advanced.
-
-5. Specialisation
-- Specialisation in the production of certain goods and services allows some countries to produce them at a lower cost than others (comparative advantage).
-- Japan specializes in the production of electronic goods and sells these at a lower price.
-
-6. Capital
-- Capital allows developed countries to enjoy an advantage over underdeveloped countries.
-- Developed countries are usually highly industrialized and have well-developed infrastructure.
-
-(Accept any other correct relevant response)
-(Allocate a max of 8 marks for headings/subheadings/examples)
-(Max 26)
-
-ADDITIONAL PART
-
-A weaker currency (rand) may positively impact on the South African economy as follows:
-- Imports will become relatively more expensive which may discourage importing and increase demand of local products.
-- Demand for South African exports such as base metals and mineral products will increase as they become relatively cheaper.
-- Tourism activities will increase as more tourists visit the country due to the weaker rand.
-- Balance of payments deficit will decrease as less goods are imported while more goods are exported.
-
-A weaker currency (rand) may negatively impact on the South African economy as follows:
-- Imported products such as crude oil, agricultural chemicals and vehicle parts will become expensive fuelling cost-push inflation.
-- Higher cost of importing production inputs may decrease domestic production which will slow down economic growth.
-- Foreign investors may withdraw their investments in the economy because a weaker rand reduces the returns on their investments.
-- Export earnings will decrease, resulting in a decrease in trade balance.
-
-(Accept any other correct relevant response)
-(Max 10)
-
-CONCLUSION
-As a developing country, South Africa should encourage international trade to achieve higher economic growth.
-(Accept any other higher-order conclusion)
-(Max. 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss BOTH demand AND supply reasons. Each reason requires explanation + example. Essay structure: Introduction (2) + Body (26) + Conclusion (2).',
-            commonMistake: 'Learners only discuss demand reasons and forget supply reasons.',
-            examinerHint: 'Demand reasons = why consumers want imports. Supply reasons = why countries can export.',
-            alternativeAccept: [
-              'Size of population (demand)',
-              'Income levels (demand)',
-              'Natural resources (supply)',
-              'Climate conditions (supply)',
-              'Specialisation (supply)',
-              'Technological resources (supply)'
-            ],
-            memoryTrick: '🧠 Remember: Demand = "P-I-W-P-C" (Population, Income, Wealth, Preferences, Consumption) Supply = "N-C-L-T-S-C" (Natural, Climate, Labour, Technology, Specialisation, Capital)',
-            mergedCorrection: `🧠 Memory Trick:
-DEMAND: "P-I-W-P-C"
-• P - Size of Population
-• I - Income levels
-• W - Wealth of population
-• P - Preferences and tastes
-• C - Consumption patterns
-
-SUPPLY: "N-C-L-T-S-C"
-• N - Natural resources
-• C - Climate conditions
-• L - Labour resources
-• T - Technological resources
-• S - Specialisation
-• C - Capital
-
-📋 NSC Memo Answer:
-INTRODUCTION
-International trade refers to the exchange of goods and services between two countries or more.
-
-BODY: MAIN PART
-
-DEMAND REASONS
-1. Size of population - Increase in population causes increase in demand.
-2. Income levels - Higher income leads to more spending on imports.
-3. Preferences and tastes - People want products not made locally.
-
-SUPPLY REASONS
-1. Natural resources - Countries have different resources.
-2. Climate conditions - Different climates grow different crops.
-3. Specialisation - Countries focus on what they do best.
-
-CONCLUSION
-As a developing country, South Africa should encourage international trade to achieve higher economic growth.`
-          }
-        }
-      ]
+WEAKER RAND:
+Positive: cheaper exports, more tourism, BOP improves.
+Negative: expensive imports, cost-push inflation, less FDI.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss BOTH demand AND supply reasons + weaker rand analysis.',
+          commonMistake: 'Learners only discuss demand reasons.',
+          examinerHint: 'P-I-W-P-C (demand) + N-C-L-T-S-C (supply).',
+          alternativeAccept: ['population size', 'income levels', 'natural resources', 'climate', 'specialisation'],
+          memoryTrick: '🧠 Demand: P-I-W-P-C. Supply: N-C-L-T-S-C.',
+          mergedCorrection: `🧠 Demand: P-I-W-P-C\n🧠 Supply: N-C-L-T-S-C\n\n📋 NSC Memo Answer:\nDemand reasons + supply reasons + weaker rand analysis.`,
+        },
+      }],
     },
-    // Q4: Markets in Circular Flow (2025 NSC P1, Q5)
+    // ——— FOREIGN TRADE ———
     {
       id: 'L5Q4',
-      source: '2025 NSC P1, Q5',
-      topicText: 'Markets in Four-Sector Circular Flow',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '5.1',
-          prompt: 'Discuss in detail the markets within the four-sector circular-flow model. (26 marks) Evaluate the contribution of the business sector to the development of the South African economy. (10 marks)',
-          clue: 'The four markets are: goods market, factor market, financial market (money and capital), and foreign exchange market.',
-          answer: 'The four markets are: goods market, factor market, financial market (money and capital), and foreign exchange market. The business sector contributes positively and negatively to the economy.',
-          marks: 36,
-          memoFullAnswer: `INTRODUCTION
-The circular flow is a simplified economic model that illustrates the inter-relationship between the economic participants.
-OR
-A market is a mechanism that brings buyers and sellers together to exchange different types of products.
-(Accept any other correct relevant introduction)
-(Max 2)
+      source: '2025 NSC Econ P1, Q5 (essay)',
+      topicText: 'Markets in Four-Sector Circular Flow (Essay)',
+      teachTopic: 'circular-flow-markets',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1',
+        prompt: 'Discuss in detail the markets within the four-sector circular-flow model. (26 marks) Evaluate the contribution of the business sector to the development of the South African economy. (10 marks)',
+        answer: 'Goods, factor, financial (money + capital), forex. Business sector: jobs, skills, GDP, R&D, tax, infrastructure, exports, CSI. Negative: inequality, pollution, collusion.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'G-F-F-F + business sector positives and negatives.',
+        memoFullAnswer: `MARKETS:
+(a) Goods market — products bought and sold.
+(b) Factor market — factors of production traded.
+(c) Financial market — money market + capital market.
+(d) Forex market — currencies traded.
 
-BODY: MAIN PART
-
-FOUR TYPES OF MARKETS IN THE CIRCULAR FLOW
-
-(a) Goods market / Product market / Output market
-- Product market is where goods and services are bought and sold.
-- Firms, government and foreign sector supply goods and services within the open economy which represents the real flow.
-- Consumers, firms, government and foreign sector buy goods and services from the goods market and their payments represent money flow.
-- Goods are defined as any tangible items such as food, clothing and cars that satisfy some human needs.
-- Services are defined as non-tangible actions which include transportation, retailing and financial transactions.
-- Consumer goods market involves the trading of durable consumer goods, semidurable consumer goods and non-durable consumer goods.
-- A further distinction is made between the following consumer goods:
-  - Non-durable goods are those items that are used up when they are consumed and cannot be re-used, such as petrol and beverages.
-  - Semi-durable goods last for a short period of time and can be used more than once, such as printer cartridge and a pen.
-  - Durable goods can be used over again and do not wear out very easily, such as vehicles and furniture.
-- Capital goods are those goods which are purchased by businesses for use in the production process.
-
-(b) Factor market / Resources market / Input market
-- Factor market is where factors of production are exchanged.
-- The labour market, property market and the financial markets are part of the factor market.
-- Households are the owners of factors of production and they sell them to firms to produce goods and services.
-- The factors of production are labour, entrepreneurship, capital and land and they are exchanged for wages, profit, interest, and rent respectively.
-- The factor market can be further subdivided into the following markets:
-  - A labour market where labour is traded, for example, the business done in employment agencies and labour brokers.
-  - A natural resource market where land and other natural resources are traded.
-- Factor services are real flows and they are accompanied by counter flows of income on the factor market.
-
-(c) Financial markets
-- Financial markets are not directly involved in production of goods and services, but act as a link between households and businesses with surplus income and other participants who need funds.
-- Banks, insurance companies and pension funds form part of the financial market.
-- Financial markets render financial services to the other participants in the economy.
-
-Money market
-- Money market is the market for short-term savings and loans.
-- Money market includes inter-bank lending for a period as short as overnight.
-- The securities traded include short term deposits, short term debentures and treasury bills.
-- The South African Reserve Bank (SARB) is a key institution in the money market.
-
-Capital market
-- The capital market is the market for long-term savings and loans.
-- The securities traded in this market are long term deposits, mortgage bonds and shares.
-- The Johannesburg Securities Exchange (JSE) is a key institution in the capital market.
-
-(d) Foreign exchange market / Foreign currency market / Forex market
-- The foreign exchange market is where different currencies of all the countries are traded.
-- e.g. The South African rand can be exchanged for the US dollar in this market.
-- The foreign exchange market originates when one country imports goods from another country and domestic currency have to be exchanged in order to pay for such imports.
-- Foreign exchange can be bought and sold at the banks and foreign exchange agencies.
-- The South African rand is freely traded in the forex markets and its value is determined by the market forces of demand and supply.
-
-(Accept any other correct relevant response)
-(Allocate a max of 8 marks for headings/subheadings/examples)
-(Max 26)
-
-ADDITIONAL PART
-
-POSITIVES
-- Businesses create job opportunities directly and indirectly, helping to lower unemployment rates.
-- The business sector offers skills development opportunities, such as in-service training and employee workshops, which improve workforce skills and enhance productivity.
-- Businesses contribute largely to the gross domestic product (GDP) of a country through the production of goods and services as the main driver of economic growth.
-- The sector invests in research and development, which encourages innovation and entrepreneurship.
-- Businesses pay corporate tax to the government which is then used to fund public services and infrastructural projects.
-- Businesses may work in partnership with the government to develop infrastructure.
-- Businesses participate in international trade activities enhancing competitiveness of the country's exports.
-- Businesses engage in corporate social investment (CSI) projects which help to improve the welfare of communities.
-
-NEGATIVES
-- The business sector widens inequality gap through paying low wages to workers.
-- Businesses being profit driven, sometimes they fail to consider the negative impact of their activities to the environment such as pollution.
-- The unfair business practices such as collusion, may result in consumer exploitation through high prices.
-
-(Accept any other correct relevant response)
-(Max 10)
-
-CONCLUSION
-Markets are critically important institutions in the economic system because they regulate the market, safeguard price stability and enhance both the business and consumer confidence.
-(Accept any other higher-order conclusion)
-(Max. 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss all 4 markets in detail. Each market requires explanation + example. Essay structure: Introduction (2) + Body (26) + Conclusion (2).',
-            commonMistake: 'Learners forget the foreign exchange market or financial market.',
-            examinerHint: 'Each market has a specific role. Goods = buying/selling products. Factor = hiring labour. Financial = savings and loans. Forex = exchanging currencies.',
-            alternativeAccept: [
-              'Goods market is where products are bought and sold',
-              'Factor market is where labour is hired',
-              'Financial market is for borrowing and lending',
-              'Forex market is for exchanging currencies'
-            ],
-            memoryTrick: '🧠 Remember: "G-F-F-F" - Goods, Factor, Financial, Forex',
-            mergedCorrection: `🧠 Memory Trick: "G-F-F-F"
-• G - Goods market (products bought and sold)
-• F - Factor market (labour, land, capital)
-• F - Financial market (money market + capital market)
-• F - Forex market (currencies exchanged)
-
-📋 NSC Memo Answer:
-INTRODUCTION
-The circular flow is a simplified economic model that illustrates the inter-relationship between the economic participants.
-
-BODY: MAIN PART
-
-(a) Goods market
-- Product market is where goods and services are bought and sold.
-- Durable goods, semi-durable goods and non-durable goods are traded here.
-
-(b) Factor market
-- Factor market is where factors of production are exchanged.
-- Labour, entrepreneurship, capital and land are exchanged for wages, profit, interest, and rent.
-
-(c) Financial markets
-- Financial markets act as a link between households and businesses with surplus income and those who need funds.
-- Money market = short-term savings and loans.
-- Capital market = long-term savings and loans (JSE).
-
-(d) Foreign exchange market
-- The foreign exchange market is where different currencies are traded.
-- The rand is freely traded and its value is determined by supply and demand.
-
-CONCLUSION
-Markets are critically important institutions in the economic system because they regulate the market, safeguard price stability and enhance both the business and consumer confidence.`
-          }
-        }
-      ]
+BUSINESS SECTOR:
+Positive: jobs, skills, GDP, R&D, tax, infrastructure, exports, CSI.
+Negative: inequality, pollution, collusion.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss all 4 markets + business sector positives and negatives.',
+          commonMistake: 'Learners forget the forex market or only discuss positives.',
+          examinerHint: 'G-F-F-F + business sector balanced.',
+          alternativeAccept: ['goods market', 'factor market', 'financial market', 'forex market'],
+          memoryTrick: '🧠 "G-F-F-F" — Goods, Factor, Financial, Forex.',
+          mergedCorrection: `🧠 "G-F-F-F"\n• G — Goods\n• F — Factor\n• F — Financial\n• F — Forex\n\n📋 NSC Memo Answer:\nFour markets + business sector contribution.`,
+        },
+      }],
     },
-    // Q5: SA Growth & Development Policies (2022 NSC P1, Q6)
+    // ——— GROWTH & DEVELOPMENT ———
     {
       id: 'L5Q5',
-      source: '2022 NSC P1, Q6',
-      topicText: 'SA Growth & Development Policies',
-      diagramConfig: null,
-      parts: [
-        {
-          part: '6.1',
-          prompt: 'Discuss in detail the South African growth and development policies and strategic initiatives since 1994. (26 marks) How can South Africa use supply-side measures to promote economic growth and development? (10 marks)',
-          clue: 'Since 1994, South Africa has implemented RDP, GEAR, BEE, EPWP, ASGISA, NSDS, JIPSA, SBDPP, NGP, and NDP.',
-          answer: 'Since 1994, South Africa has implemented RDP, GEAR, BEE, EPWP, ASGISA, NSDS, JIPSA, SBDPP, NGP, and NDP. Supply-side measures include deregulation, lower taxes, improved education, better infrastructure, competition, subsidies, and advisory services.',
-          marks: 36,
-          memoFullAnswer: `INTRODUCTION
-Economic development is the process by which the standard of living improves over a period of time.
-Economic growth is an increase in the production capacity or real GDP of an economy over time.
-(Accept any other correct relevant introduction)
-(Max 2)
+      source: '2024 NSC Econ P1, Q6 (essay)',
+      topicText: 'Demand-side Approach and Small Business (Essay)',
+      teachTopic: 'growth-vs-development',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '6.1',
+        prompt: 'Discuss in detail the demand-side approach in promoting economic growth and development in South Africa. (26 marks) Analyse the importance of promoting small businesses for the South African economy. (10 marks)',
+        answer: 'Demand-side: monetary (interest rates, OMO, moral suasion, cash reserves) + fiscal (progressive tax, wealth taxes, cash benefits, benefits in kind, land reform, property subsidies). Small business: jobs, competition, innovation, GDP, poverty reduction, tax base, exports, skills.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'Monetary + fiscal + small business importance.',
+        memoFullAnswer: `DEMAND-SIDE:
+Monetary: interest rates, OMO, moral suasion, cash reserves.
+Fiscal: progressive tax, wealth taxes, cash benefits, benefits in kind, land reform, property subsidies.
 
-BODY: MAIN PART
+SMALL BUSINESS:
+- Jobs for structurally unemployed.
+- Competition, efficiency, innovation.
+- Contributes to GDP.
+- Alleviates poverty.
+- Expands tax base.
+- Increases exports.
+- Skills development.
+- Reduces welfare burden.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss monetary + fiscal + small business.',
+          commonMistake: 'Learners only discuss fiscal policy.',
+          examinerHint: 'Monetary (4 tools) + fiscal (7 elements) + small business (8 points).',
+          alternativeAccept: ['interest rates', 'progressive tax', 'social grants', 'small business jobs'],
+          memoryTrick: '🧠 Monetary (4) + Fiscal (7) + Small business (8).',
+          mergedCorrection: `🧠 Monetary: interest rates, OMO, moral suasion, cash reserves.\n🧠 Fiscal: progressive tax, wealth tax, cash benefits, benefits in kind, land reform, property subsidies.\n🧠 Small business: jobs, GDP, poverty reduction, tax base.\n\n📋 NSC Memo Answer:\nDemand-side (monetary + fiscal) + small business promotion.`,
+        },
+      }],
+    },
+    // ——— ECONOMIC INDICATORS ———
+    {
+      id: 'L5Q6',
+      source: '2025 NSC Econ P1, Q6 (essay)',
+      topicText: 'Regional Development and Incentives (Essay)',
+      teachTopic: 'regional-development',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '6.1',
+        prompt: 'Discuss in detail South Africa\'s initiatives in regional development. (26 marks) How can the government use incentives to promote industrial development? (10 marks)',
+        answer: 'SDIs, IDZs, SEZs, corridors. Incentives: reduce corporate taxes, tax holidays, subsidies, cash grants, infrastructure, simplified registration, export incentives, duty-free, skills funding, business support.',
+        marks: 36, acceptAnyTwo: false,
+        clue: '4 regional tools + 10 incentives.',
+        memoFullAnswer: `REGIONAL DEVELOPMENT:
+- SDIs — link economic hubs.
+- IDZs — export-focused near ports.
+- SEZs — tax relief, clustering.
+- Corridors — routes connecting regions.
 
-South African growth and development policies and strategic initiatives
+INCENTIVES:
+- Reduce corporate taxes, tax holidays.
+- Subsidies on capital investment.
+- Cash grants or low-interest loans.
+- Infrastructure investment.
+- Simplified registration.
+- Export incentives.
+- Duty-free incentives.
+- Skills development funding.
+- Business support programmes.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss 4 regional tools + multiple incentives.',
+          commonMistake: 'Learners only discuss one tool.',
+          examinerHint: 'SDIs + IDZs + SEZs + corridors + incentives.',
+          alternativeAccept: ['SDIs', 'IDZs', 'SEZs', 'corridors', 'tax incentives'],
+          memoryTrick: '🧠 SDI + IDZ + SEZ + Corridor + 10 incentives.',
+          mergedCorrection: `🧠 SDI + IDZ + SEZ + Corridor\n🧠 Incentives: tax, subsidies, grants, infrastructure, duty-free.\n\n📋 NSC Memo Answer:\nRegional tools + government incentives.`,
+        },
+      }],
+    },
+    // ——— PERFECT MARKET ———
+    {
+      id: 'L5Q7',
+      source: '2025 NSC Econ P2, Q5 (essay)',
+      topicText: 'Monopoly and Abuse of Market Power (Essay)',
+      teachTopic: 'monopoly',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1',
+        prompt: 'Discuss in detail the characteristics of a monopoly market structure, including a graph showing long-run economic profit. (26 marks) How can the government prevent the abuse of market power by dominant businesses? (10 marks)',
+        answer: 'One firm, unique product, complete barriers, price maker, downward demand, long-run economic profit. Government: regulate pricing, reduce barriers, encourage private investment, competition policy, fines, prevent mergers.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'Monopoly characteristics + government prevention.',
+        memoFullAnswer: `MONOPOLY CHARACTERISTICS:
+- One firm, no competition.
+- Unique product, no substitutes.
+- Complete barriers to entry.
+- Price maker.
+- Downward-sloping demand, MR below AR.
+- Natural vs artificial.
+- Long-run economic profit.
 
-Reconstruction and Development Programme (RDP)
-- RDP was introduced to alleviate poverty and address the inequalities and shortfalls in social services.
-- The strategy focused on job creation, welfare, housing, transport, land reform, healthcare, education, training, water and sanitation.
-- The objectives of RDP were to improve service delivery for the poor such as housing, electricity, water and sanitation.
-- Create an environment that is suitable for human development through education and training.
-- Create a dynamic economy that can create new and sustainable jobs.
-- Alleviate poverty, low wages, and extreme inequalities in wages and wealth.
-- Democratise the economy and empower the previously disadvantaged groups.
+GOVERNMENT PREVENTION:
+- Regulate pricing (e.g. NERSA).
+- Reduce barriers to entry.
+- Encourage private investment.
+- Competition policy.
+- Fines for abuse.
+- Prevent mergers.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss all characteristics + graph + government prevention.',
+          commonMistake: 'Learners forget the graph.',
+          examinerHint: 'One firm, unique, barriers, price maker, long-run profit + government prevention.',
+          alternativeAccept: ['one firm', 'unique product', 'barriers', 'price maker', 'regulate pricing', 'fines'],
+          memoryTrick: '🧠 One firm. Unique. Barriers. Price maker. Profit. + Government regulates.',
+          mergedCorrection: `🧠 One firm. Unique. Barriers. Price maker. Profit.\n🧠 Government: regulate pricing, reduce barriers, competition policy, fines.\n\n📋 NSC Memo Answer:\nMonopoly characteristics + government prevention.`,
+        },
+      }],
+    },
+    // ——— IMPERFECT MARKETS ———
+    {
+      id: 'L5Q8',
+      source: '2023 NSC Econ P2, Q5 (essay)',
+      topicText: 'Monopolistic Competition vs Oligopoly (Essay)',
+      teachTopic: 'competition-policy',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '5.1',
+        prompt: 'Compare and contrast the market structures of monopolistic competition with an oligopoly in detail. (26 marks) How can collusion negatively affect the economy? (10 marks)',
+        answer: 'Monopolistic competition: many sellers, differentiated, free entry, normal profit long run, collusion impossible. Oligopoly: few sellers, homogeneous or differentiated, barriers, mutual dependence, kinked demand, economic profit long run, collusion possible.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'Number of firms, product type, entry, price control, profit, collusion.',
+        memoFullAnswer: `MONOPOLISTIC COMPETITION:
+- Many sellers.
+- Differentiated products.
+- Free entry.
+- Some price control.
+- Normal profit long run.
+- Collusion impossible.
 
-Growth, Employment, And Redistribution (GEAR)
-- GEAR was introduced to stimulate economic growth and create employment opportunities.
-- The strategy was to strengthen economic development, redistribute income and create socio-economic opportunities for the poor.
-- The objectives were to promote economic growth by attracting foreign direct investments.
-- Have tax system to finance education and training programmes which will improve workers' skills.
-- Have budget reforms meant to redistribute income.
-- Adopt a free-floating exchange rate policy that would ensure exchange rate stability.
-- Have a faster fiscal deficit reduction programme by controlling public debt to ensure price stability.
-- Reduce tariffs that would lower prices of imported inputs.
-- Maintain a consistent monetary policy to prevent high inflation.
-- Increase the restructuring and privatisation of some parastatals.
+OLIGOPOLY:
+- Few large sellers.
+- Homogeneous or differentiated.
+- Barriers to entry.
+- Mutual dependence.
+- Kinked demand.
+- Economic profit long run.
+- Collusion possible.
 
-Black Economic Empowerment Programmes (BEE)
-- The strategy was launched to assist in the transformation and redress of previously disadvantaged groups.
-- BEE aims to significantly increase the number of black people who own, manage and control factors of production (businesses).
-- The objectives were redress and affirmative action in the workplace and business environments.
+COLLUSION EFFECTS:
+- Higher prices.
+- Reduced consumer welfare.
+- Less innovation.
+- Lower quality.
+- Reduced competition.
+- Lower GDP and employment.
+- Scarcity created.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must compare multiple features + collusion effects.',
+          commonMistake: 'Learners only discuss one structure.',
+          examinerHint: 'Number, product, entry, price control, profit, collusion.',
+          alternativeAccept: ['many vs few', 'differentiated', 'free entry vs barriers', 'collusion possible vs impossible'],
+          memoryTrick: '🧠 Many vs few. Free entry vs barriers. Normal vs economic profit.',
+          mergedCorrection: `🧠 Many vs few. Free entry vs barriers. Normal vs economic profit.\n🧠 Collusion: higher prices, less innovation, lower quality.\n\n📋 NSC Memo Answer:\nCompare features + collusion harms.`,
+        },
+      }],
+    },
+    // ——— MARKET FAILURE ———
+    {
+      id: 'L5Q9',
+      source: '2024 NSC Econ P2, Q6 (essay)',
+      topicText: 'Sustainable Development and International Measures (Essay)',
+      teachTopic: 'environmental-sustainability',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '6.1',
+        prompt: 'Discuss in detail how the government can ensure sustainable development or environmental sustainability. (26 marks) Analyse the international measures taken to reduce environmental problems. (10 marks)',
+        answer: 'Government: property rights, charges, environmental taxes, subsidies, marketable permits, CAC, voluntary agreements, education. International: CITES, Basel, Stockholm, Rotterdam, UN Declarations, Kyoto, Paris.',
+        marks: 36, acceptAnyTwo: false,
+        clue: '8 government measures + 8 international protocols.',
+        memoFullAnswer: `GOVERNMENT:
+- Property rights.
+- Charges for environmental use.
+- Environmental taxes.
+- Environmental subsidies.
+- Marketable permits.
+- Command and Control.
+- Voluntary agreements.
+- Education.
 
-Expanded Public Works Programme (EPWP)
-- It was introduced to create employment opportunities for the poor and vulnerable/disadvantaged.
-- The strategy was to use labour-intensive programmes to give people skills they can use to find jobs afterwards.
-- The objectives of EPWP were to provide poverty and income relief by creating temporary work opportunities for the unskilled, unemployed, poor and vulnerable such as women and youth.
-- Use existing government and public entity budgets to reduce and alleviate unemployment.
-- Increase the ability of workers to earn an income.
+INTERNATIONAL:
+- CITES.
+- Basel Convention.
+- Stockholm Protocol.
+- Rotterdam Convention.
+- UN Declarations.
+- Kyoto Protocol.
+- Paris Agreement.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss 8 government + 7 international measures.',
+          commonMistake: 'Learners only discuss government measures.',
+          examinerHint: '8 government + 7 international.',
+          alternativeAccept: ['property rights', 'environmental taxes', 'marketable permits', 'CITES', 'Kyoto', 'Paris'],
+          memoryTrick: '🧠 8 government + 7 international.',
+          mergedCorrection: `🧠 Government: property rights, charges, taxes, subsidies, permits, CAC, voluntary, education.\n🧠 International: CITES, Basel, Stockholm, Rotterdam, UN, Kyoto, Paris.\n\n📋 NSC Memo Answer:\n8 government measures + 7 international measures.`,
+        },
+      }],
+    },
+    // ——— INFLATION ———
+    {
+      id: 'L5Q10',
+      source: '2025 NSC Econ P2, Q6 (essay)',
+      topicText: 'Measures to Combat Inflation (Essay)',
+      teachTopic: 'inflation-combating',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '6.1',
+        prompt: 'Discuss in detail the measures to combat inflation. (26 marks) How can South Africa\'s trading partners, such as the USA and China, influence the domestic inflation rate? (10 marks)',
+        answer: 'Monetary: repo rate, OMO, cash reserves, moral suasion. Fiscal: raise taxes, cut spending. Other: productivity, competition, price controls, wage policy, credit control, import relaxation, infrastructure, subsidies, indexation. Trading partners: demand for exports, import prices, tariffs, commodity prices.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'Monetary + fiscal + other + trading partners.',
+        memoFullAnswer: `MONETARY: repo rate, OMO, cash reserves, moral suasion.
+FISCAL: raise taxes, cut spending.
+OTHER: productivity, competition, price controls, wage policy, credit control, import relaxation, infrastructure, subsidies, indexation.
 
-Accelerated and Shared Growth Initiative for South Africa (ASGISA)
-- It was launched as a national initiative to be supported by all businesses, labour and entrepreneurs.
-- The key elements of ASGISA were halving unemployment and poverty by 2014 and increasing economic growth to an average of 6% between 2010 and 2014.
-- The objectives were to improve and develop infrastructure by spending 8% of the GDP on infrastructure development.
-- Promote industrial development through Industrial Development Zones (IDZ).
-- Promote education and skills development to reduce the shortage of scarce skills.
-- Stimulate the second economies (Informal sector).
-- Improve state administration through good governance.
-- Achieve economic development (welfare) through economic growth.
+TRADING PARTNERS:
+- Demand for exports → demand-pull inflation.
+- Higher import prices → imported inflation.
+- Tariffs → higher import costs.
+- Commodity prices → cost-push.
+- Political tensions → supply disruption.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss monetary + fiscal + other + trading partners.',
+          commonMistake: 'Learners only discuss monetary policy.',
+          examinerHint: 'Monetary + fiscal + other + trading partners.',
+          alternativeAccept: ['repo rate', 'raise taxes', 'productivity', 'trading partner demand', 'import prices'],
+          memoryTrick: '🧠 Monetary + fiscal + other + trading partners.',
+          mergedCorrection: `🧠 Monetary + fiscal + other + trading partners.\n\n📋 NSC Memo Answer:\nComprehensive measures to combat inflation.`,
+        },
+      }],
+    },
+    // ——— ENVIRONMENT ———
+    {
+      id: 'L5Q11',
+      source: '2023 NSC Econ P2, Q6 (essay)',
+      topicText: 'Effects of Tourism (Essay)',
+      teachTopic: 'tourism-effects',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '6.1',
+        prompt: 'Examine in detail the effects of tourism. (26 marks) How can South Africa\'s tourism profile be used to promote tourism in South Africa? (10 marks)',
+        answer: 'Effects: GDP, employment, poverty, externalities, environment, investment. Promotion: marketing, infrastructure, new attractions, quality service, information centres, packages, Indaba, cultural villages, World Heritage Sites, art festivals.',
+        marks: 36, acceptAnyTwo: false,
+        clue: 'Effects (GDP, jobs, poverty, environment) + promotion strategies.',
+        memoFullAnswer: `EFFECTS:
+- GDP: direct and indirect.
+- Employment: labour-intensive, quick jobs.
+- Poverty: rural development, SMMEs.
+- Externalities: pollution, congestion.
+- Environment: damage, water, energy.
+- Investment: infrastructure, capital goods.
 
-National Skills Development Strategy (NSDS)
-- Strategy is intended to radically transform education and training in South Africa.
-- The strategy aimed at improving the quality and quantity of training to support increased industrial competitiveness.
-- The Department of Labour used the NSDS as a tool to drive the process of developing the skills of the South African labour force.
-
-Joint Initiative on Priority Skills Acquisitions (JIPSA)
-- It was introduced as the skills development arm of ASGISA.
-- The objective was skills development, especially through the SETAs.
-
-Small Business Development Promotion Programme (SBDPP)
-- The strategy was to deliver support and services to SMMEs.
-- Department of Trade, Industry and Competition (DTIC), Industrial Development Corporation (IDC) and the National Small Business Act offer these services.
-
-The New Growth Path (NGP)
-- The strategy was introduced to identify key sectors as "job drivers" and promote industries and sectors that can drive job creation.
-- It aimed to increase economic growth, create 5 million jobs by 2020 and create greater economic equity.
-- The NGP identifies the manufacturing, tourism, green energy and infrastructure development as key areas of job creation.
-
-NATIONAL DEVELOPMENT PLAN (NDP)
-- NDP was founded and led by the former Finance Minister in 2012/13.
-- The strategy is to expand economic opportunities through investment in infrastructure, more innovation, private investment and entrepreneurship.
-- The objectives were to eliminate poverty and reduce inequality by 2030.
-- Reduce unemployment by 14% in 2020 and 6% in 2030.
-- Achieve economic growth on an inclusive basis.
-- Achieve economic transformation through enhancing the capacity of the state.
-
-(Accept any other correct relevant response)
-(A maximum of 8 marks may be allocated for mere listing of headings/examples)
-(Max 26)
-
-BODY: ADDITIONAL PART
-
-South Africa can use supply-side measures to promote economic growth and development by:
-- Removing unnecessary rules and regulations (deregulation) to improve the efficiency of markets.
-- Lowering some of the taxes and license fees to reduce administrative costs for businesses.
-- Reducing the requirements and procedures of registering businesses in the country.
-- Improving the quality of education and training to improve the skills of the labour force.
-- Improving availability, reliability and cost of infrastructure services to ensure financial viability and profitability of businesses.
-- Promoting introduction of more affordable and reliable alternative sources of energy.
-- Promoting competition in different market to improve economic efficiency.
-- Providing subsidies and incentives to encourage capital formation in the economy.
-- Upgrading and maintaining its transport network to promote and ensure greater efficiency within the transport sector.
-- Ensuring that modern, effective, efficient and reliable communication channels can be accessed.
-- Providing free advisory services such as information on new export market, to promote efficiency.
-
-(Accept any other correct relevant response)
-(A maximum of 2 marks may be allocated for mere listing of facts/examples)
-(Max 10)
-
-CONCLUSION
-The modern economy has become more dynamic and it is important for the government to abort some policies that are no longer suitable and introduce new policies that are more relevant.
-(Accept any other correct relevant higher order conclusion)
-(Max 2)`,
-          formulas: [],
-          memoCorrection: {
-            whatToCheck: 'Must discuss at least 6 policies in detail. Each policy requires explanation + objectives. Essay structure: Introduction (2) + Body (26) + Conclusion (2).',
-            commonMistake: 'Learners list policies without explaining them. Listing alone = 0 marks.',
-            examinerHint: 'Each policy needs: what it is + what it aims to achieve. E.g., "RDP was introduced to alleviate poverty and address inequalities".',
-            alternativeAccept: [
-              'RDP - Reconstruction and Development Programme',
-              'GEAR - Growth, Employment and Redistribution',
-              'BEE - Black Economic Empowerment',
-              'EPWP - Expanded Public Works Programme',
-              'ASGISA - Accelerated and Shared Growth Initiative',
-              'NSDS - National Skills Development Strategy',
-              'NDP - National Development Plan'
-            ],
-            memoryTrick: '🧠 Remember: "R-G-B-E-A-N-N" - RDP, GEAR, BEE, EPWP, ASGISA, NSDS, NDP',
-            mergedCorrection: `🧠 Memory Trick: "R-G-B-E-A-N-N"
-• R - RDP (Reconstruction and Development Programme)
-• G - GEAR (Growth, Employment and Redistribution)
-• B - BEE (Black Economic Empowerment)
-• E - EPWP (Expanded Public Works Programme)
-• A - ASGISA (Accelerated and Shared Growth Initiative)
-• N - NSDS (National Skills Development Strategy)
-• N - NDP (National Development Plan)
-
-📋 NSC Memo Answer:
-INTRODUCTION
-Economic development is the process by which the standard of living improves over a period of time.
-
-BODY: MAIN PART
-
-1. RDP
-- RDP was introduced to alleviate poverty and address the inequalities and shortfalls in social services.
-- Focused on job creation, welfare, housing, transport, land reform, healthcare, education, training, water and sanitation.
-
-2. GEAR
-- GEAR was introduced to stimulate economic growth and create employment opportunities.
-- Promoted economic growth by attracting foreign direct investments.
-
-3. BEE
-- BEE aims to significantly increase the number of black people who own, manage and control factors of production.
-
-4. EPWP
-- EPWP was introduced to create employment opportunities for the poor and vulnerable.
-- Uses labour-intensive programmes to give people skills.
-
-5. ASGISA
-- ASGISA aimed to halve unemployment and poverty by 2014.
-- Increase economic growth to an average of 6% between 2010 and 2014.
-
-6. NDP
-- NDP aims to eliminate poverty and reduce inequality by 2030.
-- Reduce unemployment by 14% in 2020 and 6% in 2030.
-
-CONCLUSION
-The modern economy has become more dynamic and it is important for the government to abort some policies that are no longer suitable and introduce new policies that are more relevant.`
-          }
-        }
-      ]
-    }
-  ]
+PROMOTION:
+- Marketing campaigns.
+- Infrastructure improvement.
+- New attractions.
+- Quality service rewards.
+- Information centres.
+- Holiday packages.
+- Tourism Indaba.
+- Cultural villages.
+- World Heritage Sites.
+- Art festivals.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must discuss effects + promotion strategies.',
+          commonMistake: 'Learners only discuss effects or only promotion.',
+          examinerHint: 'Effects (6) + promotion (10).',
+          alternativeAccept: ['GDP', 'employment', 'poverty', 'environment', 'marketing', 'infrastructure'],
+          memoryTrick: '🧠 Effects (GDP, jobs, poverty, environment) + promotion (10 strategies).',
+          mergedCorrection: `🧠 Effects + promotion strategies.\n\n📋 NSC Memo Answer:\nEffects of tourism + promotion strategies.`,
+        },
+      }],
+    },
+    // ——— TOURISM ———
+    {
+      id: 'L5Q12',
+      source: '2025 NSC Econ P2, Q4.5',
+      topicText: 'Promoting Tourism in SA',
+      teachTopic: 'tourism-promotion',
+      diagramConfig: null, tableConfig: null,
+      parts: [{
+        part: '4.5',
+        prompt: 'Analyse the strategies that can be used to promote tourism in South Africa.',
+        answer: 'Marketing, infrastructure, new attractions, quality service rewards, information centres, holiday packages, Tourism Indaba, cultural villages, World Heritage Sites, art festivals, fair taxes.',
+        marks: 8, acceptAnyTwo: false,
+        clue: 'Marketing + infrastructure + attractions + service + information + packages + Indaba + culture + heritage + festivals + taxes.',
+        memoFullAnswer: `- Increased marketing and advertising.
+- Improving infrastructure.
+- Establishing new tourist sites.
+- Rewarding quality service providers.
+- Enhancing information services.
+- Special holiday packages (off-season rates).
+- Tourism Indaba.
+- Promoting local culture.
+- Promoting World Heritage Sites.
+- Promoting art festivals.
+- Imposing fair taxes.`,
+        formulas: [],
+        memoCorrection: {
+          whatToCheck: 'Must analyse at least 4 strategies. 2 marks each.',
+          commonMistake: 'Learners only discuss marketing.',
+          examinerHint: 'Marketing + infrastructure + attractions + service + information + packages + Indaba + culture + heritage + festivals.',
+          alternativeAccept: ['marketing', 'infrastructure', 'new attractions', 'quality service', 'information centres', 'packages'],
+          memoryTrick: '🧠 11 strategies: marketing, infrastructure, attractions, service, information, packages, Indaba, culture, heritage, festivals, taxes.',
+          mergedCorrection: `🧠 11 strategies for tourism promotion.\n\n📋 NSC Memo Answer:\nMarketing, infrastructure, attractions, service, information, packages, Indaba, culture, heritage, festivals, fair taxes.`,
+        },
+      }],
+    },
+  ],
 };
 
+// ================================================================
+// COMPONENT
+// ================================================================
 const TopicLessonEconomics = () => {
   const { subject, topicId } = useParams();
   const navigate = useNavigate();
   const { neoMessage, setNeoMessage } = useNeo();
   const audioRef = useRef(null);
-  
+
+  // ─── Resolve topic (fall back to default if unknown) ───
+  const topic = TOPIC_CONCEPTS[topicId] ? topicId : DEFAULT_TOPIC;
+  const isPaper1 = PAPER_1_TOPICS.has(topic);
+  const accent = isPaper1 ? '#F57C00' : '#E65100';
+  const paperLabel = isPaper1 ? 'Paper 1' : 'Paper 2';
+  const topicName = TOPIC_NAMES[topic] || 'Economics';
+
+  const activeConcepts = TOPIC_CONCEPTS[topic] || [];
+
   const [currentLevel, setCurrentLevel] = useState(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
@@ -1957,110 +2011,180 @@ const TopicLessonEconomics = () => {
   const [showMemoAfterAnswer, setShowMemoAfterAnswer] = useState(false);
   const [showClue, setShowClue] = useState(false);
 
-  const topicName = 'Macroeconomics';
+  // Teaching + auto
+  const [taughtConcepts, setTaughtConcepts] = useState(new Set());
+  const [teachingQueue, setTeachingQueue] = useState([]);
+  const [hasInitialisedTeaching, setHasInitialisedTeaching] = useState(false);
+  const [activeTeaching, setActiveTeaching] = useState(null);
+  const [autoMode, setAutoMode] = useState(false);
+  const [welcomeDone, setWelcomeDone] = useState(false);
+
   const API_URL = 'https://smartclass-wlgb.onrender.com';
-  
-  const levelKey = `level${currentLevel}`;
-  const levelQuestions = QuestionBank[levelKey] || QuestionBank.level1;
-  const activeQuestionSet = levelQuestions[currentQuestionIndex % levelQuestions.length];
-  const currentQuestion = activeQuestionSet?.parts[currentPartIndex] || null;
-  const memo = currentQuestion?.memoCorrection || null;
+  const prefetchedRef = useRef(false);
 
-  const speakText = async (text) => {
-    try {
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-      const cleanText = text.replace(/[^a-zA-Z0-9\s.,!?()=+\-']/g, '');
-      if (!cleanText.trim()) return;
-      setIsSpeaking(true);
-      const response = await fetch(`${API_URL}/api/neo/speak`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: cleanText }),
-      });
-      if (!response.ok) throw new Error('Speak failed');
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      audio.volume = 1.0;
-      audio.play().catch(() => {});
-      audio.onended = () => { URL.revokeObjectURL(audioUrl); audioRef.current = null; setIsSpeaking(false); };
-    } catch (error) {
-      console.error('Voice error:', error);
-      setIsSpeaking(false);
-    }
-  };
+  // ─── createSpeakText ───
+  const speakText = createSpeakText(
+    { audioRef, setSpeaking: setIsSpeaking },
+    API_URL
+  );
 
+  // ─── Welcome (voice is best-effort, gate uses fixed timer) ───
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
     const firstName = userData.fullName?.split(' ')[0] || 'there';
-    const welcomeMsg = `Hi ${firstName}! Welcome to Economics! Type your answer when ready!`;
+    const welcomeMsg = `Hi ${firstName}! Welcome to ${topicName}. I'll teach you first, then we'll practice.`;
     setNeoMessage(welcomeMsg);
-    setTimeout(() => speakText(welcomeMsg), 800);
-    return () => { if (audioRef.current) audioRef.current.pause(); };
+
+    // Fire welcome voice in the background — do NOT block on it.
+    try {
+      Promise.resolve(speakText(welcomeMsg)).catch(() => {});
+    } catch (e) {
+      // swallow — voice is best-effort
+    }
+
+    // Fixed 1500ms timer so teaching always starts, even if voice is slow or down.
+    const t = setTimeout(() => setWelcomeDone(true), 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ─── Queue initialisation ───
+  useEffect(() => {
+    if (autoMode) return;
+    if (!welcomeDone) return;
+    if (hasInitialisedTeaching) return;
+    if (!activeConcepts.length) return;
+    setTeachingQueue(activeConcepts.slice());
+    setHasInitialisedTeaching(true);
+  }, [autoMode, welcomeDone, hasInitialisedTeaching, activeConcepts]);
+
+  // ─── Failsafe: force-start if stuck ───
+  useEffect(() => {
+    if (hasInitialisedTeaching) return;
+    const t = setTimeout(() => {
+      if (!hasInitialisedTeaching && activeConcepts.length > 0) {
+        console.warn('[TopicLessonEconomics] Failsafe trigger — forcing teaching queue.');
+        setTeachingQueue(activeConcepts.slice());
+        setHasInitialisedTeaching(true);
+      }
+    }, 3000);
+    return () => clearTimeout(t);
+  }, [hasInitialisedTeaching, activeConcepts]);
+
+  // ─── Queue drain ───
+  useEffect(() => {
+    if (activeTeaching) return;
+    if (!teachingQueue.length) return;
+    const [next, ...rest] = teachingQueue;
+    setTeachingQueue(rest);
+    setActiveTeaching(next);
+  }, [teachingQueue, activeTeaching]);
+
+  // ─── Prefetch (topic-scoped only) ───
+  useEffect(() => {
+    if (prefetchedRef.current) return;
+    if (!activeConcepts.length) return;
+
+    // Hard-lock to this topic's own concepts (max 6). Never walk the whole script map.
+    const conceptIdsToPrefetch = activeConcepts.slice(0, 6);
+    prefetchedRef.current = true;
+
+    const timer = setTimeout(async () => {
+      try {
+        const mod = await import('../data/EconomicsContent');
+        const scripts = mod.ECON_TEACHING_SCRIPTS || {};
+        const texts = [];
+        conceptIdsToPrefetch.forEach((conceptId) => {
+          const script = scripts[conceptId];
+          if (!script?.sections) return;
+          script.sections.forEach((section) => {
+            if (section.text) texts.push(section.text);
+            if (section.caption) texts.push(section.caption);
+            if (section.items) texts.push(...section.items);
+            if (section.stepTexts) section.stepTexts.forEach((t) => t && texts.push(t));
+            if (section.scenario) texts.push(section.scenario);
+            if (section.steps) section.steps.forEach((s) => s && texts.push(s));
+            if (section.answer) texts.push(section.answer);
+          });
+        });
+        console.log(`[prefetch] ${conceptIdsToPrefetch.length} concepts → ${texts.length} strings`);
+        if (texts.length > 0) prefetchSpeech(texts, API_URL);
+      } catch (err) {
+        console.warn('[prefetch] skipped:', err?.message);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [activeConcepts]);
+
+  // ─── Cleanup ───
+  useEffect(() => {
+    return () => {
+      try { stopSpeaking(); } catch {}
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    };
+  }, []);
+
+  // ─── Filtered question bank ───
+  const filteredBank = Object.fromEntries(
+    Object.entries(QuestionBank).map(([key, list]) => [
+      key,
+      (list || []).filter((q) => activeConcepts.includes(q.teachTopic)),
+    ])
+  );
+
+  const levelKey = `level${currentLevel}`;
+  const levelQuestions = (() => {
+    if (filteredBank[levelKey]?.length > 0) return filteredBank[levelKey];
+    for (const lvl of [1, 2, 3, 4, 5]) {
+      if (filteredBank[`level${lvl}`]?.length > 0) return filteredBank[`level${lvl}`];
+    }
+    return [];
+  })();
+
+  const activeQuestionSet = levelQuestions[currentQuestionIndex % Math.max(levelQuestions.length, 1)];
+  const currentQuestion = activeQuestionSet?.parts[currentPartIndex] || null;
+  const memo = currentQuestion?.memoCorrection || null;
+
+  // ─── Answer check ───
   const checkTypedAnswer = async () => {
     if (!typedAnswer.trim() || !currentQuestion) return;
     setIsLoading(true);
     setShowMemoAfterAnswer(true);
-    
+
     let answerDescription = currentQuestion.answer;
     if (currentQuestion.acceptAnyTwo) {
       answerDescription = `ANY TWO of: ${currentQuestion.answer}`;
     }
-    
+
     try {
       const response = await fetch(`${API_URL}/api/neo/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: `Compare the student's answer to the NSC memorandum.
-          
+
           Student's answer: "${typedAnswer.trim()}"
           Correct answer: ${answerDescription}
-          
-          ${currentQuestion.acceptAnyTwo ? 'IMPORTANT: Student only needs ANY TWO correct answers. Accept any 2.' : ''}
-          
-          CRITICAL INSTRUCTIONS FOR ACCEPTING ANSWERS:
-          - If the student lists ANY 2 correct items from the memo, mark it CORRECT.
-          - Do NOT require all 3 items.
-          - Do NOT require a specific combination.
-          - Accept ANY 2 correct answers.
-          
-          ACCEPT SYNONYMS:
-          - "expense" = "expenditure"
-          - "spending" = "expenditure"
-          - "making" = "production"
-          - "earnings" = "income"
-          - "GDP(P)" = "Production method"
-          - "GDP(I)" = "Income method"
-          - "GDP(E)" = "Expenditure method"
-          - "value added" = "Production"
-          - "pay" = "expenditure"
-          - "earn" = "income"
-          - "produce" = "production"
-          - "jobs" = "employment"
-          - "work" = "employment"
-          - "income and expenditure" = "Income + Expenditure" (CORRECT - 2 valid methods)
-          
+
+          ${currentQuestion.acceptAnyTwo ? 'IMPORTANT: Student only needs ANY TWO correct items. Accept any 2.' : ''}
+
           NSC MEMORANDUM:
           What to check: ${memo?.whatToCheck || ''}
           Common mistake: ${memo?.commonMistake || ''}
           Examiner hint: ${memo?.examinerHint || ''}
-          
-          MARK STRICTLY ACCORDING TO THE MEMORANDUM, BUT BE LENIENT WITH SYNONYMS.
-          
+
+          Be lenient with synonyms. Mark strictly per memo.
+
           If CORRECT:
           "CORRECT: [3 words max]"
-          
+
           If WRONG:
           "INCORRECT: [what they wrote vs what memo requires]
-          WHY: [use the common mistake from memo]
-          AGAIN: [Try again!]"`,
+          WHY: [use the common mistake]
+          AGAIN: [try again]"`,
           subject: 'economics',
           userId: 'student',
-        })
+        }),
       });
 
       const data = await response.json();
@@ -2071,20 +2195,20 @@ const TopicLessonEconomics = () => {
         setAiCorrection('');
         setAiMistake('');
         setAiTeaching('');
-        const praise = "Correct!";
+        const praise = 'Correct!';
         setNeoMessage('✅ ' + praise);
         speakText(praise);
       } else {
         setIsCorrect(false);
         const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
-        const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
-        const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
-        
+        const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/);
+        const teachingMatch = reply.match(/AGAIN:\s*([^\n]+)/);
+
         setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
         setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : memo?.commonMistake || '');
         setAiTeaching(teachingMatch ? teachingMatch[1].trim() : memo?.examinerHint || '');
-        
-        const speakMsg = teachingMatch ? teachingMatch[1].trim() : memo?.examinerHint || '';
+
+        const speakMsg = mistakeMatch ? mistakeMatch[1].trim() : memo?.examinerHint || '';
         if (speakMsg) {
           setNeoMessage(speakMsg);
           speakText(speakMsg);
@@ -2101,34 +2225,27 @@ const TopicLessonEconomics = () => {
   const handleAnotherApproach = async () => {
     if (alternativeCount >= 2) return;
     setIsLoading(true);
-    
     try {
       const response = await fetch(`${API_URL}/api/neo/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `The student doesn't understand. Explain it like they're 12 years old.
-          
+          message: `The student doesn't understand. Explain this simply.
+
           Question: ${currentQuestion.prompt}
-          
-          Think of it like this:
-          - The two lines are 10 apart (30 - 20 = 10)
-          - The slope is 0.5, which means "half spent, half saved"
-          - So every R10 injection becomes R20 total (because it gets spent again and again)
-          - Answer: 20
-          
-          Keep it SIMPLE. No formulas. Just: "Gap × 2 = Answer".`,
+          Correct answer: ${currentQuestion.answer}
+          Memory trick: ${memo?.memoryTrick || ''}
+
+          Keep it SIMPLE. Use the memory trick. No jargon.`,
           subject: 'economics',
           userId: 'student',
-        })
+        }),
       });
-
       const data = await response.json();
       const reply = data.reply || '';
-      
       setAlternativeExplanation(reply);
       setShowAnotherWay(true);
-      setAlternativeCount(prev => prev + 1);
+      setAlternativeCount((prev) => prev + 1);
       setNeoMessage(reply);
       speakText(reply);
     } catch (error) {
@@ -2149,96 +2266,124 @@ const TopicLessonEconomics = () => {
     setIsCorrect(null);
     setShowMemoAfterAnswer(false);
     setShowClue(false);
-    
+
     const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
     const firstName = userData.fullName?.split(' ')[0] || 'there';
-    
-    // ALWAYS MOVE FORWARD - regardless of correct or wrong
+
     if (currentQuestionIndex < levelQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setCurrentPartIndex(0);
-      
-      // Don't say "Next question!" every time - use random motivational messages
       const msgs = [
         `${firstName}, let's go!`,
         `Keep going ${firstName}!`,
         `You're doing great!`,
         `Let's continue!`,
-        `You've got this!`
       ];
       const msg = msgs[Math.floor(Math.random() * msgs.length)];
       setNeoMessage(msg);
       speakText(msg);
-      
     } else {
-      // Moving to NEXT LEVEL
       const nextLevel = currentLevel + 1;
       setCurrentLevel(nextLevel);
       setCurrentQuestionIndex(0);
       setCurrentPartIndex(0);
-      
+
       let levelMsg = '';
-      if (nextLevel === 3) {
-        levelMsg = `🔥 ${firstName}, things are going to step up a bit!`;
-      } else if (nextLevel === 4) {
-        levelMsg = `💪 ${firstName}, let's keep pushing!`;
-      } else if (nextLevel === 5) {
-        levelMsg = `🏆 ${firstName}, this is the final level!`;
-      } else if (nextLevel > 5) {
-        levelMsg = `🎉 ${firstName}, you've completed ALL levels! You're ready for the exam!`;
+      if (nextLevel === 3) levelMsg = `🔥 ${firstName}, things step up now!`;
+      else if (nextLevel === 4) levelMsg = `💪 ${firstName}, keep pushing!`;
+      else if (nextLevel === 5) levelMsg = `🏆 ${firstName}, final level!`;
+      else if (nextLevel > 5) {
+        levelMsg = `🎉 ${firstName}, you've completed everything!`;
         setTimeout(() => navigate(`/subjects/${subject}`), 3000);
-      } else {
-        levelMsg = `${firstName}, let's continue!`;
-      }
-      
+      } else levelMsg = `${firstName}, let's continue!`;
+
       setNeoMessage(levelMsg);
       speakText(levelMsg);
     }
   };
 
-  if (!currentQuestion) {
+  // ─── PHASE 0: AUTO MODE ───
+  if (autoMode) {
     return (
-      <div className="tl-loading"><div className="tl-spinner"></div></div>
+      <AutoPlayMode
+        onSpeak={speakText}
+        onExit={() => setAutoMode(false)}
+        audioRef={audioRef}
+        scriptsModule="econ"
+        moduleLabel="Economics"
+      />
     );
   }
 
-  // Determine which diagram to show
+  // ─── PHASE 1: TEACHING ───
+  if (activeTeaching) {
+    return (
+      <ConceptTeaching
+        topic={activeTeaching}
+        onSpeak={speakText}
+        onComplete={() => {
+          setTaughtConcepts((prev) => {
+            const next = new Set(prev);
+            next.add(activeTeaching);
+            return next;
+          });
+          setActiveTeaching(null);
+        }}
+        autoMode={autoMode}
+        onToggleAuto={() => setAutoMode((v) => !v)}
+        scriptsModule="econ"
+        accent={accent}
+      />
+    );
+  }
+
+  // ─── GATE ───
+  if (!hasInitialisedTeaching || teachingQueue.length > 0) {
+    return <div className="tl-loading"><div className="tl-spinner"></div></div>;
+  }
+
+  if (!currentQuestion) {
+    return (
+      <div className="tl-loading">
+        <div className="tl-spinner"></div>
+        <p style={{ marginTop: 16, color: '#666', textAlign: 'center' }}>
+          Loading questions…
+        </p>
+      </div>
+    );
+  }
+
+  // ─── Diagram renderer ───
   const renderDiagram = () => {
     const diagramConfig = activeQuestionSet.diagramConfig;
     if (!diagramConfig) return null;
-    
     switch (diagramConfig.type) {
-      case 'circularFlow':
-        return <AnimatedCircularFlow config={diagramConfig} />;
-      case 'multiplierGraph':
-        return <AnimatedMultiplierGraph config={diagramConfig} />;
-      default:
-        return null;
+      case 'circularFlow': return <AnimatedCircularFlow config={diagramConfig} />;
+      case 'multiplierGraph': return <AnimatedMultiplierGraph config={diagramConfig} />;
+      default: return null;
     }
   };
 
-  // Render table if exists - COMPACT VERSION
   const renderTable = () => {
     const tableConfig = activeQuestionSet.tableConfig;
     if (!tableConfig) return null;
-    
     return (
-      <div className="tl-table-container" style={{ marginBottom: '16px', overflowX: 'auto' }}>
+      <div className="tl-table-container" style={{ marginBottom: 16, overflowX: 'auto' }}>
         {tableConfig.title && (
-          <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '14px', marginBottom: '8px', color: '#1a1a1a' }}>
+          <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 14, marginBottom: 8, color: '#1a1a1a' }}>
             {tableConfig.title}
           </div>
         )}
         {tableConfig.subtitle && (
-          <div style={{ textAlign: 'center', fontSize: '12px', marginBottom: '8px', color: '#666' }}>
+          <div style={{ textAlign: 'center', fontSize: 12, marginBottom: 8, color: '#666' }}>
             {tableConfig.subtitle}
           </div>
         )}
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', background: '#fff', borderRadius: '8px', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, background: '#fff', borderRadius: 8, overflow: 'hidden' }}>
           <thead>
-            <tr style={{ background: '#7E57C2', color: '#fff' }}>
+            <tr style={{ background: accent, color: '#fff' }}>
               {tableConfig.headers.map((header, i) => (
-                <th key={i} style={{ padding: '8px', textAlign: 'left', border: '1px solid #E0E0E0', fontWeight: '600', fontSize: '12px' }}>
+                <th key={i} style={{ padding: 8, textAlign: 'left', border: '1px solid #E0E0E0', fontWeight: 600, fontSize: 12 }}>
                   {header}
                 </th>
               ))}
@@ -2248,7 +2393,7 @@ const TopicLessonEconomics = () => {
             {tableConfig.rows.map((row, i) => (
               <tr key={i} style={{ background: i % 2 === 0 ? '#FAFAFA' : '#FFFFFF' }}>
                 {row.map((cell, j) => (
-                  <td key={j} style={{ padding: '6px', border: '1px solid #E0E0E0', color: '#333', fontSize: '12px' }}>
+                  <td key={j} style={{ padding: 6, border: '1px solid #E0E0E0', color: '#333', fontSize: 12 }}>
                     {cell}
                   </td>
                 ))}
@@ -2257,7 +2402,7 @@ const TopicLessonEconomics = () => {
           </tbody>
         </table>
         {tableConfig.note && (
-          <div style={{ fontSize: '11px', color: '#666', marginTop: '6px', fontStyle: 'italic' }}>
+          <div style={{ fontSize: 11, color: '#666', marginTop: 6, fontStyle: 'italic' }}>
             {tableConfig.note}
           </div>
         )}
@@ -2265,18 +2410,15 @@ const TopicLessonEconomics = () => {
     );
   };
 
-  // Clean memo lines for display
   const cleanMemoLines = (memoText) => {
     if (!memoText) return [];
     return memoText
       .split('\n')
-      .filter(line => line.trim() && !line.includes('(Any') && !line.includes('(Accept') && !line.includes('(Max'))
-      .map(line => line.trim());
+      .filter((line) => line.trim() && !line.includes('(Any') && !line.includes('(Accept') && !line.includes('(Max'))
+      .map((line) => line.trim());
   };
 
   const memoLines = cleanMemoLines(currentQuestion.memoFullAnswer);
-
-  // Progress within level
   const progress = ((currentQuestionIndex + 1) / levelQuestions.length) * 100;
 
   return (
@@ -2287,11 +2429,16 @@ const TopicLessonEconomics = () => {
         </button>
         <div className="tl-progress-mini">
           <div className="tl-progress-bar-mini">
-            <div className="tl-progress-fill-mini" style={{ width: `${progress}%` }}></div>
+            <div className="tl-progress-fill-mini" style={{ width: `${progress}%`, background: accent }}></div>
           </div>
-          <span className="tl-progress-text-mini">{currentQuestionIndex + 1}/{levelQuestions.length}</span>
+          <span className="tl-progress-text-mini">
+            {paperLabel} • {currentQuestionIndex + 1}/{levelQuestions.length}
+          </span>
         </div>
-        <NeoVoiceIndicator neoMessage={neoMessage} isSpeaking={isSpeaking} />
+        <NeoVoiceIndicator
+          autoMode={autoMode}
+          onToggleAuto={() => setAutoMode((v) => !v)}
+        />
       </header>
 
       {neoMessage && (
@@ -2310,46 +2457,32 @@ const TopicLessonEconomics = () => {
           <span className="tl-equation-label">
             Level {currentLevel} • {activeQuestionSet.source} • {currentQuestion.marks} mark{currentQuestion.marks > 1 ? 's' : ''}
           </span>
-          
-          {/* Diagram (if present) */}
+
           {renderDiagram()}
-          
-          {/* Table (if present) */}
           {renderTable()}
-          
-          {/* Topic Card */}
+
           <div className="tl-equation-card">
             <h1 className="tl-equation-text">{activeQuestionSet.topicText}</h1>
             <p className="tl-equation-instruction">{currentQuestion.prompt}</p>
           </div>
 
-          {/* ==========================================
-              CORRECT - CLEAN MESSAGE + MEMO LIST
-              ========================================== */}
           {isCorrect === true && showMemoAfterAnswer && (
             <div className="tl-correct-clean">
               <div className="tl-correct-msg">
                 <span className="tl-correct-icon">✅</span>
                 <p>Correct!</p>
               </div>
-              
-              {/* Show all answers as a clean list */}
               <div className="tl-memo-answer-clean">
                 <strong>All possible answers:</strong>
-                <ul style={{ marginTop: '8px', paddingLeft: '20px', listStyleType: 'disc' }}>
+                <ul style={{ marginTop: 8, paddingLeft: 20, listStyleType: 'disc' }}>
                   {memoLines.map((line, i) => (
-                    <li key={i} style={{ marginBottom: '4px', fontSize: '14px' }}>
-                      {line}
-                    </li>
+                    <li key={i} style={{ marginBottom: 4, fontSize: 14 }}>{line}</li>
                   ))}
                 </ul>
               </div>
             </div>
           )}
 
-          {/* ==========================================
-              WRONG - CORRECTION PANEL (MERGED)
-              ========================================== */}
           {isCorrect === false && showMemoAfterAnswer && (
             <div className="tl-correction-panel clean">
               <span className="tl-panel-label">Neo's Correction (Per NSC Memo)</span>
@@ -2360,16 +2493,13 @@ const TopicLessonEconomics = () => {
                     <p>{aiCorrection}</p>
                   </div>
                 )}
-                
-                {/* MERGED CORRECTION - Memory Trick + Memo Answer (NO Fix) */}
                 {memo?.mergedCorrection && (
                   <div className="tl-memo-merged">
-                    <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: '14px', lineHeight: '1.6', margin: 0, background: '#fff', padding: '12px', borderRadius: '8px', border: '1px solid #e0e0e0' }}>
+                    <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit', fontSize: 14, lineHeight: 1.6, margin: 0, background: '#fff', padding: 12, borderRadius: 8, border: '1px solid #e0e0e0' }}>
                       {memo.mergedCorrection}
                     </pre>
                   </div>
                 )}
-
                 {showAnotherWay && alternativeExplanation && (
                   <div className="tl-alternative-approach">
                     <strong>🔄 Another way:</strong>
@@ -2380,7 +2510,6 @@ const TopicLessonEconomics = () => {
             </div>
           )}
 
-          {/* Input with Clue Button */}
           {isCorrect === null && (
             <div className="tl-typed-answer-area clean">
               <div className="tl-input-wrapper">
@@ -2392,7 +2521,7 @@ const TopicLessonEconomics = () => {
                   rows={3}
                 />
                 {currentQuestion.clue && (
-                  <button 
+                  <button
                     className="tl-clue-btn"
                     onClick={() => setShowClue(!showClue)}
                     aria-label="Show clue"
@@ -2402,24 +2531,22 @@ const TopicLessonEconomics = () => {
                   </button>
                 )}
               </div>
-              
+
               {showClue && currentQuestion.clue && (
-                <div className="tl-clue-popup">
-                  💡 {currentQuestion.clue}
-                </div>
+                <div className="tl-clue-popup">💡 {currentQuestion.clue}</div>
               )}
-              
-              <button 
+
+              <button
                 className="tl-submit-answer-btn"
                 onClick={checkTypedAnswer}
                 disabled={!typedAnswer.trim() || isLoading}
+                style={{ background: accent }}
               >
                 {isLoading ? 'Checking...' : 'Submit Answer'} <FaArrowRight />
               </button>
             </div>
           )}
 
-          {/* Buttons */}
           {isCorrect !== null && (
             <div className="tl-action-buttons clean">
               {isCorrect === false && alternativeCount < 2 && (
@@ -2427,7 +2554,11 @@ const TopicLessonEconomics = () => {
                   <FaSync /> Explain Another Way
                 </button>
               )}
-              <button className="tl-proceed-btn" onClick={handleProceed}>
+              <button
+                className="tl-proceed-btn"
+                onClick={handleProceed}
+                style={{ background: accent }}
+              >
                 {isCorrect ? 'Next Question' : 'Try Another Question'} <FaArrowRight />
               </button>
             </div>

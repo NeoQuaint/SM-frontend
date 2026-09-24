@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import '../css/Dashboard.css';
 import { useNeo } from '../context/NeoContext';
 import { FaUser, FaTimes, FaSignOutAlt, FaCog, FaQuestionCircle, FaCamera, FaFileAlt, FaSpinner, FaHome, FaTasks, FaComments } from 'react-icons/fa';
+import { ThinkingOrb } from 'thinking-orbs';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Dashboard = () => {
   const uploadInputRef = useRef(null);
   const typewriterRef = useRef(null);
   const API_URL = 'https://smartclass-wlgb.onrender.com';
-  
+
   // Scan Homework state
   const [scanView, setScanView] = useState(false);
   const [studentImage, setStudentImage] = useState(null);
@@ -37,33 +38,33 @@ const Dashboard = () => {
       clearTimeout(typewriterRef.current);
       typewriterRef.current = null;
     }
-    
+
     setDisplayedText('');
     setIsTyping(true);
     let currentIndex = 0;
     const characters = text.split('');
-    
+
     const typeNextChar = () => {
       if (currentIndex >= characters.length) {
         setIsTyping(false);
         typewriterRef.current = null;
         return;
       }
-      
+
       const char = characters[currentIndex];
       setDisplayedText(text.slice(0, currentIndex + 1));
       currentIndex++;
-      
+
       // Natural pauses on punctuation
       let delay = 25;
       if (char === '.' || char === '!' || char === '?') delay = 350;
       else if (char === ',') delay = 180;
       else if (char === ';' || char === ':') delay = 200;
       else if (char === ' ') delay = 35;
-      
+
       typewriterRef.current = setTimeout(typeNextChar, delay);
     };
-    
+
     typeNextChar();
   };
 
@@ -71,17 +72,17 @@ const Dashboard = () => {
     try {
       // Start typewriter effect
       startTypewriter(text);
-      
+
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
       }
-      
+
       const cleanText = text.replace(/[^a-zA-Z0-9\s.,!?()=+\-']/g, '');
       if (!cleanText.trim()) return;
-      
+
       setIsSpeaking(true);
-      
+
       const response = await fetch(`${API_URL}/api/neo/speak`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,9 +96,9 @@ const Dashboard = () => {
       const audio = new Audio(audioUrl);
       audioRef.current = audio;
       audio.volume = 1.0;
-      
+
       audio.play().catch(() => {});
-      
+
       audio.onended = () => {
         URL.revokeObjectURL(audioUrl);
         audioRef.current = null;
@@ -122,10 +123,10 @@ const Dashboard = () => {
       const parsed = JSON.parse(data);
       setUserData(parsed);
       buildLearningPath(parsed);
-      
+
       const firstName = parsed.fullName?.split(' ')[0] || 'there';
       const hasMetNeo = localStorage.getItem('smartclass_met_neo');
-      
+
       let introMsg;
       if (!hasMetNeo) {
         introMsg = `Hi ${firstName}! Nice to meet you! My name is Neo, and I'm your personal tutor. I can't wait to help you learn and grow. Tap any subject below and we'll get started!`;
@@ -133,13 +134,13 @@ const Dashboard = () => {
       } else {
         introMsg = `Welcome back ${firstName}! Ready to learn something new? Pick a subject below!`;
       }
-      
+
       setNeoMessage(introMsg);
       speakText(introMsg);
     } else {
       navigate('/');
     }
-    
+
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -170,7 +171,7 @@ const Dashboard = () => {
   const handleImageCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const imageUrl = URL.createObjectURL(file);
     setStudentImage(imageUrl);
     setScanView(true);
@@ -228,12 +229,12 @@ const Dashboard = () => {
         const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
         const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
         const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
-        
+
         setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
         setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : '');
         setAiTeaching(teachingMatch ? teachingMatch[1].trim() : '');
         setScanComplete(true);
-        
+
         const speakMsg = teachingMatch ? teachingMatch[1].trim() : '';
         if (speakMsg) speakText(speakMsg);
       }
@@ -275,7 +276,7 @@ const Dashboard = () => {
     'business-studies': '/BS.png',
     'geography': '/G.png',
     'history': '/H.png',
-    'english': '/EN.png',
+    'english': '/ENGG.png',
     'afrikaans': '/AF.png',
     'cat': '/CAT.png',
     'technology': '/T.png',
@@ -323,7 +324,7 @@ const Dashboard = () => {
         accept="image/*" 
         style={{ display: 'none' }} 
       />
-      
+
       {/* SCAN HOMEWORK OVERLAY */}
       <AnimatePresence>
         {scanView && (
@@ -344,9 +345,9 @@ const Dashboard = () => {
               <button className="scan-close-btn" onClick={closeScanView}>
                 <FaTimes />
               </button>
-              
+
               <h2 className="scan-title">📸 Scan Homework</h2>
-              
+
               <div className="scan-split-container">
                 <div className="scan-image-panel">
                   <span className="scan-panel-label">Your Work</span>
@@ -357,7 +358,7 @@ const Dashboard = () => {
 
                 <div className="scan-correction-panel">
                   <span className="scan-panel-label">Neo's Correction</span>
-                  
+
                   {isScanning ? (
                     <div className="scan-checking">
                       <FaSpinner className="scan-spinner" />
@@ -371,7 +372,7 @@ const Dashboard = () => {
                           <p>{aiCorrection}</p>
                         </div>
                       )}
-                      
+
                       {aiCorrection && aiMistake && (
                         <div className="scan-wrong-msg">
                           <div className="scan-what-you-wrote">
@@ -396,7 +397,7 @@ const Dashboard = () => {
                   )}
                 </div>
               </div>
-              
+
               <button className="scan-take-photo-btn" onClick={handleScanHomework}>
                 <FaCamera /> Take Photo of Homework
               </button>
@@ -439,13 +440,10 @@ const Dashboard = () => {
         {/* Neo's Introduction - WhatsApp Bubble with Typewriter */}
         <div className="neo-question-section">
           <div className="neo-line">
-            <div className="neo-voice-icon">
-              <span className="wave-bar"></span>
-              <span className="wave-bar"></span>
-              <span className="wave-bar"></span>
-              <span className="wave-bar"></span>
-              <span className="wave-bar"></span>
-            </div>
+            <ThinkingOrb
+              state="composing"
+              size={64}
+            />
             <div className="neo-chat-bubble">
               <p className={`neo-chat-text ${isTyping ? 'typing' : ''}`}>
                 {getNeoMessage()}
@@ -457,13 +455,13 @@ const Dashboard = () => {
         {/* Your Subjects */}
         <div className="section-block">
           <span className="section-label">YOUR SUBJECTS</span>
-          
+
           <div className="subjects-compact-grid">
             {displaySubjects.map((subject, i) => {
               const color = subjectColors[i % subjectColors.length] || '#FF9800';
               const bg = subjectBgs[i % subjectBgs.length] || '#FFF8F0';
               const subjectImg = subjectImages[subject] || null;
-              
+
               return (
                 <div 
                   key={subject} 
@@ -476,7 +474,7 @@ const Dashboard = () => {
                   ) : (
                     <span className="sc-emoji">📝</span>
                   )}
-                  
+
                   <span className="sc-name">{subjectLabels[subject] || subject}</span>
                 </div>
               );

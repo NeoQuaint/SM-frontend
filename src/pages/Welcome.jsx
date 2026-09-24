@@ -39,21 +39,63 @@ const Welcome = () => {
     }
   }, []);
 
-  // Check if user is already logged in
+  // ==========================================
+  // CHECK AUTH ON MOUNT — fetch from backend
+  // ==========================================
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const userData = localStorage.getItem('smartclass_user');
-    
-    if (token && userData) {
-      const user = JSON.parse(userData);
-      if (user.onboardingComplete === true) {
-        navigate('/dashboard');
-      } else {
-        setEmail(user.email || '');
-        setFullName(user.fullName || '');
-        setStep(1);
+    const checkAuth = async () => {
+      const token = localStorage.getItem('authToken');
+      
+      // No token → show welcome screen
+      if (!token) return;
+      
+      try {
+        // Fetch fresh user data from backend (source of truth)
+        const meRes = await fetch(`${API_URL}/api/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (!meRes.ok) {
+          // Token invalid or expired → clear and show welcome
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('smartclass_user');
+          return;
+        }
+        
+        const meData = await meRes.json();
+        
+        if (meData.status === 'success' && meData.user) {
+          const user = {
+            id: meData.user.id,
+            email: meData.user.email,
+            fullName: meData.user.full_name || '',
+            avatar: meData.user.avatar || 'AVO',
+            grade: meData.user.grade || '',
+            subjects: meData.user.subjects || [],
+            notificationsEnabled: meData.user.notifications_enabled || false,
+            onboardingComplete: meData.user.onboarding_complete || false
+          };
+          
+          localStorage.setItem('smartclass_user', JSON.stringify(user));
+          
+          if (user.onboardingComplete === true) {
+            navigate('/dashboard');
+          } else {
+            // Resume onboarding from where they left off
+            setEmail(user.email || '');
+            setFullName(user.fullName || '');
+            setSelectedSubjects(user.subjects || []);
+            setGrade(user.grade || '');
+            setAvatar(user.avatar || '');
+            setStep(1);
+          }
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
       }
-    }
+    };
+    
+    checkAuth();
   }, [navigate]);
 
   const avatars = [
@@ -163,7 +205,7 @@ const Welcome = () => {
   };
 
   // ==========================================
-  // LOGIN - Now hydrates from backend
+  // LOGIN
   // ==========================================
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -192,7 +234,7 @@ const Welcome = () => {
           grade: data.user.grade || '',
           subjects: data.user.subjects || [],
           notificationsEnabled: data.user.notifications_enabled || false,
-          onboardingComplete: data.user.onboarding_complete || data.user.onboardingComplete || false
+          onboardingComplete: data.user.onboarding_complete || false
         };
         
         if (!hydratedUser) {
@@ -223,6 +265,9 @@ const Welcome = () => {
     }
   };
 
+  // ==========================================
+  // REGISTER
+  // ==========================================
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
@@ -276,6 +321,9 @@ const Welcome = () => {
     setError('');
   };
 
+  // ==========================================
+  // SAVE ONBOARDING TO BACKEND + LOCALSTORAGE
+  // ==========================================
   const saveAndGoToDashboard = async (notifications = false) => {
     const token = localStorage.getItem('authToken');
     

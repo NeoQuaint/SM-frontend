@@ -4,8 +4,83 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNeo } from '../context/NeoContext';
 import NeoVoiceIndicator from '../components/NeoVoiceIndicator';
 import AnimatedGraph from '../components/AnimatedGraph';
+import NeoTeacher from '../components/NeoTeacher';
+import NeoDemo from '../components/NeoDemo';
+import { mathToSpoken } from '../utils/speakHelpers';
 import { FaArrowLeft, FaCheck, FaArrowRight, FaSpinner, FaRedo, FaCamera, FaSync, FaTimes, FaBook } from 'react-icons/fa';
 import '../css/TopicLesson.css';
+
+// ==========================================
+// NEO TEACHING CONTENT (VISUAL-FIRST)
+// ==========================================
+const TeachingContent = {
+  sections: [
+    {
+      type: 'heading',
+      text: "Let's look at this function together.",
+    },
+    {
+      type: 'scene',
+      sceneId: 'function-intro',
+      steps: 4,
+      stepDuration: 3400,
+      config: {
+        a: 1,
+        b: 2,
+        c: -4,
+        equation: 'f(x) = 2^x - 4',
+        asymptote: -4,
+        xIntercepts: [2],
+      },
+      caption: 'This is f(x) = 2^x - 4. Watch the shape.',
+    },
+    {
+      type: 'concept',
+      label: 'The key idea',
+      text: 'The "2 to the power x" makes it grow fast. The minus 4 pushes everything down 4 units.',
+    },
+    {
+      type: 'concept',
+      label: 'Now you try',
+      text: 'Same shape. Different number. What if it was 2 to the power x minus 8?',
+    },
+  ],
+};
+
+// ==========================================
+// DEMO CONTENT — first question, teacher shows the way
+// ==========================================
+const DemoContent = {
+  equation: 'f(x) = 2^x - 8',
+  question: 'Question: Write down the equation of the asymptote of f.',
+  answer: 'y = -8',
+  graphConfig: {
+    functionType: 'exponential',
+    equation: 'f(x) = 2^x - 8',
+    a: 1,
+    b: 2,
+    c: -8,
+    asymptote: -8,
+    xIntercepts: [3],
+    showAsymptote: true,
+    showXIntercept: true,
+    showYIntercept: true,
+  },
+  steps: [
+    {
+      label: 'Step 1',
+      text: 'Here is the function: 2 to the power x, minus 8.',
+    },
+    {
+      label: 'Step 2',
+      text: 'The asymptote is always the number at the end. That is minus 8.',
+    },
+    {
+      label: 'Step 3',
+      text: 'So the graph hugs the line y equal minus 8 without ever touching it.',
+    },
+  ],
+};
 
 // ==========================================
 // FUNCTIONS & GRAPHS - MASTER QUESTION BANK
@@ -14,6 +89,43 @@ const QuestionBank = {
   tier1: [
     {
       id: 'T1A',
+      source: 'Practice • Apply what you just learned',
+      functionText: 'f(x) = 2^x - 8',
+      domain: 'x ∈ [-2; 4)',
+      parts: [
+        {
+          part: '1.1',
+          prompt: 'Write down the equation of the asymptote of f.',
+          answer: 'y = -8',
+          marks: 1,
+          formulas: [
+            'You just saw: the number added at the end is the asymptote',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: -8,
+            asymptote: -8, showAsymptote: true, showXIntercept: false,
+            showYIntercept: true,
+          },
+        },
+        {
+          part: '1.2',
+          prompt: 'Determine the coordinates of the x-intercept of f.',
+          answer: '(3; 0)',
+          marks: 2,
+          formulas: [
+            'X-intercept: put y = 0 and solve for x',
+            '2 to the power x equals 8, so x equals 3',
+          ],
+          graphConfig: {
+            functionType: 'exponential', a: 1, b: 2, c: -8,
+            asymptote: -8, showAsymptote: true, showXIntercept: true,
+            xIntercepts: [3], showYIntercept: true,
+          },
+        },
+      ],
+    },
+    {
+      id: 'T1B',
       source: '2023 NSC P1, Q4.1-4.3',
       functionText: 'f(x) = 2^x - 4',
       domain: 'x ∈ [-2; 4)',
@@ -61,59 +173,6 @@ const QuestionBank = {
             asymptote: -4, showAsymptote: true, showXIntercept: true,
             showYIntercept: true, xIntercepts: [2],
             showLineK: true, lineK: { a: 1.5, c: -3 },
-          },
-        },
-      ],
-    },
-    {
-      id: 'T1B',
-      source: '2021 NSC P1, Q5.1-5.3',
-      functionText: 'f(x) = -1/(x-3) + 2',
-      domain: 'x ∈ R, x ≠ 3',
-      parts: [
-        {
-          part: '5.1',
-          prompt: 'Write down the equations of the asymptotes of f.',
-          answer: 'x = 3, y = 2',
-          marks: 2,
-          formulas: [
-            'Vertical asymptote: where denominator = 0',
-            'Horizontal asymptote: the number outside the fraction',
-          ],
-          graphConfig: {
-            functionType: 'hyperbola', a: -1, b: 0, c: 2,
-            asymptote: 2, verticalAsymptote: 3, showAsymptote: true,
-            showXIntercept: false, showYIntercept: false,
-          },
-        },
-        {
-          part: '5.2',
-          prompt: 'Write down the domain of f.',
-          answer: 'x ∈ R, x ≠ 3',
-          marks: 1,
-          formulas: [
-            'Domain: all x values EXCEPT where denominator = 0',
-          ],
-          graphConfig: {
-            functionType: 'hyperbola', a: -1, b: 0, c: 2,
-            asymptote: 2, verticalAsymptote: 3, showAsymptote: true,
-            showXIntercept: false, showYIntercept: false,
-          },
-        },
-        {
-          part: '5.3',
-          prompt: 'Determine the coordinates of the x-intercept and y-intercept.',
-          answer: 'x-int: (3.5; 0), y-int: (0; 7/3)',
-          marks: 3,
-          formulas: [
-            'X-intercept: Put y = 0',
-            'Y-intercept: Put x = 0',
-          ],
-          graphConfig: {
-            functionType: 'hyperbola', a: -1, b: 0, c: 2,
-            asymptote: 2, verticalAsymptote: 3, showAsymptote: true,
-            showXIntercept: true, showYIntercept: true,
-            xIntercepts: [3.5],
           },
         },
       ],
@@ -367,8 +426,8 @@ const QuestionBank = {
           answer: 'E(5; -36)',
           marks: 4,
           formulas: [
-            'Find derivative: f\'(x)',
-            'Set f\'(x) = 0 and solve',
+            "Find derivative: f'(x)",
+            "Set f'(x) = 0 and solve",
             'Test which x gives a minimum',
           ],
           graphConfig: {
@@ -382,7 +441,7 @@ const QuestionBank = {
           answer: 'x < 8/3',
           marks: 2,
           formulas: [
-            'Concave down: f\'\'(x) < 0',
+            "Concave down: f''(x) < 0",
             'Find the SECOND derivative',
           ],
           graphConfig: {
@@ -404,7 +463,7 @@ const QuestionBank = {
           answer: 'x ∈ (1; 2.5)',
           marks: 2,
           formulas: [
-            'Decreasing where f\'(x) < 0',
+            "Decreasing where f'(x) < 0",
             'Between the turning points',
           ],
           graphConfig: {
@@ -414,11 +473,11 @@ const QuestionBank = {
         },
         {
           part: '9.2',
-          prompt: 'Write down the x-intercepts of f\'.',
+          prompt: "Write down the x-intercepts of f'.",
           answer: 'x = 1 and x = 2.5',
           marks: 1,
           formulas: [
-            'X-intercepts of f\' are the turning points of f',
+            "X-intercepts of f' are the turning points of f",
           ],
           graphConfig: {
             functionType: 'cubic', a: 1, b: -8, c: 5,
@@ -437,7 +496,7 @@ const TopicLesson = () => {
   const fileInputRef = useRef(null);
   const audioRef = useRef(null);
   const audioUnlockedRef = useRef(false);
-  
+
   const [currentTier, setCurrentTier] = useState(1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
@@ -457,10 +516,12 @@ const TopicLesson = () => {
   const [markingView, setMarkingView] = useState(false);
   const [accessGranted, setAccessGranted] = useState(false);
   const [isCheckingAccess, setIsCheckingAccess] = useState(true);
+  const [showTeaching, setShowTeaching] = useState(true);
+  const [showDemo, setShowDemo] = useState(true);
 
   const topicName = 'Functions and Graphs';
   const API_URL = 'https://smartclass-wlgb.onrender.com';
-  
+
   const tierKey = `tier${currentTier}`;
   const tierQuestions = QuestionBank[tierKey] || QuestionBank.tier1;
   const activeQuestionSet = tierQuestions[currentQuestionIndex % tierQuestions.length];
@@ -472,7 +533,7 @@ const TopicLesson = () => {
       const subscription = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
       const hasActiveSub = subscription?.active === true;
       const currentPackage = subscription?.package || null;
-      
+
       if (hasActiveSub) {
         if (currentPackage === 'Basic') {
           const allowedSubjects = JSON.parse(localStorage.getItem('smartclass_basic_subjects') || '[]');
@@ -486,42 +547,25 @@ const TopicLesson = () => {
           setAccessGranted(true);
         }
       } else {
-        // No subscription - check if this is the free topic (first topic of first subject)
-        const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
-        const userSubjects = userData.subjects || [];
-        const firstSubject = userSubjects[0];
-        
-        // Map of first topic IDs per subject
-        const firstTopicIds = {
-          'mathematics': 'functions-and-graphs',
-          'physical-sciences': 'mechanics',
-          'life-sciences': 'life-processes',
-          'economics': 'macroeconomic-core',
-          'mathematical-literacy': 'finance-financial-maths',
-          'accounting': 'financial-statements',
-          'business-studies': 'business-environments',
-          'geography': 'climate-and-weather',
-          'history': 'cold-war',
-          'english': 'comprehension',
-          'afrikaans': 'begrip',
-          'cat': 'hardware',
-          'technology': 'design',
-        };
-        
-        const isFirstSubject = subject === firstSubject;
-        const isFirstTopic = topicId === firstTopicIds[subject];
-        
-        if (isFirstSubject && isFirstTopic) {
-          setAccessGranted(true);
+        const claimedRaw = localStorage.getItem('smartclass_claimed_free_topic');
+
+        if (claimedRaw) {
+          const claimed = JSON.parse(claimedRaw);
+          if (claimed.subject === subject && claimed.topicId === topicId) {
+            setAccessGranted(true);
+          } else {
+            navigate('/paywall');
+            return;
+          }
         } else {
-          navigate('/paywall');
+          navigate(`/subjects/${subject}`);
           return;
         }
       }
-      
+
       setIsCheckingAccess(false);
     };
-    
+
     checkAccess();
   }, [subject, topicId, navigate]);
 
@@ -530,7 +574,7 @@ const TopicLesson = () => {
     const unlockAudio = () => {
       if (audioUnlockedRef.current) return;
       audioUnlockedRef.current = true;
-      const silentAudio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABHgD///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAChoQAAgAAAJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+      const silentAudio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABHgD///////////////////////////////////////8AAAA8TEFNRTMuOThyAc0AAAAAAAAAABSAJAChoQAAgAAAJQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
       silentAudio.volume = 0;
       silentAudio.play().then(() => { silentAudio.pause(); }).catch(() => {});
       window.removeEventListener('click', unlockAudio);
@@ -544,49 +588,91 @@ const TopicLesson = () => {
     };
   }, []);
 
-  // Speak
-  const speakText = async (text) => {
-    try {
-      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-      const cleanText = text.replace(/[^a-zA-Z0-9\s.,!?()=+\-']/g, '');
-      if (!cleanText.trim()) return;
-      setIsSpeaking(true);
-      const response = await fetch(`${API_URL}/api/neo/speak`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: cleanText }),
-      });
-      if (!response.ok) throw new Error('Speak failed');
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audioRef.current = audio;
-      audio.volume = 1.0;
-      audio.play().catch(() => {});
-      audio.onended = () => { URL.revokeObjectURL(audioUrl); audioRef.current = null; setIsSpeaking(false); };
-    } catch (error) {
-      console.error('Voice error:', error);
-      setIsSpeaking(false);
-    }
+  // Speak — converts math symbols, returns Promise with real audio duration (ms)
+  const speakText = (text) => {
+    return new Promise((resolve) => {
+      try {
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current = null;
+        }
+
+        const spokenText = mathToSpoken(text);
+        const cleanText = spokenText.replace(/[^a-zA-Z0-9\s.,!?()+\-']/g, '');
+        if (!cleanText.trim()) {
+          resolve(0);
+          return;
+        }
+
+        setIsSpeaking(true);
+
+        fetch(`${API_URL}/api/neo/speak`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: cleanText }),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error('Speak failed');
+            return response.blob();
+          })
+          .then((audioBlob) => {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audioRef.current = audio;
+            audio.volume = 1.0;
+
+            audio.addEventListener('loadedmetadata', () => {
+              resolve(audio.duration * 1000);
+            });
+
+            audio.onended = () => {
+              URL.revokeObjectURL(audioUrl);
+              audioRef.current = null;
+              setIsSpeaking(false);
+            };
+
+            audio.onerror = () => {
+              URL.revokeObjectURL(audioUrl);
+              audioRef.current = null;
+              setIsSpeaking(false);
+              resolve(0);
+            };
+
+            audio.play().catch(() => {
+              setIsSpeaking(false);
+              resolve(0);
+            });
+          })
+          .catch((error) => {
+            console.error('Voice error:', error);
+            setIsSpeaking(false);
+            resolve(0);
+          });
+      } catch (error) {
+        console.error('Voice error:', error);
+        setIsSpeaking(false);
+        resolve(0);
+      }
+    });
   };
 
-  // Welcome
+  // Welcome — after teaching AND demo are done
   useEffect(() => {
-    if (accessGranted) {
+    if (accessGranted && !showTeaching && !showDemo) {
       const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
       const firstName = userData.fullName?.split(' ')[0] || 'there';
-      const welcomeMsg = `Hi ${firstName}! Welcome to Functions and Graphs! Check the formulas below for help. Type your answer when ready!`;
+      const welcomeMsg = `${firstName}, it's your turn now. Type your answer when ready.`;
       setNeoMessage(welcomeMsg);
       setTimeout(() => speakText(welcomeMsg), 800);
     }
     return () => { if (audioRef.current) audioRef.current.pause(); };
-  }, [accessGranted]);
+  }, [accessGranted, showTeaching, showDemo]);
 
   // Check typed answer
   const checkTypedAnswer = async () => {
     if (!typedAnswer.trim() || !currentQuestion) return;
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`${API_URL}/api/neo/ask`, {
         method: 'POST',
@@ -626,12 +712,12 @@ const TopicLesson = () => {
         const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
         const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
         const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
-        
+
         setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
         setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : '');
         setAiTeaching(teachingMatch ? teachingMatch[1].trim() : '');
         setShowGraphInCorrection(true);
-        
+
         const speakMsg = teachingMatch ? teachingMatch[1].trim() : '';
         if (speakMsg) {
           setNeoMessage(speakMsg);
@@ -650,7 +736,7 @@ const TopicLesson = () => {
   const checkPhotoAnswer = async (imageBase64) => {
     if (!currentQuestion) return;
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`${API_URL}/api/neo/vision`, {
         method: 'POST',
@@ -691,13 +777,13 @@ const TopicLesson = () => {
         const incorrectMatch = reply.match(/INCORRECT:\s*([^\n]+)/);
         const mistakeMatch = reply.match(/WHY:\s*([^\n]+)/) || reply.match(/MISTAKE:\s*([^\n]+)/);
         const teachingMatch = reply.match(/FIX:\s*([^\n]+)/) || reply.match(/TEACHING:\s*([\s\S]+)/);
-        
+
         setAiCorrection(incorrectMatch ? incorrectMatch[1].trim() : '');
         setAiMistake(mistakeMatch ? mistakeMatch[1].trim() : '');
         setAiTeaching(teachingMatch ? teachingMatch[1].trim() : '');
         setShowGraphInCorrection(true);
         setMarkingView(false);
-        
+
         const speakMsg = teachingMatch ? teachingMatch[1].trim() : '';
         if (speakMsg) {
           setNeoMessage(speakMsg);
@@ -713,14 +799,13 @@ const TopicLesson = () => {
     }
   };
 
-  // Camera capture
   const handleCameraClick = () => fileInputRef.current?.click();
 
   const handleImageCapture = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setMarkingView(true);
-    
+
     const reader = new FileReader();
     reader.onload = async () => {
       const base64 = reader.result.split(',')[1];
@@ -729,11 +814,10 @@ const TopicLesson = () => {
     reader.readAsDataURL(file);
   };
 
-  // Alternative approach
   const handleAnotherApproach = async () => {
     if (alternativeCount >= 2) return;
     setIsLoading(true);
-    
+
     try {
       const response = await fetch(`${API_URL}/api/neo/ask`, {
         method: 'POST',
@@ -751,7 +835,7 @@ const TopicLesson = () => {
 
       const data = await response.json();
       const reply = data.reply || '';
-      
+
       setAlternativeExplanation(reply);
       setShowAnotherWay(true);
       setAlternativeCount(prev => prev + 1);
@@ -764,10 +848,8 @@ const TopicLesson = () => {
     }
   };
 
-  // Toggle graph enlarge
   const toggleGraphEnlarge = () => setIsGraphEnlarged(!isGraphEnlarged);
 
-  // Proceed
   const handleProceed = () => {
     setTypedAnswer('');
     setAiCorrection('');
@@ -781,7 +863,9 @@ const TopicLesson = () => {
     setIsCorrect(null);
     setStudentImage(null);
     setMarkingView(false);
-    
+
+    if (showDemo) setShowDemo(false);
+
     if (isCorrect) {
       if (currentPartIndex < activeQuestionSet.parts.length - 1) {
         setCurrentPartIndex(currentPartIndex + 1);
@@ -812,7 +896,7 @@ const TopicLesson = () => {
       const nextIndex = (currentQuestionIndex + 1) % tierQuestions.length;
       setCurrentQuestionIndex(nextIndex);
       setCurrentPartIndex(0);
-      
+
       const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
       const firstName = userData.fullName?.split(' ')[0] || 'there';
       const msg = `${firstName}, let's try a different question. You've got this!`;
@@ -821,24 +905,79 @@ const TopicLesson = () => {
     }
   };
 
-  // If checking access, show loading
   if (isCheckingAccess) {
-    return (
-      <div className="tl-loading"><div className="tl-spinner"></div></div>
-    );
+    return <div className="tl-loading"><div className="tl-spinner"></div></div>;
   }
 
-  // If no access granted, show loading (will redirect to /paywall)
   if (!accessGranted) {
+    return <div className="tl-loading"><div className="tl-spinner"></div></div>;
+  }
+
+  const avatarMap = { 'AVO': '/AVO.png', 'CAT': '/CAT.png', 'STRAW': '/STRAW.png', 'ORANGE': '/ORANGE.png', 'DOG': '/DOG.png' };
+  const userData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
+
+  // ==========================================
+  // PHASE 1: TEACHING
+  // ==========================================
+  if (showTeaching) {
     return (
-      <div className="tl-loading"><div className="tl-spinner"></div></div>
+      <div className="tl-app">
+        <header className="tl-header">
+          <button className="tl-back" onClick={() => navigate(`/subjects/${subject}`)}>
+            <FaArrowLeft /> {topicName}
+          </button>
+          <div className="tl-progress-mini">
+            <div className="tl-progress-bar-mini">
+              <div className="tl-progress-fill-mini" style={{ width: '15%' }}></div>
+            </div>
+            <span className="tl-progress-text-mini">Teaching</span>
+          </div>
+          <NeoVoiceIndicator neoMessage={neoMessage} isSpeaking={isSpeaking} />
+        </header>
+
+        <NeoTeacher
+          content={TeachingContent}
+          avatarSrc={avatarMap[userData.avatar] || '/AVO.png'}
+          onSpeak={speakText}
+          onComplete={() => setShowTeaching(false)}
+        />
+      </div>
     );
   }
 
-  if (!currentQuestion) {
+  // ==========================================
+  // PHASE 2: DEMO
+  // ==========================================
+  if (showDemo) {
     return (
-      <div className="tl-loading"><div className="tl-spinner"></div></div>
+      <div className="tl-app">
+        <header className="tl-header">
+          <button className="tl-back" onClick={() => navigate(`/subjects/${subject}`)}>
+            <FaArrowLeft /> {topicName}
+          </button>
+          <div className="tl-progress-mini">
+            <div className="tl-progress-bar-mini">
+              <div className="tl-progress-fill-mini" style={{ width: '30%' }}></div>
+            </div>
+            <span className="tl-progress-text-mini">Watch Neo</span>
+          </div>
+          <NeoVoiceIndicator neoMessage={neoMessage} isSpeaking={isSpeaking} />
+        </header>
+
+        <NeoDemo
+          demo={DemoContent}
+          onSpeak={speakText}
+          onComplete={() => setShowDemo(false)}
+        />
+      </div>
     );
+  }
+
+  // ==========================================
+  // PHASE 3: PRACTICE
+  // ==========================================
+  if (!currentQuestion) {
+    return <div className="tl-loading"><div className="tl-spinner"></div></div>;
   }
 
   const isFourPlusMarks = currentQuestion.marks >= 4;
@@ -874,7 +1013,7 @@ const TopicLesson = () => {
           <span className="tl-equation-label">
             Tier {currentTier} • {activeQuestionSet.source} • Part {currentQuestion.part} • {currentQuestion.marks} mark{currentQuestion.marks > 1 ? 's' : ''}
           </span>
-          
+
           <div className="tl-equation-card">
             <h1 className="tl-equation-text">{activeQuestionSet.functionText}</h1>
             <p className="tl-equation-instruction">{currentQuestion.prompt}</p>
@@ -916,7 +1055,7 @@ const TopicLesson = () => {
               <span className="tl-panel-label">Neo's Correction</span>
               <div className="tl-wrong-msg">
                 {showGraphInCorrection && currentQuestion.graphConfig && (
-                  <div 
+                  <div
                     className={`tl-correction-graph-corner ${isGraphEnlarged ? 'enlarged' : ''}`}
                     onClick={toggleGraphEnlarge}
                   >
@@ -976,22 +1115,22 @@ const TopicLesson = () => {
                   onChange={(e) => setTypedAnswer(e.target.value)}
                   rows={2}
                 />
-                
+
                 {isFourPlusMarks && (
                   <button className="tl-camera-icon-btn" onClick={handleCameraClick} disabled={isLoading} title="Take photo of working">
                     <FaCamera />
                   </button>
                 )}
               </div>
-              
-              <button 
+
+              <button
                 className="tl-submit-answer-btn"
                 onClick={checkTypedAnswer}
                 disabled={!typedAnswer.trim() || isLoading}
               >
                 {isLoading ? 'Checking...' : 'Submit Answer'} <FaArrowRight />
               </button>
-              
+
               <input type="file" ref={fileInputRef} onChange={handleImageCapture}
                 accept="image/*" capture="environment" style={{ display: 'none' }} />
             </div>

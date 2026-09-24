@@ -31,6 +31,8 @@ const Profile = () => {
   const [subscription, setSubscription] = useState(null);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [isLoadingSub, setIsLoadingSub] = useState(true);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
   const paymentWindowRef = useRef(null);
   const pollingIntervalRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -67,7 +69,6 @@ const Profile = () => {
       navigate('/');
     }
 
-    // Fetch subscription from backend on mount
     const fetchSubscription = async () => {
       setIsLoadingSub(true);
       try {
@@ -123,6 +124,7 @@ const Profile = () => {
     localStorage.removeItem('smartclass_basic_subjects');
     localStorage.removeItem('smartclass_free_topic_used');
     localStorage.removeItem('smartclass_free_topic');
+    localStorage.removeItem('smartclass_claimed_free_topic');
     navigate('/');
   };
 
@@ -189,29 +191,86 @@ const Profile = () => {
     }
   };
 
-  const handleUnsubscribe = async () => {
-    if (window.confirm('Are you sure you want to cancel your subscription? You will lose access to all locked topics immediately.')) {
-      setIsProcessing(true);
+  const handleUnsubscribe = () => {
+    setShowCancelModal(true);
+  };
+
+  const confirmUnsubscribe = async () => {
+    setShowCancelModal(false);
+    setIsProcessing(true);
+    
+    try {
+      const userId = userData?.email || userData?.id;
+      const res = await fetch(`${API_URL}/api/yoco/cancel-subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      const data = await res.json();
       
-      try {
-        const userId = userData?.email || userData?.id;
-        await fetch(`${API_URL}/api/subscription/cancel`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId })
+      if (data.success) {
+        const sub = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+        if (sub) {
+          sub.cancelled = true;
+          sub.endDate = data.endDate;
+          sub.active = true;
+          sub.status = 'cancelled';
+          localStorage.setItem('smartclass_subscription', JSON.stringify(sub));
+        }
+        setSubscription(JSON.parse(localStorage.getItem('smartclass_subscription') || 'null'));
+        
+        const endDateStr = new Date(data.endDate).toLocaleDateString('en-ZA', { 
+          day: 'numeric', month: 'long', year: 'numeric' 
         });
-      } catch (error) {
-        console.error('Cancel error:', error);
+        setSuccessMessage(`Subscription cancelled. You'll keep access until ${endDateStr}.`);
+        setShowSuccessModal(true);
       }
-      
-      localStorage.removeItem('smartclass_subscription');
-      localStorage.removeItem('smartclass_basic_subjects');
-      setSubscription(null);
-      
-      setIsProcessing(false);
-      setSuccessMessage('Subscription cancelled successfully.');
-      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Cancel error:', error);
     }
+    
+    setIsProcessing(false);
+  };
+
+  const handleDowngradeClick = () => {
+    setShowCancelModal(false);
+    setShowDowngradeModal(true);
+  };
+
+  const confirmDowngrade = async () => {
+    setShowDowngradeModal(false);
+    setIsProcessing(true);
+    
+    try {
+      const userId = userData?.email || userData?.id;
+      await fetch(`${API_URL}/api/yoco/downgrade-basic`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId })
+      });
+      
+      const updatedSub = {
+        package: 'Basic',
+        price: 39,
+        amount: 39,
+        subjectsAllowed: 2,
+        subjects: (userData.subjects || []).slice(0, 2),
+        active: true,
+        status: 'active',
+        type: 'monthly',
+        purchasedAt: new Date().toISOString()
+      };
+      
+      localStorage.setItem('smartclass_subscription', JSON.stringify(updatedSub));
+      localStorage.setItem('smartclass_basic_subjects', JSON.stringify(updatedSub.subjects));
+      setSubscription(updatedSub);
+      setSuccessMessage('Downgraded to Basic Plan (R39/month - 2 subjects)');
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Downgrade error:', error);
+    }
+    
+    setIsProcessing(false);
   };
 
   const handleChoosePlan = () => {
@@ -320,6 +379,20 @@ const Profile = () => {
         window.location.href = createData.redirectUrl;
       }
 
+      if (paymentType === 'swap') {
+        setPaymentError('Complete payment in the opened tab. Redirecting...');
+        
+        const checkWindow = setInterval(() => {
+          if (paymentWindow && paymentWindow.closed) {
+            clearInterval(checkWindow);
+            window.location.href = '/swap-success';
+          }
+        }, 1000);
+        
+        setTimeout(() => clearInterval(checkWindow), 300000);
+        return;
+      }
+
       setPaymentError('Complete payment in the opened tab. Waiting for confirmation...');
 
       const interval = setInterval(async () => {
@@ -332,7 +405,7 @@ const Profile = () => {
 
           const verifyData = await verifyResponse.json();
 
-          if (verifyData.success && (verifyData.status === 'completed' || verifyData.hasSubscription || verifyData.swapCompleted)) {
+          if (verifyData.success && (verifyData.status === 'completed' || verifyData.hasSubscription)) {
             clearInterval(interval);
             pollingIntervalRef.current = null;
             localStorage.removeItem('smartclass_payment_pending');
@@ -367,47 +440,7 @@ const Profile = () => {
     setTimeout(() => {
       setIsProcessing(false);
       
-      if (paymentType === 'swap' && pendingSwap) {
-        const freshUserData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
-        
-        const updatedSubjects = (freshUserData.subjects || []).map(s => 
-          s === pendingSwap.oldSubject ? pendingSwap.newSubject : s
-        );
-
-        const updatedUserData = { ...freshUserData, subjects: updatedSubjects };
-        localStorage.setItem('smartclass_user', JSON.stringify(updatedUserData));
-        
-        const sub = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
-        if (sub) {
-          sub.subjects = updatedSubjects;
-          localStorage.setItem('smartclass_subscription', JSON.stringify(sub));
-          setSubscription(sub);
-        }
-        
-        const basicSubjects = JSON.parse(localStorage.getItem('smartclass_basic_subjects') || '[]');
-        if (basicSubjects.length > 0) {
-          const updatedBasicSubjects = basicSubjects.map(s => 
-            s === pendingSwap.oldSubject ? pendingSwap.newSubject : s
-          );
-          localStorage.setItem('smartclass_basic_subjects', JSON.stringify(updatedBasicSubjects));
-        }
-        
-        const swaps = JSON.parse(localStorage.getItem('smartclass_swaps') || '[]');
-        swaps.push({
-          oldSubject: pendingSwap.oldSubject,
-          newSubject: pendingSwap.newSubject,
-          fee: 19,
-          date: new Date().toISOString()
-        });
-        localStorage.setItem('smartclass_swaps', JSON.stringify(swaps));
-        
-        setUserData(updatedUserData);
-        setPendingSwap(null);
-        setShowPaymentModal(false);
-        setSuccessMessage(`Subject swapped successfully! ${subjectLabels[pendingSwap.oldSubject]} → ${subjectLabels[pendingSwap.newSubject]}`);
-        setShowSuccessModal(true);
-        
-      } else if (paymentType === 'upgrade_basic') {
+      if (paymentType === 'upgrade_basic') {
         const freshUserData = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
         
         const updatedSub = {
@@ -418,6 +451,7 @@ const Profile = () => {
           subjects: freshUserData.subjects?.slice(0, 2) || [],
           purchasedAt: new Date().toISOString(),
           active: true,
+          status: 'active',
           type: 'monthly',
           hasLiveTutoring: false
         };
@@ -440,6 +474,7 @@ const Profile = () => {
           subjects: freshUserData.subjects || [],
           purchasedAt: new Date().toISOString(),
           active: true,
+          status: 'active',
           type: 'monthly',
           hasLiveTutoring: true
         };
@@ -485,6 +520,7 @@ const Profile = () => {
   } : null;
 
   const hasActiveSub = currentSub?.active === true;
+  const isCancelled = currentSub?.cancelled === true || currentSub?.status === 'cancelled';
 
   const settings = [
     { 
@@ -520,13 +556,15 @@ const Profile = () => {
       action: handleChoosePlan,
       showArrow: true
     });
-    settings.push({
-      icon: <FaBan />,
-      label: 'Unsubscribe',
-      color: '#E57373',
-      action: handleUnsubscribe,
-      showArrow: true
-    });
+    if (!isCancelled) {
+      settings.push({
+        icon: <FaBan />,
+        label: 'Unsubscribe',
+        color: '#E57373',
+        action: handleUnsubscribe,
+        showArrow: true
+      });
+    }
   } else {
     settings.push({
       icon: <FaArrowUp />,
@@ -583,6 +621,16 @@ const Profile = () => {
           {hasActiveSub ? (
             <div className="profile-subscription-badge">
               <FaCrown /> {currentSub.package} Plan • R{currentSub.price}/month
+              {isCancelled && currentSub.endDate && (
+                <span style={{ 
+                  display: 'block', 
+                  fontSize: '11px', 
+                  marginTop: '4px',
+                  opacity: 0.75 
+                }}>
+                  Ends {new Date(currentSub.endDate).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </span>
+              )}
             </div>
           ) : (
             <div className="profile-subscription-badge" style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.1)', color: '#666' }}>
@@ -840,6 +888,143 @@ const Profile = () => {
             <p className="paywall-secure" style={{ marginTop: '12px' }}>
               <FaShieldAlt /> Secure payment via Yoco
             </p>
+          </div>
+        </div>
+      )}
+
+      {showCancelModal && (
+        <div className="paywall-modal-overlay" onClick={() => !isProcessing && setShowCancelModal(false)}>
+          <div className="paywall-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="paywall-modal-close" onClick={() => setShowCancelModal(false)}>
+              <FaTimes />
+            </button>
+            
+            <h2>Cancel Subscription?</h2>
+            <p className="paywall-modal-subtitle">
+              You'll lose access to:
+            </p>
+            
+            <div className="paywall-features">
+              <div className="paywall-feature" style={{ color: '#E57373' }}>
+                <FaBan style={{ color: '#E57373', marginRight: '8px' }} />
+                <span>All locked topics</span>
+              </div>
+              <div className="paywall-feature" style={{ color: '#E57373' }}>
+                <FaBan style={{ color: '#E57373', marginRight: '8px' }} />
+                <span>Subject swapping</span>
+              </div>
+              {currentSub?.package === 'Standard' && (
+                <div className="paywall-feature" style={{ color: '#E57373' }}>
+                  <FaBan style={{ color: '#E57373', marginRight: '8px' }} />
+                  <span>Live tutoring sessions</span>
+                </div>
+              )}
+            </div>
+            
+            <p style={{ fontSize: '13px', color: '#888', marginTop: '16px', textAlign: 'center' }}>
+              You'll keep access until the end of your current billing period.
+            </p>
+            
+            {currentSub?.package === 'Standard' && (
+              <button 
+                className="paywall-pay-btn"
+                onClick={handleDowngradeClick}
+                disabled={isProcessing}
+                style={{ 
+                  background: '#FF9800', 
+                  width: '100%', 
+                  marginTop: '16px' 
+                }}
+              >
+                Downgrade to Basic (R39)
+              </button>
+            )}
+            
+            <button 
+              className="paywall-pay-btn"
+              onClick={confirmUnsubscribe}
+              disabled={isProcessing}
+              style={{ 
+                background: '#E57373', 
+                width: '100%', 
+                marginTop: '10px' 
+              }}
+            >
+              {isProcessing ? <><FaSpinner className="paywall-spinner" /> Processing...</> : 'Cancel Anyway'}
+            </button>
+            
+            <button 
+              className="paywall-modal-btn"
+              onClick={() => setShowCancelModal(false)}
+              style={{ 
+                marginTop: '10px', 
+                background: '#F5F5F5', 
+                color: '#333' 
+              }}
+            >
+              Keep My Plan
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showDowngradeModal && (
+        <div className="paywall-modal-overlay" onClick={() => !isProcessing && setShowDowngradeModal(false)}>
+          <div className="paywall-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="paywall-modal-close" onClick={() => setShowDowngradeModal(false)}>
+              <FaTimes />
+            </button>
+            
+            <h2>Downgrade to Basic?</h2>
+            <p className="paywall-modal-subtitle">
+              Switch to Basic and keep 2 subjects for R39/month.
+            </p>
+            
+            <div className="paywall-price">
+              <span className="paywall-currency">R</span>
+              <span className="paywall-amount">39</span>
+              <span className="paywall-period">/ month</span>
+            </div>
+            
+            <div className="paywall-features">
+              <div className="paywall-feature">
+                <FaCheck className="paywall-check" />
+                <span>Keep 2 subjects</span>
+              </div>
+              <div className="paywall-feature">
+                <FaCheck className="paywall-check" />
+                <span>All topics unlocked</span>
+              </div>
+              <div className="paywall-feature">
+                <FaCheck className="paywall-check" />
+                <span>Subject swapping (R19 per swap)</span>
+              </div>
+            </div>
+            
+            <button 
+              className="paywall-pay-btn"
+              onClick={confirmDowngrade}
+              disabled={isProcessing}
+              style={{ 
+                background: '#FF9800', 
+                width: '100%', 
+                marginTop: '16px' 
+              }}
+            >
+              {isProcessing ? <><FaSpinner className="paywall-spinner" /> Processing...</> : 'Confirm Downgrade'}
+            </button>
+            
+            <button 
+              className="paywall-modal-btn"
+              onClick={() => setShowDowngradeModal(false)}
+              style={{ 
+                marginTop: '10px', 
+                background: '#F5F5F5', 
+                color: '#333' 
+              }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}

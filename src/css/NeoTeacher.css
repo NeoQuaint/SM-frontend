@@ -1,0 +1,385 @@
+.neo-teacher {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 20px 40px;
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: 'Georgia', serif;
+}
+
+/* Header: avatar + wave */
+.neo-teacher-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, #F9F6FC, #FFFFFF);
+  border: 2px solid #EDE0F4;
+  border-radius: 20px;
+}
+
+.neo-teacher-orb {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* Soft purple halo behind the orb */
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(126, 87, 194, 0.08) 0%, transparent 70%);
+  animation: orbGlow 3s ease-in-out infinite;
+}
+
+@keyframes orbGlow {
+  0%, 100% {
+    background: radial-gradient(circle, rgba(126, 87, 194, 0.08) 0%, transparent 70%);
+  }
+  50% {
+    background: radial-gradient(circle, rgba(126, 87, 194, 0.18) 0%, transparent 70%);
+  }
+}
+
+.neo-teacher-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.neo-teacher-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #2D2420;
+}
+
+.neo-teacher-status {
+  font-size: 13px;
+  color: #8B7E74;
+}
+
+.neo-teacher-wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 24px;
+}
+
+.neo-wave-bar {
+  width: 3px;
+  height: 20px;
+  background: #7E57C2;
+  border-radius: 2px;
+  transform-origin: center;
+}
+
+/* Body: sections */
+.neo-teacher-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.neo-section {
+  transition: opacity 0.4s;
+}
+
+/* Heading */
+.neo-heading {
+  font-size: 26px;
+  font-weight: 700;
+  color: #2D2420;
+  line-height: 1.3;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+/* Concept card */
+.neo-concept {
+  background: #FFFFFF;
+  border: 2px solid #F0F0F0;
+  border-radius: 18px;
+  padding: 20px 22px;
+}
+
+.neo-concept-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.neo-concept-text {
+  font-size: 17px;
+  line-height: 1.65;
+  color: #333;
+  margin: 0;
+}
+
+/* Bullets */
+.neo-bullets {
+  background: #FFFFFF;
+  border: 2px solid #F0F0F0;
+  border-radius: 18px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.neo-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: #333;
+}
+
+.neo-bullet-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7E57C2;
+  flex-shrink: 0;
+  margin-top: 8px;
+}
+
+/* Continue button */
+.neo-teacher-continue {
+  align-self: center;
+  padding: 18px 36px;
+  background: #2D2420;
+  color: #FFFBF5;
+  border: none;
+  border-radius: 100px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 8px 24px rgba(45, 36, 32, 0.15);
+  transition: all 0.25s ease;
+  margin-top: 12px;
+}
+
+.neo-teacher-continue:hover {
+  background: #1A1410;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(45, 36, 32, 0.2);
+}
+
+/* ========== SCENE SECTIONS (visual teaching) ========== */
+.neo-scene-wrap {
+  background: #FFFFFF;
+  border: 2px solid #EDE0F4;
+  border-radius: 20px;
+  padding: 20px 16px;
+  margin: 8px 0;
+  box-shadow: 0 4px 20px rgba(126, 87, 194, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.neo-scene-wrap svg {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  display: block;
+}
+
+.neo-scene-caption {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4A3D5C;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 320px;
+}
+
+@media (max-width: 480px) {
+  .neo-scene-wrap {
+    padding: 14px 10px;
+  }
+  .neo-scene-caption {
+    font-size: 13px;
+  }
+}
+
+
+
+/* ========== DEMO SESSION (Neo shows one) ========== */
+.neo-demo-tag {
+  display: inline-block;
+  background: #7E57C2;
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+.neo-demo-question {
+  background: #FFFFFF;
+  border: 2px solid #EDE0F4;
+  border-radius: 16px;
+  padding: 20px 18px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.neo-demo-equation {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 8px;
+  font-family: 'Georgia', serif;
+}
+
+.neo-demo-prompt {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.neo-demo-scene {
+  background: #FFFFFF;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid #EDE0F4;
+}
+
+.neo-demo-step {
+  background: #F9F6FC;
+  border: 2px solid #EDE0F4;
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 10px 0;
+}
+
+.neo-demo-step-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7E57C2;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.neo-demo-step-text {
+  font-size: 15px;
+  color: #2D2420;
+  margin: 0;
+  line-height: 1.55;
+  font-family: 'Georgia', serif;
+}
+
+.neo-demo-answer {
+  background: linear-gradient(135deg, #F0FFF4, #FFFFFF);
+  border: 2px solid #C8E6C9;
+  border-radius: 14px;
+  padding: 18px;
+  margin-top: 14px;
+  text-align: center;
+}
+
+.neo-demo-answer-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #4CAF50;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.neo-demo-answer-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: #2E7D32;
+  margin: 0;
+  font-family: 'Georgia', serif;
+}
+/* Worked Example */
+.neo-example {
+  background: #F3E5F5;
+  border-left: 4px solid #7E57C2;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin: 24px 0;
+}
+
+.neo-example-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #7E57C2;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.neo-example-scenario {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  font-style: italic;
+}
+
+.neo-example-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.neo-example-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #333;
+}
+
+.neo-example-step-num {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #7E57C2;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.neo-example-answer {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #1a1a1a;
+  border: 1px solid #E1BEE7;
+}
+
+.neo-example-answer strong {
+  color: #7E57C2;
+}
