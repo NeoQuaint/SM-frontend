@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, Navigate } from 'react-router-dom';
 import { useNeo } from '../context/NeoContext';
 import NeoVoiceIndicator from '../components/NeoVoiceIndicator';
 import ConceptTeaching from '../components/ConceptTeaching';
@@ -9,8 +9,6 @@ import {
   FaArrowRight,
   FaSync,
   FaLightbulb,
-  FaLock,
-  FaCheck,
 } from 'react-icons/fa';
 import {
   createSpeakText,
@@ -251,6 +249,7 @@ const TopicLessonAccounting = () => {
   const [hasInitialisedTeaching, setHasInitialisedTeaching] = useState(false);
   const [welcomeDone, setWelcomeDone] = useState(false);
   const [showPaywallGate, setShowPaywallGate] = useState(false);
+  const [showAutoPaywall, setShowAutoPaywall] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -259,7 +258,7 @@ const TopicLessonAccounting = () => {
       const token = localStorage.getItem('authToken');
       const cachedSub = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
 
-      if (cachedSub?.active) {
+      if (cachedSub?.active && cachedSub?.type !== 'free') {
         if (isMounted) {
           setHasSubscription(true);
           setSubscriptionChecked(true);
@@ -284,6 +283,7 @@ const TopicLessonAccounting = () => {
           localStorage.setItem('smartclass_subscription', JSON.stringify({
             ...data.subscription,
             active: true,
+            type: 'paid',
           }));
           setHasSubscription(true);
         } else {
@@ -303,11 +303,6 @@ const TopicLessonAccounting = () => {
     checkSub();
     return () => { isMounted = false; };
   }, []);
-
-  const handleUnlock = () => {
-    const returnPath = `/lesson/${subject}/${resolvedTopic}`;
-    navigate(`/paywall?return=${encodeURIComponent(returnPath)}`);
-  };
 
   const speakText = useRef(
     createSpeakText({ audioRef, setSpeaking: setIsSpeaking }, API_URL)
@@ -534,6 +529,18 @@ Keep it short. Use plain English.`,
     setCurrentPartIndex(0);
   };
 
+  // ============ PAYWALL REDIRECTS — CHECKED FIRST ============
+  if (showAutoPaywall) {
+    const returnPath = `/lesson/${subject}/${resolvedTopic}`;
+    return <Navigate to={`/paywall?return=${encodeURIComponent(returnPath)}`} replace />;
+  }
+
+  if (showPaywallGate) {
+    const returnPath = `/lesson/${subject}/${resolvedTopic}`;
+    return <Navigate to={`/paywall?return=${encodeURIComponent(returnPath)}`} replace />;
+  }
+
+  // ============ AUTOPLAY ============
   if (autoMode) {
     return (
       <AutoPlayMode
@@ -578,43 +585,6 @@ Keep it short. Use plain English.`,
     return (
       <div className="tl-loading">
         <div className="tl-spinner" />
-      </div>
-    );
-  }
-
-  if (showPaywallGate) {
-    return (
-      <div className="tl-app">
-        <header className="tl-header">
-          <button className="tl-back" onClick={() => navigate(`/subjects/${subject}`)}>
-            <FaArrowLeft /> {topicName}
-          </button>
-          <div style={{ width: 40 }} />
-          <div style={{ width: 40 }} />
-        </header>
-
-        <main className="tl-main">
-          <div className="tl-practice-gate">
-            <div className="tl-practice-gate-inner">
-              <span className="tl-practice-gate-eyebrow">Free plan</span>
-              <h2 className="tl-practice-gate-title">
-                You've finished the first concept of {topicName}.
-              </h2>
-              <p className="tl-practice-gate-text">
-                The rest of this topic — plus every other topic in your subjects — unlocks with a subscription. R59/month.
-              </p>
-              <button className="tl-practice-gate-cta" onClick={handleUnlock}>
-                Unlock full access — R59/month
-              </button>
-              <button
-                className="tl-practice-gate-secondary"
-                onClick={() => navigate(`/subjects/${subject}`)}
-              >
-                Back to topics
-              </button>
-            </div>
-          </div>
-        </main>
       </div>
     );
   }
@@ -675,7 +645,20 @@ Keep it short. Use plain English.`,
             {currentQuestionIndex + 1}/{levelQuestions.length}
           </span>
         </div>
-        <NeoVoiceIndicator autoMode={autoMode} onToggleAuto={() => setAutoMode((v) => !v)} />
+        <NeoVoiceIndicator
+          autoMode={autoMode}
+          onToggleAuto={() => {
+            if (!hasSubscription) {
+              setAutoMode(true);
+              setTimeout(() => {
+                setAutoMode(false);
+                setShowAutoPaywall(true);
+              }, 2000);
+              return;
+            }
+            setAutoMode((v) => !v);
+          }}
+        />
       </header>
 
       {neoMessage && (
