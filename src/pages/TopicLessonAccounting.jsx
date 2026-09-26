@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useNeo } from '../context/NeoContext';
 import NeoVoiceIndicator from '../components/NeoVoiceIndicator';
 import ConceptTeaching from '../components/ConceptTeaching';
@@ -9,6 +9,8 @@ import {
   FaArrowRight,
   FaSync,
   FaLightbulb,
+  FaLock,
+  FaCheck,
 } from 'react-icons/fa';
 import {
   createSpeakText,
@@ -17,9 +19,6 @@ import {
 } from '../utils/speakHelpers';
 import '../css/TopicLesson.css';
 
-// ================================================================
-// TOPIC CONFIG
-// ================================================================
 const DEFAULT_TOPIC = 'company-financial-statements';
 
 const PAPER_1_TOPICS = new Set([
@@ -113,9 +112,6 @@ const TOPIC_CONCEPTS = {
   ],
 };
 
-// ================================================================
-// QUESTION BANK — real NSC sources 2023/2024/2025 P1 + P2
-// ================================================================
 const QuestionBank = {
   level1: [
     { id: 'L1Q1', source: '2023 NSC Acct P1, Q3.1.2', topicText: 'Audit Report Matching', teachTopic: 'gov-audit-internal-external', parts: [{ part: '3.1.2', prompt: 'Match the term "unqualified audit report" with its correct description.', answer: 'The financial statements fairly present the financial position of the company.', marks: 1, clue: '💡 Think about what "unqualified" means in an audit context.', memoFullAnswer: 'The financial statements fairly present the financial position of the company.', formulas: [], memoCorrection: { whatToCheck: 'Must match unqualified report to "fairly present" description.', commonMistake: 'Learners think "unqualified" means the auditor is not qualified.', examinerHint: 'Unqualified = clean report = statements fairly present.', alternativeAccept: ['Fairly present', 'D'], memoryTrick: '🧠 "Unqualified = clean bill of health"', mergedCorrection: '🧠 Memory Trick: "Unqualified = clean bill of health"\n\n📋 NSC Memo Answer:\nThe financial statements fairly present the financial position of the company.' } }] },
@@ -141,7 +137,6 @@ const QuestionBank = {
     { id: 'L1Q21', source: '2024 NSC Acct P2, Q2.1.1', topicText: 'Weighted Average', teachTopic: 'stock-valuation-methods', parts: [{ part: '2.1.1', prompt: 'How is weighted average cost per unit calculated?', answer: 'Total cost of stock available divided by total number of units available.', marks: 2, clue: '💡 Total ÷ units.', memoFullAnswer: 'Total cost ÷ total units', formulas: ['WA = Total cost ÷ Total units'], memoCorrection: { whatToCheck: 'Must mention total cost ÷ total units.', commonMistake: 'Learners use closing stock only.', examinerHint: 'Total ÷ units.', alternativeAccept: ['Total ÷ units'], memoryTrick: '🧠 "Total ÷ units"', mergedCorrection: '🧠 Memory Trick: "Total ÷ units"\n\n📋 NSC Memo Answer:\nTotal cost of stock available ÷ total units available' } }] },
     { id: 'L1Q22', source: '2024 NSC Acct P2, Q3.2.1', topicText: 'Bad Debts Treatment', teachTopic: 'budget-cash-budget', parts: [{ part: '3.2.1', prompt: 'Do bad debts appear in the cash budget?', answer: 'No — bad debts do not involve cash movement.', marks: 2, clue: '💡 Cash budget = cash only.', memoFullAnswer: 'No', formulas: [], memoCorrection: { whatToCheck: 'Must say No.', commonMistake: 'Learners say Yes because bad debts are written off.', examinerHint: 'Bad debts = no cash.', alternativeAccept: ['No'], memoryTrick: '🧠 "Bad debts = no cash"', mergedCorrection: '🧠 Memory Trick: "Bad debts = no cash"\n\n📋 NSC Memo Answer:\nNo' } }] },
   ],
-
   level2: [
     { id: 'L2Q1', source: '2024 NSC Acct P1, Q2.3.2', topicText: 'Stock Turnover Rate', teachTopic: 'fi-stock-turnover', tableConfig: { headers: ['Item', 'Amount (R)'], rows: [['Cost of sales', '5,060,000'], ['Opening stock', '193,000'], ['Closing stock', '174,000']] }, parts: [{ part: '2.3.2', prompt: 'Calculate the stock turnover rate. Show all workings.', answer: '27.6 times', marks: 4, clue: '💡 Cost of sales ÷ Average trading stock.', memoFullAnswer: 'Average = (193,000 + 174,000) ÷ 2 = 183,500\nRate = 5,060,000 ÷ 183,500 = 27.6 times', formulas: ['Rate = CoS ÷ Average stock', 'Average = (Open + Close) ÷ 2'], memoCorrection: { whatToCheck: 'Must average first.', commonMistake: 'Learners use closing stock only.', examinerHint: 'Average = (open + close) ÷ 2.', alternativeAccept: ['27.6'], memoryTrick: '🧠 "CoS ÷ Average stock"', mergedCorrection: '🧠 Memory Trick: "CoS ÷ Average stock"\n\n📋 NSC Memo Answer:\nAverage = R183,500\nRate = 27.6 times' } }] },
     { id: 'L2Q2', source: '2024 NSC Acct P1, Q2.3.3', topicText: 'Interim DPS', teachTopic: 'fi-eps-dps', parts: [{ part: '2.3.3', prompt: 'Interim dividends R416,000. 1,200,000 shares in issue. Calculate interim DPS.', answer: '34.7 cents', marks: 3, clue: '💡 DPS = Dividends ÷ Shares.', memoFullAnswer: 'DPS = 416,000 ÷ 1,200,000 = R0.3467 = 34.7 cents', formulas: ['DPS = Dividends ÷ Shares'], memoCorrection: { whatToCheck: 'Must divide correctly.', commonMistake: 'Forget to convert to cents.', examinerHint: 'Answer in cents.', alternativeAccept: ['34.7c'], memoryTrick: '🧠 "DPS = Dividends ÷ Shares"', mergedCorrection: '🧠 Memory Trick: "DPS = Dividends ÷ Shares"\n\n📋 NSC Memo Answer:\n34.7 cents' } }] },
@@ -164,7 +159,6 @@ const QuestionBank = {
     { id: 'L2Q19', source: '2023 NSC Acct P2, Q3.1', topicText: 'Cash Budget Non-Cash', teachTopic: 'budget-cash-budget', parts: [{ part: '3.1', prompt: 'Name TWO items that appear in the Cash Budget but NOT in the Projected Income Statement.', answer: 'Cash from debtors and payments to creditors.', marks: 3, clue: '💡 Items that are cash movements only.', memoFullAnswer: 'Cash from debtors and payments to creditors.', formulas: [], memoCorrection: { whatToCheck: 'Two valid items.', commonMistake: 'Only one.', examinerHint: 'Cash from debtors + payments to creditors.', alternativeAccept: ['Debtors + creditors'], memoryTrick: '🧠 "Debtors + creditors"', mergedCorrection: '🧠 Memory Trick: "Debtors + creditors"\n\n📋 NSC Memo Answer:\nCash from debtors and payments to creditors' } }] },
     { id: 'L2Q20', source: '2024 NSC Acct P2, Q2.1', topicText: 'Stockholding Period', teachTopic: 'stock-holding-period', parts: [{ part: '2.1', prompt: 'Closing stock R780,500. CoS R2,230,000. Days?', answer: '127.8 days', marks: 4, clue: '💡 Period = Average stock ÷ CoS × 365.', memoFullAnswer: '780,500 ÷ 2,230,000 × 365 = 127.8 days', formulas: ['Period = Stock ÷ CoS × 365'], memoCorrection: { whatToCheck: 'Must multiply by 365.', commonMistake: 'Forget 365.', examinerHint: 'Multiply by 365.', alternativeAccept: ['127.8'], memoryTrick: '🧠 "Stock ÷ CoS × 365"', mergedCorrection: '🧠 Memory Trick: "Stock ÷ CoS × 365"\n\n📋 NSC Memo Answer:\n127.8 days' } }] },
   ],
-
   level3: [
     { id: 'L3Q1', source: '2024 NSC Acct P1, Q1.1.4', topicText: 'Profit/Loss on Trade-In', teachTopic: 'fin-fixed-assets-depreciation', tableConfig: { headers: ['Item', 'Detail'], rows: [['Cost price', 'R240,000'], ['Purchased', '1 July 2021'], ['Rate', '20% p.a. diminishing'], ['Trade-in', 'R153,660'], ['Date', '1 Sep 2023']] }, parts: [{ part: '1.1.4', prompt: 'Calculate profit or loss on the vehicle traded in on 1 September 2023.', answer: 'R3,900 profit', marks: 5, clue: '💡 Calculate carrying value first.', memoFullAnswer: 'Y1: 32,000. CV = 208,000\nY2: 41,600. CV = 166,400\nY3: 16,640. CV = 149,760\nProfit = R3,900', formulas: ['Depreciation = CV × rate × time', 'Profit = Proceeds − CV'], memoCorrection: { whatToCheck: 'Must use carrying value, not cost.', commonMistake: 'Use cost price.', examinerHint: 'Diminishing uses CV.', alternativeAccept: ['R3,900 profit'], memoryTrick: '🧠 "Profit = Proceeds − CV"', mergedCorrection: '🧠 Memory Trick: "Profit = Proceeds − CV"\n\n📋 NSC Memo Answer:\nProfit = R3,900' } }] },
     { id: 'L3Q2', source: '2023 NSC Acct P1, Q1.1', topicText: 'FIFO Closing Stock', teachTopic: 'fin-closing-stock', tableConfig: { headers: ['Date', 'Units', 'Price'], rows: [['June 2022', '2,085', 'R1,950'], ['Sept 2022', '2,215', 'R2,020'], ['Jan 2023', '740', 'R2,100']] }, parts: [{ part: '1.1', prompt: '1,009 bicycles on hand. Value using FIFO.', answer: 'R2,097,380', marks: 6, clue: '💡 Work from newest backwards.', memoFullAnswer: '740 × R2,100 = 1,554,000\n269 × R2,020 = 543,380\nTotal = R2,097,380', formulas: ['FIFO = newest prices first'], memoCorrection: { whatToCheck: 'Must use newest prices first.', commonMistake: 'Use oldest prices.', examinerHint: 'Newest purchase price first.', alternativeAccept: ['R2,097,380'], memoryTrick: '🧠 "FIFO = newest for closing"', mergedCorrection: '🧠 Memory Trick: "FIFO = newest for closing"\n\n📋 NSC Memo Answer:\nR2,097,380' } }] },
@@ -182,7 +176,6 @@ const QuestionBank = {
     { id: 'L3Q14', source: '2024 NSC Acct P2, Q4.2.4', topicText: 'Increase Profit', teachTopic: 'cost-break-even', parts: [{ part: '4.2.4', prompt: 'Want R300,000 extra profit producing 400 extra units. Current variable cost R755. Selling price?', answer: 'R1,505', marks: 4, clue: '💡 (Extra profit ÷ extra units) + variable cost.', memoFullAnswer: '(300,000 ÷ 400) + 755 = 750 + 755 = R1,505', formulas: ['Price = (Profit ÷ units) + VC'], memoCorrection: { whatToCheck: 'Must add variable cost.', commonMistake: 'Forget VC.', examinerHint: 'Profit per unit + variable cost.', alternativeAccept: ['R1,505'], memoryTrick: '🧠 "Profit ÷ units + VC"', mergedCorrection: '🧠 Memory Trick: "Profit ÷ units + VC"\n\n📋 NSC Memo Answer:\nR1,505' } }] },
     { id: 'L3Q15', source: '2023 NSC Acct P2, Q4.2.2', topicText: 'Stockholding Period Analysis', teachTopic: 'stock-holding-period', parts: [{ part: '4.2.2', prompt: 'Hawai stockholding = 152.1 days. Yama = 55.2 days. Comment.', answer: 'Hawai slow-moving (over 3 months). Yama faster. Difference = 97 days.', marks: 5, clue: '💡 Compare the two.', memoFullAnswer: 'Hawai 152.1 days (slow). Yama 55.2 days (fast). Difference 97 days.', formulas: [], memoCorrection: { whatToCheck: 'Must compare both.', commonMistake: 'Only one.', examinerHint: 'Compare holding periods.', alternativeAccept: ['Hawai 152 days, Yama 55 days'], memoryTrick: '🧠 "Compare both"', mergedCorrection: '🧠 Memory Trick: "Compare both"\n\n📋 NSC Memo Answer:\nHawai 152.1 days (slow); Yama 55.2 days (fast)' } }] },
   ],
-
   level4: [
     { id: 'L4Q1', source: '2024 NSC Acct P1, Q3.6', topicText: 'CEO Characteristics', teachTopic: 'gov-ceo-cfo-roles', parts: [{ part: '3.6', prompt: 'Explain TWO characteristics of a good CEO.', answer: 'Honesty and integrity; strong leadership and vision.', marks: 4, acceptAnyTwo: true, clue: '💡 Trust + leadership.', memoFullAnswer: 'Honesty, integrity, leadership, financial knowledge.', formulas: [], memoCorrection: { whatToCheck: 'Any TWO valid.', commonMistake: 'Vague answers.', examinerHint: 'Honesty + leadership.', alternativeAccept: ['Honesty', 'Leadership'], memoryTrick: '🧠 "Honest + leader"', mergedCorrection: '🧠 Memory Trick: "Honest + leader"\n\n📋 NSC Memo Answer:\nHonesty, integrity, leadership, financial knowledge' } }] },
     { id: 'L4Q2', source: '2024 NSC Acct P1, Q3.4', topicText: 'Risk and Gearing', teachTopic: 'interp-gearing', tableConfig: { headers: ['Indicator', '2024', '2023'], rows: [['Debt-equity', '0.2:1', '0.5:1'], ['ROCE', '24%', '15%'], ['Interest', '12%', '12%']] }, parts: [{ part: '3.4', prompt: 'Explain how the fixed asset purchase affected risk and gearing. Quote TWO indicators.', answer: 'Debt-equity improved 0.5:1 → 0.2:1 (less risk). ROCE 15% → 24% > interest 12% — good gearing.', marks: 6, clue: '💡 Both risk and reward.', memoFullAnswer: 'Debt-equity 0.5 → 0.2 (less risk). ROCE 15 → 24 > interest 12%.', formulas: [], memoCorrection: { whatToCheck: 'Quote both indicators with figures.', commonMistake: 'Only debt-equity.', examinerHint: 'Lower debt + higher ROCE.', alternativeAccept: ['Debt 0.2:1, ROCE 24% > 12%'], memoryTrick: '🧠 "Lower debt + higher ROCE"', mergedCorrection: '🧠 Memory Trick: "Lower debt + higher ROCE"\n\n📋 NSC Memo Answer:\nDebt-equity 0.5→0.2; ROCE 15→24% > interest 12%' } }] },
@@ -193,7 +186,6 @@ const QuestionBank = {
     { id: 'L4Q7', source: '2024 NSC Acct P2, Q4.2.1', topicText: 'Production Comment', teachTopic: 'cost-break-even', parts: [{ part: '4.2.1', prompt: 'Units produced 3,640. BEP 6,868. Loss on 3,228 units. Comment.', answer: 'Below break-even — loss. But improved vs 2023 loss of 5,073 units.', marks: 4, clue: '💡 Compare to previous.', memoFullAnswer: 'Below BEP 6,868 by 3,228 units. Loss, but improved from 5,073 last year.', formulas: [], memoCorrection: { whatToCheck: 'Must mention loss AND improvement.', commonMistake: 'Only loss.', examinerHint: 'Loss + improvement.', alternativeAccept: ['Loss but improving'], memoryTrick: '🧠 "Loss but improving"', mergedCorrection: '🧠 Memory Trick: "Loss but improving"\n\n📋 NSC Memo Answer:\nBelow BEP by 3,228 units (loss) but improved from 5,073' } }] },
     { id: 'L4Q8', source: '2024 NSC Acct P2, Q2.2.2', topicText: 'Stockholding Period 2024', teachTopic: 'stock-holding-period', parts: [{ part: '2.2.2', prompt: 'Punchies holding period = 127.8 days (up from 69 days). Comment.', answer: 'Increased by 58.8 days — printers may become outdated.', marks: 4, clue: '💡 Compare and explain.', memoFullAnswer: 'Increased 69→127.8 days (+58.8). Risk of obsolescence.', formulas: [], memoCorrection: { whatToCheck: 'Compare + explain.', commonMistake: 'Only state figure.', examinerHint: 'Compare to 69 days.', alternativeAccept: ['127.8 days, up from 69'], memoryTrick: '🧠 "Compare + explain"', mergedCorrection: '🧠 Memory Trick: "Compare + explain"\n\n📋 NSC Memo Answer:\n127.8 days, up 58.8 days from 69 — obsolescence risk' } }] },
   ],
-
   level5: [
     { id: 'L5Q1', source: '2024 NSC Acct P1, Q2 (full)', topicText: 'Full Cash Flow', teachTopic: 'cf-operating-activities', parts: [{ part: '2', prompt: 'Eybers Ltd — year ended 29 Feb 2024.\n(a) Retained Income Note (8)\n(b) Cash Flow Statement (17)\n(c) % op exp on sales (3)\n(d) Stock turnover (4)\n(e) Interim DPS (3)', answer: 'See memo', marks: 35, clue: '💡 Work through systematically.', memoFullAnswer: 'Retained: Opening + NPAT − Div = Closing.\nCF: Op + Inv + Fin = Net change.\n% op exp = 16.5%.\nStock turnover = 27.6 times.\nInterim DPS = 34.7c.', formulas: ['CF = Op + Inv + Fin'], memoCorrection: { whatToCheck: 'All sections complete.', commonMistake: 'Miss non-cash items.', examinerHint: 'Add back non-cash items.', alternativeAccept: ['Full correct'], memoryTrick: '🧠 "Op + Inv + Fin"', mergedCorrection: '🧠 Memory Trick: "Op + Inv + Fin"\n\n📋 NSC Memo Answer:\nSee full NSC memo.' } }] },
     { id: 'L5Q2', source: '2025 NSC Acct P1, Q2 (full)', topicText: 'Cash Flow + Indicators', teachTopic: 'cf-reconciliation-note', parts: [{ part: '2', prompt: 'Mustang Ltd — year ended 28 Feb 2025.\n(a) Change in receivables/payables (7)\n(b) Cash Flow (25)\n(c) NAV, acid-test, payout rate (13)', answer: 'See memo', marks: 45, clue: '💡 Receivables up = outflow. Payables up = inflow.', memoFullAnswer: 'Receivables R1,831,500 outflow. Payables R123,880 inflow. NAV R14.34. Acid-test 1.8:1. Payout 40%.', formulas: ['Receivables up = outflow', 'Payables up = inflow'], memoCorrection: { whatToCheck: 'All complete.', commonMistake: 'Reverse inflow/outflow.', examinerHint: 'Debtors up = out. Creditors up = in.', alternativeAccept: ['Full correct'], memoryTrick: '🧠 "Debtors up = out. Creditors up = in."', mergedCorrection: '🧠 Memory Trick: "Debtors up = out. Creditors up = in."\n\n📋 NSC Memo Answer:\nSee full NSC memo.' } }] },
@@ -206,13 +198,11 @@ const QuestionBank = {
   ],
 };
 
-// ================================================================
-// REACT COMPONENT
-// ================================================================
 const API_URL = 'https://smartclass-wlgb.onrender.com';
 
 const TopicLessonAccounting = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { subject, topicId } = useParams();
   const { neoMessage, setNeoMessage } = useNeo();
 
@@ -230,7 +220,15 @@ const TopicLessonAccounting = () => {
   const accent = isPaper1 ? '#00897B' : '#00695C';
   const paperLabel = isPaper1 ? 'Paper 1' : 'Paper 2';
 
-  const [currentLevel, setCurrentLevel] = useState(1);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
+
+  const [currentLevel, setCurrentLevel] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    const levelParam = parseInt(params.get('level'), 10);
+    return Number.isInteger(levelParam) && levelParam >= 1 && levelParam <= 5 ? levelParam : 1;
+  });
+
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentPartIndex, setCurrentPartIndex] = useState(0);
   const [isCorrect, setIsCorrect] = useState(null);
@@ -252,6 +250,64 @@ const TopicLessonAccounting = () => {
   const [teachingQueue, setTeachingQueue] = useState([]);
   const [hasInitialisedTeaching, setHasInitialisedTeaching] = useState(false);
   const [welcomeDone, setWelcomeDone] = useState(false);
+  const [showPaywallGate, setShowPaywallGate] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkSub = async () => {
+      const token = localStorage.getItem('authToken');
+      const cachedSub = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+
+      if (cachedSub?.active) {
+        if (isMounted) {
+          setHasSubscription(true);
+          setSubscriptionChecked(true);
+        }
+        return;
+      }
+
+      if (!token) {
+        if (isMounted) setSubscriptionChecked(true);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/yoco/check-subscription`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+
+        if (!isMounted) return;
+
+        if (data.hasSubscription) {
+          localStorage.setItem('smartclass_subscription', JSON.stringify({
+            ...data.subscription,
+            active: true,
+          }));
+          setHasSubscription(true);
+        } else {
+          const existing = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+          if (existing?.type !== 'free') {
+            localStorage.removeItem('smartclass_subscription');
+          }
+          setHasSubscription(false);
+        }
+      } catch (err) {
+        console.error('Subscription check failed:', err);
+      } finally {
+        if (isMounted) setSubscriptionChecked(true);
+      }
+    };
+
+    checkSub();
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleUnlock = () => {
+    const returnPath = `/lesson/${subject}/${resolvedTopic}`;
+    navigate(`/paywall?return=${encodeURIComponent(returnPath)}`);
+  };
 
   const speakText = useRef(
     createSpeakText({ audioRef, setSpeaking: setIsSpeaking }, API_URL)
@@ -298,11 +354,12 @@ const TopicLessonAccounting = () => {
 
   useEffect(() => {
     if (activeTeaching) return;
+    if (showPaywallGate) return;
     if (!teachingQueue.length) return;
     const [next, ...rest] = teachingQueue;
     setTeachingQueue(rest);
     setActiveTeaching(next);
-  }, [teachingQueue, activeTeaching]);
+  }, [teachingQueue, activeTeaching, showPaywallGate]);
 
   useEffect(() => {
     if (prefetchedRef.current) return;
@@ -467,6 +524,8 @@ Keep it short. Use plain English.`,
     } else if (currentLevel < 5) {
       setCurrentLevel(currentLevel + 1);
       setCurrentQuestionIndex(0);
+      setCurrentPartIndex(0);
+      return;
     } else {
       setNeoMessage('🎉 You have completed all levels for this topic!');
       setTimeout(() => navigate(`/subjects/${subject}`), 2500);
@@ -492,12 +551,20 @@ Keep it short. Use plain English.`,
         topic={activeTeaching}
         onSpeak={speakText}
         onComplete={() => {
+          const wasFirstConcept = taughtConcepts.size === 0;
+          const hasMoreConcepts = teachingQueue.length > 0;
+
           setTaughtConcepts((prev) => {
             const next = new Set(prev);
             next.add(activeTeaching);
             return next;
           });
+
           setActiveTeaching(null);
+
+          if (wasFirstConcept && hasMoreConcepts && !hasSubscription) {
+            setShowPaywallGate(true);
+          }
         }}
         autoMode={autoMode}
         onToggleAuto={() => setAutoMode((v) => !v)}
@@ -511,6 +578,43 @@ Keep it short. Use plain English.`,
     return (
       <div className="tl-loading">
         <div className="tl-spinner" />
+      </div>
+    );
+  }
+
+  if (showPaywallGate) {
+    return (
+      <div className="tl-app">
+        <header className="tl-header">
+          <button className="tl-back" onClick={() => navigate(`/subjects/${subject}`)}>
+            <FaArrowLeft /> {topicName}
+          </button>
+          <div style={{ width: 40 }} />
+          <div style={{ width: 40 }} />
+        </header>
+
+        <main className="tl-main">
+          <div className="tl-practice-gate">
+            <div className="tl-practice-gate-inner">
+              <span className="tl-practice-gate-eyebrow">Free plan</span>
+              <h2 className="tl-practice-gate-title">
+                You've finished the first concept of {topicName}.
+              </h2>
+              <p className="tl-practice-gate-text">
+                The rest of this topic — plus every other topic in your subjects — unlocks with a subscription. R59/month.
+              </p>
+              <button className="tl-practice-gate-cta" onClick={handleUnlock}>
+                Unlock full access — R59/month
+              </button>
+              <button
+                className="tl-practice-gate-secondary"
+                onClick={() => navigate(`/subjects/${subject}`)}
+              >
+                Back to topics
+              </button>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

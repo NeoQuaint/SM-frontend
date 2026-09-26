@@ -2205,3 +2205,88 @@
   color: #FFFFFF;
   border-color: #8B0000;
 }
+
+
+/* ==========================================
+   PRACTICE GATE (free user, after concept 1)
+   ========================================== */
+
+.tl-practice-gate {
+  padding: 32px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.tl-practice-gate-inner {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  background: #FFFFFF;
+  border: 2px solid #EDE0F4;
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: 0 4px 20px rgba(126, 87, 194, 0.06);
+}
+
+.tl-practice-gate-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #7E57C2;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.tl-practice-gate-title {
+  font-family: 'Georgia', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #2D2420;
+  margin: 0 0 12px;
+  line-height: 1.3;
+}
+
+.tl-practice-gate-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.tl-practice-gate-cta {
+  width: 100%;
+  padding: 16px;
+  background: #2D2420;
+  color: #FFFBF5;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Georgia', serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  margin-bottom: 10px;
+}
+
+.tl-practice-gate-cta:hover {
+  background: #1A1410;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(45, 36, 32, 0.15);
+}
+
+.tl-practice-gate-secondary {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #8B7E74;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tl-practice-gate-secondary:hover {
+  color: #2D2420;
+}

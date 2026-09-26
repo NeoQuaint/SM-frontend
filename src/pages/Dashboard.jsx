@@ -14,13 +14,13 @@ const Dashboard = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
+  const [subscription, setSubscription] = useState(null);
   const audioRef = useRef(null);
   const fileInputRef = useRef(null);
   const uploadInputRef = useRef(null);
   const typewriterRef = useRef(null);
   const API_URL = 'https://smartclass-wlgb.onrender.com';
 
-  // Scan Homework state
   const [scanView, setScanView] = useState(false);
   const [studentImage, setStudentImage] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -30,10 +30,9 @@ const Dashboard = () => {
   const [scanComplete, setScanComplete] = useState(false);
 
   // ==========================================
-  // SMOOTH TYPEWRITER (character by character with punctuation pauses)
+  // SMOOTH TYPEWRITER
   // ==========================================
   const startTypewriter = (text) => {
-    // Clear any existing animation
     if (typewriterRef.current) {
       clearTimeout(typewriterRef.current);
       typewriterRef.current = null;
@@ -55,7 +54,6 @@ const Dashboard = () => {
       setDisplayedText(text.slice(0, currentIndex + 1));
       currentIndex++;
 
-      // Natural pauses on punctuation
       let delay = 25;
       if (char === '.' || char === '!' || char === '?') delay = 350;
       else if (char === ',') delay = 180;
@@ -70,7 +68,6 @@ const Dashboard = () => {
 
   const speakText = async (text) => {
     try {
-      // Start typewriter effect
       startTypewriter(text);
 
       if (audioRef.current) {
@@ -107,7 +104,6 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Voice error:', error);
       setIsSpeaking(false);
-      // Even if voice fails, complete the typewriter instantly
       if (typewriterRef.current) {
         clearTimeout(typewriterRef.current);
         typewriterRef.current = null;
@@ -123,6 +119,9 @@ const Dashboard = () => {
       const parsed = JSON.parse(data);
       setUserData(parsed);
       buildLearningPath(parsed);
+
+      const sub = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+      setSubscription(sub);
 
       const firstName = parsed.fullName?.split(' ')[0] || 'there';
       const hasMetNeo = localStorage.getItem('smartclass_met_neo');
@@ -142,12 +141,8 @@ const Dashboard = () => {
     }
 
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (typewriterRef.current) {
-        clearTimeout(typewriterRef.current);
-      }
+      if (audioRef.current) audioRef.current.pause();
+      if (typewriterRef.current) clearTimeout(typewriterRef.current);
     };
   }, []);
 
@@ -157,6 +152,7 @@ const Dashboard = () => {
     localStorage.removeItem('smartclass_subscription');
     localStorage.removeItem('smartclass_free_topic_used');
     localStorage.removeItem('smartclass_basic_subjects');
+    localStorage.removeItem('smartclass_paywall_seen');
     navigate('/');
   };
 
@@ -277,9 +273,6 @@ const Dashboard = () => {
     'geography': '/G.png',
     'history': '/H.png',
     'english': '/ENGG.png',
-    'afrikaans': '/AF.png',
-    'cat': '/CAT.png',
-    'technology': '/T.png',
   };
 
   const subjectLabels = {
@@ -293,12 +286,10 @@ const Dashboard = () => {
     'geography': 'Geography',
     'history': 'History',
     'english': 'English',
-    'afrikaans': 'Afrikaans',
-    'cat': 'CAT',
-    'technology': 'Technology',
   };
 
   const displaySubjects = userData.subjects || [];
+  const isPaid = subscription?.active === true && subscription?.type !== 'free';
 
   const getNeoMessage = () => {
     return displayedText || neoMessage || `Hi ${userData?.fullName?.split(' ')[0] || 'there'}! Ready to learn?`;
@@ -325,7 +316,6 @@ const Dashboard = () => {
         style={{ display: 'none' }} 
       />
 
-      {/* SCAN HOMEWORK OVERLAY */}
       <AnimatePresence>
         {scanView && (
           <motion.div
@@ -406,7 +396,6 @@ const Dashboard = () => {
         )}
       </AnimatePresence>
 
-      {/* Header */}
       <header className="dash-header">
         <span className="header-greeting">Hi {userData.fullName.split(' ')[0]} 👋</span>
         <div className="dash-header-right">
@@ -416,7 +405,6 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Sidebar */}
       {sidebarOpen && (
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}>
           <div className="sidebar" onClick={(e) => e.stopPropagation()}>
@@ -424,6 +412,9 @@ const Dashboard = () => {
             <div className="sidebar-profile">
               <img src={avatarMap[userData.avatar]} alt="" className="sidebar-avatar" />
               <h3>{userData.fullName}</h3>
+              <p style={{ fontSize: 12, color: '#8B7E74', margin: '4px 0 0' }}>
+                {isPaid ? `${subscription.package} plan` : 'Free plan'}
+              </p>
             </div>
             <div className="sidebar-menu">
               <button className="sidebar-item" onClick={() => { setSidebarOpen(false); navigate('/profile'); }}><FaUser /> Profile</button>
@@ -435,15 +426,26 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Main */}
       <main className="dash-main">
-        {/* Neo's Introduction - WhatsApp Bubble with Typewriter */}
+        {!isPaid && (
+          <div style={{
+            margin: '0 0 20px',
+            padding: '12px 16px',
+            background: '#F9F6FC',
+            borderRadius: 12,
+            fontSize: 13,
+            color: '#7E57C2',
+            fontWeight: 600,
+            textAlign: 'center',
+            lineHeight: 1.5,
+          }}>
+            Free plan — Neo teaches the first concept of every topic. Subscribe to unlock the rest.
+          </div>
+        )}
+
         <div className="neo-question-section">
           <div className="neo-line">
-            <ThinkingOrb
-              state="composing"
-              size={64}
-            />
+            <ThinkingOrb state="composing" size={64} />
             <div className="neo-chat-bubble">
               <p className={`neo-chat-text ${isTyping ? 'typing' : ''}`}>
                 {getNeoMessage()}
@@ -452,9 +454,10 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Your Subjects */}
         <div className="section-block">
-          <span className="section-label">YOUR SUBJECTS</span>
+          <span className="section-label">
+            YOUR SUBJECTS {!isPaid && <span style={{ color: '#8B7E74', fontWeight: 400, fontSize: 11, marginLeft: 8 }}>· Free plan</span>}
+          </span>
 
           <div className="subjects-compact-grid">
             {displaySubjects.map((subject, i) => {
@@ -474,7 +477,6 @@ const Dashboard = () => {
                   ) : (
                     <span className="sc-emoji">📝</span>
                   )}
-
                   <span className="sc-name">{subjectLabels[subject] || subject}</span>
                 </div>
               );
@@ -482,7 +484,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Scan Homework */}
         <div className="primary-actions">
           <div 
             className="action-card scan-homework-card" 
@@ -508,7 +509,6 @@ const Dashboard = () => {
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="dash-footer">
         <button className="ftab active" onClick={() => navigate('/dashboard')}>
           <FaHome />

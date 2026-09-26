@@ -34,12 +34,8 @@ const GoogleCallback = () => {
           return;
         }
 
-        // Save token
         localStorage.setItem('authToken', data.token);
 
-        // ==========================================
-        // HYDRATE: Fetch FULL user data from backend
-        // ==========================================
         try {
           const meRes = await fetch(`${API_URL}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${data.token}` }
@@ -48,7 +44,6 @@ const GoogleCallback = () => {
           const meData = await meRes.json();
 
           if (meData.status === 'success' && meData.user) {
-            // Save complete user data from backend
             const userData = {
               id: meData.user.id,
               email: meData.user.email,
@@ -62,9 +57,10 @@ const GoogleCallback = () => {
 
             localStorage.setItem('smartclass_user', JSON.stringify(userData));
 
-            // Fetch subscription
             try {
-              const subRes = await fetch(`${API_URL}/api/yoco/check-subscription?userId=${encodeURIComponent(meData.user.email)}`);
+              const subRes = await fetch(`${API_URL}/api/yoco/check-subscription`, {
+                headers: { 'Authorization': `Bearer ${data.token}` }
+              });
               const subData = await subRes.json();
               
               if (subData.hasSubscription) {
@@ -73,13 +69,15 @@ const GoogleCallback = () => {
                   active: true
                 }));
               } else {
-                localStorage.removeItem('smartclass_subscription');
+                const existing = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+                if (existing?.type !== 'free') {
+                  localStorage.removeItem('smartclass_subscription');
+                }
               }
             } catch (subErr) {
               console.error('Subscription fetch error:', subErr);
             }
 
-            // Navigate based on onboarding status
             if (userData.onboardingComplete) {
               navigate('/dashboard');
             } else {
@@ -89,7 +87,6 @@ const GoogleCallback = () => {
               }, 100);
             }
           } else {
-            // Fallback: use data from Google response
             const userData = {
               id: data.user.id,
               email: data.user.email,
@@ -114,7 +111,6 @@ const GoogleCallback = () => {
           }
         } catch (meError) {
           console.error('Hydrate error:', meError);
-          // Fallback: use data from Google response
           const userData = {
             id: data.user.id,
             email: data.user.email,

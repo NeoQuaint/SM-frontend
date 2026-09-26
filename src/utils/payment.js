@@ -3,7 +3,7 @@ const API_URL = 'https://smartclass-wlgb.onrender.com';
 // Create subscription checkout and redirect to Yoco
 export const createSubscriptionCheckout = async (amount, pkg) => {
   const token = localStorage.getItem('authToken');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
   
   try {
     const response = await fetch(`${API_URL}/api/yoco/create-subscription-checkout`, {
@@ -38,7 +38,7 @@ export const createSubscriptionCheckout = async (amount, pkg) => {
 // Create swap fee checkout (R19)
 export const createSwapCheckout = async (amount, oldSubject, newSubject) => {
   const token = localStorage.getItem('authToken');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = JSON.parse(localStorage.getItem('smartclass_user') || '{}');
   
   try {
     const response = await fetch(`${API_URL}/api/yoco/create-swap-checkout`, {
@@ -126,4 +126,29 @@ export const cancelSubscription = async () => {
     console.error('Cancel subscription error:', error);
     return { success: false, error: error.message };
   }
+};
+
+/**
+ * checkGateStatus — single source of truth for what a user can access.
+ *
+ * Model (Option B — unlimited first concept):
+ *   - Free users: watch concept 1 of EVERY topic, forever. No timer, no lockout.
+ *   - Paid users: all concepts, all practice, everything.
+ *
+ * Returns:
+ *   {
+ *     hasSubscription: boolean,
+ *     subscription: object | null
+ *   }
+ *
+ * The lesson page decides what to gate based on hasSubscription and
+ * where the user is in the teaching queue (concept 1 vs concept 2+).
+ */
+export const checkGateStatus = async () => {
+  const result = await checkSubscription();
+
+  return {
+    hasSubscription: result.hasSubscription === true,
+    subscription: result.subscription || null,
+  };
 };

@@ -14,11 +14,10 @@ const SubjectSelection = () => {
   const [showAllSubjects, setShowAllSubjects] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // All available subjects
   const allSubjects = [
     'mathematics', 'physical-sciences', 'life-sciences', 'economics',
     'mathematical-literacy', 'accounting', 'business-studies', 'geography',
-    'history', 'english', 'afrikaans', 'cat', 'technology',
+    'history', 'english',
   ];
 
   useEffect(() => {
@@ -26,14 +25,14 @@ const SubjectSelection = () => {
     if (data) {
       const parsed = JSON.parse(data);
       setUserData(parsed);
-      
+
       const pendingPlan = localStorage.getItem('pending_plan');
       if (pendingPlan === 'standard') {
         setMaxSubjects(4);
-        setSelectedSubjects(parsed.subjects || []);
+        setSelectedSubjects((parsed.subjects || []).filter(s => allSubjects.includes(s)));
       } else {
         setMaxSubjects(2);
-        setSelectedSubjects((parsed.subjects || []).slice(0, 2));
+        setSelectedSubjects((parsed.subjects || []).filter(s => allSubjects.includes(s)).slice(0, 2));
       }
     } else {
       navigate('/');
@@ -51,9 +50,6 @@ const SubjectSelection = () => {
     'geography': 'Geography',
     'history': 'History',
     'english': 'English',
-    'afrikaans': 'Afrikaans',
-    'cat': 'CAT',
-    'technology': 'Technology',
   };
 
   const subjectImages = {
@@ -67,18 +63,14 @@ const SubjectSelection = () => {
     'geography': '/G.png',
     'history': '/H.png',
     'english': '/EN.png',
-    'afrikaans': '/AF.png',
-    'cat': '/CAT.png',
-    'technology': '/T.png',
   };
 
   const subjectColors = ['#FF9800', '#42A5F5', '#4CAF50', '#EF5350', '#7E57C2'];
   const subjectBgs = ['#FFF8F0', '#F0F4FF', '#F0FFF4', '#FFF0F0', '#F9F6FC'];
 
-  // Which subjects to display (user's picks OR all 13 subjects)
   const displaySubjects = showAllSubjects 
     ? allSubjects 
-    : (userData?.subjects || []);
+    : (userData?.subjects?.filter(s => allSubjects.includes(s)) || []);
 
   const toggleSubject = (subjectId) => {
     setSelectedSubjects(prev => {
@@ -100,9 +92,8 @@ const SubjectSelection = () => {
     try {
       const token = localStorage.getItem('authToken');
       
-      // Save to backend
       if (token) {
-        await fetch(`${API_URL}/api/auth/update-subjects`, {
+        const res = await fetch(`${API_URL}/api/auth/update-subjects`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -110,24 +101,29 @@ const SubjectSelection = () => {
           },
           body: JSON.stringify({ subjects: selectedSubjects })
         });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          alert(errData.error || 'Failed to save subjects. Please try again.');
+          setIsSaving(false);
+          return;
+        }
       }
       
-      // Update localStorage
       const updatedUserData = {
         ...userData,
         subjects: selectedSubjects,
       };
       localStorage.setItem('smartclass_user', JSON.stringify(updatedUserData));
       
-      // Update subscription
       const subscription = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
       if (subscription) {
         subscription.subjects = selectedSubjects;
         subscription.active = true;
+        subscription.subjectsAllowed = maxSubjects;
         localStorage.setItem('smartclass_subscription', JSON.stringify(subscription));
       }
       
-      // Update basic subjects for Basic plan
       const pendingPlan = localStorage.getItem('pending_plan');
       if (pendingPlan === 'basic') {
         localStorage.setItem('smartclass_basic_subjects', JSON.stringify(selectedSubjects));
@@ -135,7 +131,6 @@ const SubjectSelection = () => {
         localStorage.removeItem('smartclass_basic_subjects');
       }
       
-      // Clear pending plan
       localStorage.removeItem('pending_plan');
       localStorage.removeItem('smartclass_free_topic_used');
       
@@ -145,12 +140,6 @@ const SubjectSelection = () => {
     } catch (error) {
       console.error('Save error:', error);
       setIsSaving(false);
-      
-      // Still save to localStorage even if backend fails
-      const updatedUserData = { ...userData, subjects: selectedSubjects };
-      localStorage.setItem('smartclass_user', JSON.stringify(updatedUserData));
-      localStorage.removeItem('pending_plan');
-      localStorage.removeItem('smartclass_free_topic_used');
       navigate('/dashboard');
     }
   };
@@ -164,11 +153,11 @@ const SubjectSelection = () => {
   }
 
   const firstName = userData.fullName?.split(' ')[0] || 'there';
+  const hadMoreSubjects = (userData.subjects?.length || 0) > maxSubjects;
 
   return (
     <div className="dash-app" style={{ minHeight: '100vh', paddingBottom: '40px' }}>
       <main className="dash-main">
-        {/* Neo Message */}
         <div className="neo-question-section">
           <div className="neo-line">
             <div className="neo-voice-icon">
@@ -180,17 +169,28 @@ const SubjectSelection = () => {
             </div>
             <span className="neo-question">
               {maxSubjects === 2 
-                ? `Hi ${firstName}! You can select 2 subjects you will be studying with me.`
-                : `Hi ${firstName}! You can select up to 4 subjects you will be studying with me.`}
+                ? `Hi ${firstName}! Pick the 2 subjects you want to study with me.`
+                : `Hi ${firstName}! Pick the 4 subjects you want to study with me.`}
             </span>
           </div>
         </div>
 
-        {/* Subject Selection */}
+        {hadMoreSubjects && (
+          <p style={{
+            fontSize: '13px',
+            color: '#7E57C2',
+            marginBottom: '12px',
+            fontWeight: '600',
+            padding: '0 20px'
+          }}>
+            Your plan allows {maxSubjects} subjects. Pick your {maxSubjects} favourites — you can swap one later for R19.
+          </p>
+        )}
+
         <div className="section-block">
           <div className="section-header-row">
             <span className="section-label">
-              {showAllSubjects ? 'ALL SUBJECTS' : 'SELECT YOUR SUBJECTS'}
+              {showAllSubjects ? 'ALL SUBJECTS' : 'YOUR SUBJECTS'}
             </span>
             
             <button 
@@ -201,7 +201,6 @@ const SubjectSelection = () => {
             </button>
           </div>
           
-          {/* Counter */}
           <p style={{
             fontSize: '13px',
             color: selectedSubjects.length >= maxSubjects ? '#7E57C2' : '#999',
@@ -271,7 +270,6 @@ const SubjectSelection = () => {
           </div>
         </div>
 
-        {/* Proceed Button */}
         <button 
           onClick={handleProceed}
           disabled={selectedSubjects.length === 0 || isSaving}

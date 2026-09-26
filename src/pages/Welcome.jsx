@@ -28,7 +28,6 @@ const Welcome = () => {
   const [avatar, setAvatar] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  // Load Google Identity Services script
   useEffect(() => {
     if (!document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
       const script = document.createElement('script');
@@ -40,23 +39,20 @@ const Welcome = () => {
   }, []);
 
   // ==========================================
-  // CHECK AUTH ON MOUNT — fetch from backend
+  // CHECK AUTH ON MOUNT
   // ==========================================
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('authToken');
       
-      // No token → show welcome screen
       if (!token) return;
       
       try {
-        // Fetch fresh user data from backend (source of truth)
         const meRes = await fetch(`${API_URL}/api/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (!meRes.ok) {
-          // Token invalid or expired → clear and show welcome
           localStorage.removeItem('authToken');
           localStorage.removeItem('smartclass_user');
           return;
@@ -81,7 +77,6 @@ const Welcome = () => {
           if (user.onboardingComplete === true) {
             navigate('/dashboard');
           } else {
-            // Resume onboarding from where they left off
             setEmail(user.email || '');
             setFullName(user.fullName || '');
             setSelectedSubjects(user.subjects || []);
@@ -106,6 +101,7 @@ const Welcome = () => {
     { id: 'DOG', src: '/DOG.png', name: 'Dog' }
   ];
 
+  // Only the 10 subjects we actually ship content for
   const subjects = [
     { id: 'mathematics', label: 'Mathematics' },
     { id: 'physical-sciences', label: 'Physical Sciences' },
@@ -117,9 +113,6 @@ const Welcome = () => {
     { id: 'geography', label: 'Geography' },
     { id: 'history', label: 'History' },
     { id: 'english', label: 'English' },
-    { id: 'afrikaans', label: 'Afrikaans' },
-    { id: 'cat', label: 'CAT' },
-    { id: 'technology', label: 'Technology' },
   ];
 
   // ==========================================
@@ -148,7 +141,9 @@ const Welcome = () => {
         localStorage.setItem('smartclass_user', JSON.stringify(userData));
 
         try {
-          const subRes = await fetch(`${API_URL}/api/yoco/check-subscription?userId=${encodeURIComponent(meData.user.email)}`);
+          const subRes = await fetch(`${API_URL}/api/yoco/check-subscription`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
           const subData = await subRes.json();
           
           if (subData.hasSubscription) {
@@ -157,7 +152,10 @@ const Welcome = () => {
               active: true
             }));
           } else {
-            localStorage.removeItem('smartclass_subscription');
+            const existing = JSON.parse(localStorage.getItem('smartclass_subscription') || 'null');
+            if (existing?.type !== 'free') {
+              localStorage.removeItem('smartclass_subscription');
+            }
           }
         } catch (subErr) {
           console.error('Subscription fetch error:', subErr);
@@ -322,7 +320,7 @@ const Welcome = () => {
   };
 
   // ==========================================
-  // SAVE ONBOARDING TO BACKEND + LOCALSTORAGE
+  // SAVE ONBOARDING + ROUTE TO DASHBOARD
   // ==========================================
   const saveAndGoToDashboard = async (notifications = false) => {
     const token = localStorage.getItem('authToken');
@@ -360,6 +358,7 @@ const Welcome = () => {
       joinedDate: new Date().toISOString()
     };
     localStorage.setItem('smartclass_user', JSON.stringify(userData));
+
     navigate('/dashboard');
   };
 
@@ -595,15 +594,19 @@ const Welcome = () => {
             {step === 2 && (
               <div className="onboarding-step">
                 <h2 className="onboarding-title">Which grade are you in?</h2>
-                <p className="onboarding-subtitle">Grade 8-12</p>
+                <p className="onboarding-subtitle">Grade 12 only for now</p>
                 
                 <div className="grade-grid">
-                  {[8, 9, 10, 11, 12].map((g) => (
+                  {[12].map((g) => (
                     <button key={g} className={`grade-btn ${grade === g.toString() ? 'selected' : ''}`} onClick={() => handleGradeSelect(g)}>
                       Grade {g}
                     </button>
                   ))}
                 </div>
+
+                <p style={{ fontSize: '13px', color: '#8B7E74', marginTop: '16px', textAlign: 'center' }}>
+                  We're starting with Grade 12. More grades coming soon.
+                </p>
               </div>
             )}
 
