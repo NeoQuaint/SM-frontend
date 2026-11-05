@@ -13,3 +13,5 @@ Progress is stored in this browser on this domain. Progress on the ChatGPT-hoste
 Rollback by deploying the old commit through Vercel, or restoring its tree in a new commit.
 
 Narration uses Kokoro Heart (af_heart), reusing bundled clips and the existing /api/neo/speak backend through /api/kokoro. Browser speech is not used. New audio is cached locally; word highlighting is an approximate position within the audio because the service does not return word timestamps.
+
+Find narration is bundled in public/kids-find-voice.js and public/voice/find-*.mp3, with upcoming prompts preloaded during travel. Regenerate the approved text list using node scripts/generate-find-narration.cjs. Find shows a correct-answer tick, a small five-discovery confetti burst, and encountered discoveries along the path. Kids Remix plays after the final spoken celebration and stops when leaving Find.
