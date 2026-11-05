@@ -1,0 +1,112 @@
+
+body.aa-open{overflow:hidden}
+#actions-motion{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;border:0;border-radius:0;padding:0;background:#f8f1e8;color:#3c4458;font-family:inherit;overflow:hidden}
+#actions-motion::backdrop{background:#f8f1e8}
+#actions-motion *{box-sizing:border-box}
+#actions-motion button{font:inherit;border:0;cursor:pointer;min-height:46px;color:inherit;touch-action:manipulation}
+#actions-motion button:focus-visible{outline:4px solid #7e68b4;outline-offset:4px}
+#actions-motion button:disabled{opacity:.35;cursor:default}
+.aa-library{height:100%;padding:25px 5vw 35px;overflow:auto;max-width:1200px;margin:auto}
+.aa-library header{display:flex;align-items:center;gap:22px;border:0;padding:0;margin:0 0 25px}
+.aa-library header button{border-radius:50%;width:48px;background:#ebe2d4}
+.aa-library header small{font-size:10px;letter-spacing:2px;color:#8e7a71;font-weight:800}
+.aa-library h1{font-size:38px;letter-spacing:-1px;margin:7px 0}
+.aa-story-choices{display:grid;grid-template-columns:1fr 1fr;gap:25px}
+.aa-story-choice{text-align:left;border-radius:30px;background:#e6def0;overflow:hidden;padding:0!important;box-shadow:0 7px 0 #b9acc63b}
+.aa-story-choice:nth-child(2){background:#d4ead8;box-shadow:0 7px 0 #93b59d3b}
+.aa-story-preview{height:330px;overflow:hidden}.aa-story-preview svg{width:100%;height:100%}
+.aa-story-copy{padding:22px 26px}.aa-story-copy h2{font-size:28px;letter-spacing:-.7px;margin:7px 0 14px}.aa-story-copy small{font-size:13px;color:#6d6378}.aa-start{display:inline-flex;gap:12px;align-items:center;background:#fff9ef;border-radius:30px;padding:12px 22px;font-weight:800}
+.aa-player{height:100%;position:relative;isolation:isolate;background:linear-gradient(#eadcf0 0 68%,#dcb794 68%)}
+.aa-player.room-bathroom{background:linear-gradient(#ccebe8 0 68%,#dcb794 68%)}
+.aa-player.room-kitchen{background:linear-gradient(#ffe7b5 0 68%,#dcb794 68%)}
+.aa-player.room-school,.aa-player.room-pitch{background:linear-gradient(#b7e7f0 0 68%,#99cf7a 68%)}
+.aa-top{position:absolute;top:0;left:0;right:0;padding:18px 25px!important;display:flex;justify-content:space-between;align-items:center;gap:15px;z-index:3;border:0!important}
+.aa-top button{border-radius:40px;background:#fff9efed;padding:10px 18px;font-size:14px!important}
+.aa-top span{font-size:15px;font-weight:750}
+.aa-action-label{position:absolute;top:84px;left:50%;translate:-50% 0;background:#fff9eddf;border-radius:40px;padding:9px 24px;font-size:18px;font-weight:850;z-index:2;white-space:nowrap;box-shadow:0 4px 0 #866e6a10}
+.aa-world{position:absolute;inset:80px 0 175px;display:flex;justify-content:center;align-items:center}
+.aa-world>.aa-scene-svg{width:100%;height:100%;max-width:1100px;overflow:visible}
+.aa-bottom{position:absolute;bottom:0;left:0;right:0;padding:18px 22px max(14px,env(safe-area-inset-bottom));z-index:4;text-align:center;background:linear-gradient(transparent,#fff8e9e8 22%,#fff8e9)}
+.aa-caption{font-size:clamp(19px,2.5vw,26px);font-weight:750;line-height:1.35;max-width:800px;margin:8px auto 12px;min-height:36px;letter-spacing:-.4px}
+.aa-caption span{border-radius:8px;transition:background .15s}.aa-caption .active-word{background:#ffe18a;color:#755022}
+.aa-controls{display:flex;align-items:center;justify-content:center;gap:18px}
+.aa-controls button{background:#eee3cf;width:46px;height:46px;border-radius:50%;font-size:25px!important}
+.aa-controls .aa-play{height:58px;width:58px;background:#7c69b4;color:white;box-shadow:0 4px 0 #5f4f8f;font-size:26px!important}
+.aa-scene-dots{display:flex;justify-content:center;gap:3px;margin:10px auto 0}
+.aa-scene-dots button{width:30px;min-height:24px!important;background:none;padding:7px!important}
+.aa-scene-dots i{display:block;height:6px;border-radius:20px;background:#d9cdb9}.aa-scene-dots [aria-current] i{background:#9474bd}
+.aa-status{font-size:12px;margin:5px auto;color:#6f6172;min-height:0}
+.aa-person .fp-left-leg{transform-origin:79px 213px}.aa-person .fp-right-leg{transform-origin:120px 213px}
+.aa-person .fp-left-arm{transform-origin:67px 143px}.aa-person .fp-right-arm{transform-origin:133px 143px}
+.aa-person .fp-head{transform-origin:100px 118px}
+#actions-motion svg *{animation-play-state:paused!important}
+#actions-motion.aa-playing .aa-world svg *{animation-play-state:running!important}
+.pose-idle .fp-head,.pose-wave .fp-head{animation:aa-nod 3s ease-in-out infinite}
+.pose-wave .fp-right-arm{animation:aa-wave 1.5s ease-in-out infinite}
+.pose-wake .fp-left-arm,.pose-stretch .fp-left-arm{animation:aa-stretch-left 3.5s ease-in-out infinite}
+.pose-wake .fp-right-arm,.pose-stretch .fp-right-arm{animation:aa-stretch-right 3.5s ease-in-out infinite}
+.pose-wake .fp-head{animation:aa-wake-head 3.5s ease-in-out infinite}
+.pose-walk .aa-travel{animation:aa-travel 7s ease-in-out infinite}
+.pose-walk .fp-left-leg,.pose-run .fp-left-leg{animation:aa-step-left 1s ease-in-out infinite}
+.pose-walk .fp-right-leg,.pose-run .fp-right-leg{animation:aa-step-right 1s ease-in-out infinite}
+.pose-walk .fp-left-arm,.pose-run .fp-left-arm{animation:aa-step-right 1s ease-in-out infinite}
+.pose-walk .fp-right-arm,.pose-run .fp-right-arm{animation:aa-step-left 1s ease-in-out infinite}
+.pose-run .fp-leg,.pose-run .fp-arm{animation-duration:.55s}
+.pose-run .fp-body{animation:aa-run-bob .55s ease-in-out infinite}
+.pose-brush .fp-right-arm{animation:aa-brush 0.48s ease-in-out infinite}
+.pose-brush .fp-head{animation:aa-nod 3s ease-in-out infinite}
+.pose-bath .fp-left-arm{animation:aa-wash 1.5s ease-in-out infinite}.pose-bath .fp-right-arm{animation:aa-brush 1.6s ease-in-out infinite}
+.aa-bubble{animation:aa-bubble 2s ease-in-out infinite}
+.pose-dress .fp-right-arm{animation:aa-dress 2.5s ease-in-out infinite}.pose-dress .fp-left-arm{animation:aa-dress-left 2.5s ease-in-out infinite}.pose-dress .fp-body>path:nth-of-type(1){animation:aa-shirt 2.5s ease-in-out infinite}
+.pose-eat .fp-right-arm{animation:aa-eat 2.8s ease-in-out infinite}.pose-eat .fp-head{animation:aa-nod 2.8s ease-in-out infinite}
+.pose-hug .fp-right-arm{animation:aa-hug-right 3.5s ease-in-out infinite}.pose-hug .fp-left-arm{animation:aa-hug-left 3.5s ease-in-out infinite}
+.pose-hug.actor-mom .fp-body{animation:aa-mom-hug 3.5s ease-in-out infinite}.pose-hug.actor-girl .aa-travel{animation:aa-child-hug 3.5s ease-in-out infinite}
+.pose-read .fp-right-arm{animation:aa-read 3s ease-in-out infinite}.aa-book{animation:aa-book 3s ease-in-out infinite;transform-origin:485px 445px}
+.pose-tie .fp-body{animation:aa-bend 3s ease-in-out infinite}.pose-tie .fp-left-arm{animation:aa-tie-left 1s ease-in-out infinite}.pose-tie .fp-right-arm{animation:aa-tie-right 1s ease-in-out infinite}.aa-laces{animation:aa-lace 1s ease-in-out infinite;transform-origin:475px 554px}
+.pose-pack .fp-right-arm{animation:aa-pack 3s ease-in-out infinite}
+.pose-kick .fp-right-leg,.pose-pass .fp-right-leg{animation:aa-kick 3s ease-in-out infinite}
+.pose-kick .fp-left-arm,.pose-pass .fp-left-arm{animation:aa-balance 3s ease-in-out infinite}
+.ball-run{animation:aa-dribble .55s ease-in-out infinite}
+.ball-pass{animation:aa-pass-ball 3s ease-in-out infinite}
+.ball-kick{animation:aa-kick-ball 3s ease-in-out infinite}
+.aa-clouds{animation:aa-cloud 16s ease-in-out infinite}
+@keyframes aa-nod{50%{transform:rotate(4deg)}}
+@keyframes aa-wake-head{0%,100%{transform:rotate(-9deg)}40%,70%{transform:rotate(2deg)}}
+@keyframes aa-wave{0%,100%{transform:rotate(-110deg)}50%{transform:rotate(-145deg)}}
+@keyframes aa-stretch-left{0%,100%{transform:rotate(0)}35%,65%{transform:rotate(135deg)}}
+@keyframes aa-stretch-right{0%,100%{transform:rotate(0)}35%,65%{transform:rotate(-135deg)}}
+@keyframes aa-step-left{0%,100%{transform:rotate(20deg)}50%{transform:rotate(-20deg)}}
+@keyframes aa-step-right{0%,100%{transform:rotate(-20deg)}50%{transform:rotate(20deg)}}
+@keyframes aa-travel{0%,100%{transform:translateX(-45px)}50%{transform:translateX(45px)}}
+@keyframes aa-run-bob{50%{transform:translateY(-10px)}}
+@keyframes aa-brush{0%,100%{transform:rotate(138deg)}50%{transform:rotate(148deg)}}
+@keyframes aa-wash{0%,100%{transform:rotate(60deg)}50%{transform:rotate(100deg)}}
+@keyframes aa-bubble{50%{transform:translateY(-9px)}}
+@keyframes aa-dress{0%,100%{transform:rotate(20deg)}40%,65%{transform:rotate(150deg)}}
+@keyframes aa-dress-left{0%,100%{transform:rotate(-20deg)}40%,65%{transform:rotate(-150deg)}}
+@keyframes aa-shirt{50%{opacity:.75}}
+@keyframes aa-eat{0%,100%{transform:rotate(10deg)}40%,65%{transform:rotate(140deg)}}
+@keyframes aa-hug-right{0%,100%{transform:rotate(-55deg)}40%,70%{transform:rotate(-95deg)}}
+@keyframes aa-hug-left{0%,100%{transform:rotate(55deg)}40%,70%{transform:rotate(95deg)}}
+@keyframes aa-mom-hug{40%,70%{transform:rotate(-8deg)}}
+@keyframes aa-child-hug{40%,70%{transform:translateX(22px)}}
+@keyframes aa-read{50%{transform:rotate(65deg)}}
+@keyframes aa-book{50%{transform:scaleX(.88)}}
+@keyframes aa-bend{0%,100%{transform:rotate(12deg) translateY(10px)}40%,70%{transform:rotate(32deg) translateY(20px)}}
+@keyframes aa-tie-left{50%{transform:rotate(-35deg)}}
+@keyframes aa-tie-right{50%{transform:rotate(35deg)}}
+@keyframes aa-lace{50%{transform:scaleX(.7)}}
+@keyframes aa-pack{0%,100%{transform:rotate(-25deg)}40%,70%{transform:rotate(25deg)}}
+@keyframes aa-kick{0%,100%{transform:rotate(0)}20%{transform:rotate(25deg)}40%,55%{transform:rotate(-65deg)}}
+@keyframes aa-balance{40%,55%{transform:rotate(45deg)}}
+@keyframes aa-dribble{50%{transform:translate(28px,-10px)}}
+@keyframes aa-pass-ball{0%,25%,100%{transform:translate(0,0)}60%,85%{transform:translate(165px,0)}}
+@keyframes aa-kick-ball{0%,25%,100%{transform:translate(0,0)}65%,85%{transform:translate(225px,-150px)}}
+@keyframes aa-cloud{50%{transform:translateX(40px)}}
+@media(max-width:600px){.aa-library{padding:18px}.aa-library h1{font-size:28px}.aa-library header{gap:12px}.aa-story-choices{grid-template-columns:1fr;gap:18px}.aa-story-preview{height:225px}.aa-story-copy{padding:16px 22px}.aa-story-copy h2{font-size:24px}.aa-top{padding:14px!important;gap:8px}.aa-top span{font-size:12px;max-width:150px}.aa-top button{font-size:12px!important;padding:8px 12px}.aa-action-label{top:76px;font-size:17px}.aa-world{inset:95px -90px 185px}.aa-bottom{padding:10px 16px max(12px,env(safe-area-inset-bottom))}.aa-caption{font-size:21px;min-height:58px}.aa-controls{gap:16px}.aa-scene-dots button{width:28px}.aa-scene-dots{gap:0}.aa-status{font-size:11px}}
+@media(prefers-reduced-motion:reduce){#actions-motion svg *{animation:none!important}#actions-motion .aa-caption span{transition:none}}
+body.reduced #actions-motion svg *{animation:none!important}
+#actions-motion-read{max-width:720px;width:calc(100vw - 30px);max-height:90dvh;border:0;border-radius:25px;padding:30px;background:#fff9ee;color:#3c4458;font-family:inherit}
+#actions-motion-read h1{font-size:28px}#actions-motion-read h2{font-size:20px}#actions-motion-read p{line-height:1.7}#actions-motion-read button{padding:12px 20px;border:0;border-radius:25px;background:#e7dbf0;cursor:pointer}
+
+#actions-motion .pose-hug .fp-right-arm{animation:aa-wrap-right 3.5s ease-in-out infinite}#actions-motion .pose-hug .fp-left-arm{animation:aa-wrap-left 3.5s ease-in-out infinite}#actions-motion .pose-tie .fp-body{animation:none}#actions-motion .aa-tie-upper{transform-origin:100px 220px;animation:aa-tie-bend 3s ease-in-out infinite} @keyframes aa-wrap-left{0%,100%{transform:rotate(18deg)}40%,70%{transform:rotate(0)}}@keyframes aa-wrap-right{0%,100%{transform:rotate(-18deg)}40%,70%{transform:rotate(0)}}@keyframes aa-tie-bend{0%,100%{transform:rotate(45deg)}40%,70%{transform:rotate(55deg)}}

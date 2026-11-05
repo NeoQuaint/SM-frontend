@@ -1,0 +1,69 @@
+
+body.pf-open{overflow:hidden}#find-friends{position:fixed;inset:0;margin:0;border:0;width:100%;height:100dvh;max-width:none;max-height:none;padding:14px 18px 12px;box-sizing:border-box;background:linear-gradient(#c5efff,#e7f9ff 50%,#b8e5a3);color:#644d74;font-family:inherit;overflow:auto}#find-friends *{box-sizing:border-box}#find-friends button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}#find-friends main{max-width:1050px;margin:auto}
+.pf-bar{display:flex;align-items:center;justify-content:space-between;max-width:1000px;margin:auto}.pf-bar button,.pf-heading>button{border:3px solid #fff;border-radius:50%;background:#fff9;width:50px;height:50px;font-size:26px!important}.pf-progress{display:flex;gap:14px;font-size:43px;color:#fff9;text-shadow:0 2px #a3c6ce}.pf-earned:nth-child(1){color:#f281a7}.pf-earned:nth-child(2){color:#ffc944}
+.pf-heading{display:flex;align-items:center;justify-content:center;gap:16px;margin:15px auto 0}.pf-heading img{width:70px;height:85px;object-fit:contain}.pf-heading small{font-size:14px}.pf-heading h2{font-size:clamp(25px,4vw,39px);margin:4px 0}.pf-heading>button{background:#f283a7;color:white!important}
+.pf-landscape{position:relative;aspect-ratio:3/2;width:min(100%,calc((100dvh - 240px)*1.5));margin:0 auto}.pf-garden{position:absolute;inset:0;background:url('kids-celebration-garden.svg') center/100% 100% no-repeat;border-radius:35px}.pf-actors{position:absolute;inset:0}.pf-animal{position:absolute;width:33%;height:30%;left:35%;bottom:11%;border:0;background:none;padding:0}.pf-animal svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 6px 3px #374a3820)}.pf-enter{animation:pf-arrive 1.7s ease-out both}.pf-cow.pf-enter{animation-name:pf-arrive-cow}.pf-tap{position:absolute;right:10%;bottom:-6%;font-size:32px;animation:pf-point 1s ease-in-out infinite alternate}.pf-respond{animation:pf-hello .5s ease-in-out 4 alternate}.pf-reveal{animation:pf-pop .8s ease-out both}
+.pf-bush{position:absolute;width:30%;height:34%;bottom:12%;border:0;background:none;padding:0}.pf-bush svg{width:100%;height:100%;overflow:visible}.pf-bush-0{left:32%}.pf-bush-1{right:2%}.pf-clue{animation:pf-clue 2s ease-in-out infinite alternate;transform-origin:center bottom}.pf-rustle{animation:pf-rustle .5s ease-in-out}
+.pf-found{position:absolute;bottom:0;left:6%;display:flex;gap:8px;z-index:2}.pf-found>span{width:clamp(65px,11vw,125px);display:block;background:#fff9;border:3px solid white;border-radius:20px}.pf-found svg{width:100%;display:block}
+.pf-hint{text-align:center;min-height:35px;font-weight:700;font-size:18px;margin:12px auto}.pf-hint button{border:3px solid white;border-radius:23px;padding:12px 20px;background:#ffd86b;margin:5px;min-height:48px}
+.pf-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}.pf-confetti i{position:absolute;left:var(--x);top:0;color:var(--colour);font-size:24px;animation:pf-confetti 1.8s ease-in var(--delay) both}
+.pf-party-maya{position:absolute;left:36%;bottom:17%;width:26%}.pf-party-maya img{width:100%}.pf-dancing .pf-party-maya,.pf-dancing .pf-friends-dance{animation:pf-hello .7s ease-in-out infinite alternate}
+@keyframes pf-arrive{from{left:12%;opacity:0}to{left:35%;opacity:1}}@keyframes pf-arrive-cow{from{left:65%;opacity:0}to{left:35%;opacity:1}}@keyframes pf-point{to{transform:translateY(-8px)}}@keyframes pf-hello{to{transform:translateY(-10px) rotate(4deg)}}@keyframes pf-clue{to{transform:rotate(6deg)}}@keyframes pf-rustle{25%,75%{transform:rotate(4deg)}50%{transform:rotate(-4deg)}}@keyframes pf-pop{from{scale:.5;opacity:0}to{scale:1;opacity:1}}@keyframes pf-confetti{to{transform:translateY(400px) rotate(240deg);opacity:0}}
+@media(max-width:600px){#find-friends{padding:12px 8px}.pf-heading{margin-top:20px;gap:8px}.pf-heading img{width:54px;height:68px}.pf-heading small{font-size:12px}.pf-heading h2{font-size:27px}.pf-heading>button{width:44px;height:44px}.pf-landscape{width:100%;margin-top:9vh}.pf-animal{width:37%;height:34%;left:33%}.pf-bush{width:34%;height:38%}.pf-bush-0{left:28%}.pf-bush-1{right:0}.pf-tap{font-size:27px}.pf-hint{font-size:16px;padding:0 12px}.pf-found>span{width:72px}.pf-bar{padding:0 10px}}
+@media(max-height:550px) and (orientation:landscape){.pf-heading{margin:0}.pf-heading img,.pf-heading small{display:none}.pf-heading h2{font-size:23px}.pf-landscape{width:min(66%,calc((100dvh - 170px)*1.5))}.pf-hint{margin:0;font-size:14px}.pf-bar button{width:40px;height:40px}.pf-progress{font-size:30px}}
+@media(prefers-reduced-motion:reduce){#find-friends *{animation:none!important}}.reduced #find-friends *{animation:none!important}
+
+/* Room for the garden, and a separate little collection beneath it. */
+#find-friends{background:linear-gradient(#c5efff,#e7f9ff 55%,#fff6df)}
+.pf-audio-tools{display:flex;gap:7px}.pf-audio-tools button{font-size:23px!important}
+#find-friends main{max-width:1100px}
+#find-friends .pf-landscape{width:min(100%,1050px);aspect-ratio:1.5;margin:10px auto 0}
+#find-friends .pf-garden{background-size:108% auto;background-position:center bottom;background-color:#d5f4ff;border:4px solid #fff;border-radius:30px;box-shadow:0 5px 0 #77b99530}
+#find-friends .pf-found{position:relative;left:auto;bottom:auto;display:flex;justify-content:center;align-items:center;gap:18px;min-height:125px;margin:14px auto 0;padding:8px;z-index:2}
+.pf-friend-card,.pf-friend-slot{width:145px;height:130px;border:3px solid white;border-radius:26px;background:#fff8e7;box-shadow:0 6px 0 #e6d4b6;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#find-friends .pf-friend-card svg{height:82px;width:115px;flex-shrink:0}
+.pf-friend-card strong{display:flex;gap:3px;font-family:'Comic Sans MS','Chalkboard SE',cursive;font-size:34px;font-weight:900;line-height:1.1;letter-spacing:2px}
+.pf-friend-card strong span{color:var(--letter-colour);text-shadow:0 2px white;transform:rotate(-6deg)}.pf-friend-card strong span:nth-child(2){transform:rotate(7deg)}
+.pf-friend-slot{background:#ffffff66;border:3px dashed #c4b5ce;box-shadow:none;color:#b3a1c2;font-size:42px}
+.pf-new-friend{animation:pf-collect-card .5s ease-out 1.1s both}
+#find-friends .pf-reveal{animation:pf-to-collection 1.65s ease-in-out both}
+.pf-welcome{position:absolute;inset:4% 20%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center}
+.pf-welcome img{width:40%;max-height:65%;object-fit:contain;animation:pf-hello 1s ease-in-out infinite alternate}.pf-welcome p{font-size:clamp(22px,4vw,35px);font-weight:900;color:#8656ae;margin:0;background:#fff9;border-radius:20px;padding:5px 15px}.pf-welcome>span{color:#e878a4;font-size:30px;letter-spacing:15px}
+@keyframes pf-to-collection{0%{opacity:0;transform:scale(.6)}30%{opacity:1;transform:scale(1.05)}65%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(140%) scale(.5)}}
+@keyframes pf-collect-card{from{opacity:0;transform:translateY(-25px) scale(.7)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:600px){#find-friends{padding:9px 6px}.pf-heading{margin-top:10px}.pf-heading img{height:60px}.pf-heading small{display:none}#find-friends .pf-landscape{width:100%;aspect-ratio:1.35;margin-top:8px}#find-friends .pf-found{min-height:116px;margin-top:12px;gap:16px;padding:0}.pf-friend-card,.pf-friend-slot{width:125px;height:118px}#find-friends .pf-friend-card svg{width:105px;height:75px}.pf-friend-card strong{font-size:31px}.pf-bar{padding:0 4px}.pf-progress{font-size:34px;gap:6px}.pf-bar button{width:43px;height:43px}.pf-hint{margin:12px auto 6px}}
+@media(min-width:601px){#find-friends .pf-landscape{width:min(100%,calc((100dvh - 310px)*1.5));min-width:450px}}
+@media(max-height:550px) and (orientation:landscape){#find-friends .pf-landscape{width:min(72%,560px);min-width:0;margin:4px auto}#find-friends .pf-found{min-height:90px;margin-top:10px}.pf-friend-card,.pf-friend-slot{height:90px;width:105px}#find-friends .pf-friend-card svg{height:55px;width:85px}.pf-friend-card strong{font-size:26px}}
+
+/* Two-picture listening round: large cards, no answer labels until success. */
+#find-friends[data-phase="choose"] .pf-landscape,#find-friends[data-phase="chosen"] .pf-landscape{width:min(100%,550px);min-width:0;max-height:30dvh;aspect-ratio:2}
+#find-friends .pf-choice{width:clamp(130px,35vw,240px);height:clamp(155px,38vw,230px);border:4px solid #d8c5f4;border-radius:28px;background:#fff;box-shadow:0 7px 0 #d8c5f4;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;transition:transform .3s,background .3s}
+#find-friends .pf-choice:nth-child(2){border-color:#a8dfd6;box-shadow:0 7px 0 #a8dfd6}
+#find-friends .pf-choice svg{width:100%;height:80%;overflow:visible}
+#find-friends .pf-choice strong{min-height:30px;font:900 30px 'Comic Sans MS','Chalkboard SE',cursive;color:#e85187;letter-spacing:4px}
+#find-friends .pf-choice-correct{background:#fff3c9;transform:translateY(-8px) scale(1.05);border-color:#ffc940}
+#find-friends .pf-choice:focus-visible{outline:4px solid #7952ba;outline-offset:5px}
+@media(max-height:550px) and (orientation:landscape){#find-friends[data-phase="choose"] .pf-landscape,#find-friends[data-phase="chosen"] .pf-landscape{display:none}#find-friends .pf-choice{height:145px;width:190px}}
+
+/* Quiet white choice stage; scenery returns only for learning and celebration. */
+#find-friends:is([data-phase="choose"],[data-phase="chosen"]){background:#fff}
+#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-landscape,#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-heading img,#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-heading small,#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-progress{display:none}
+#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-heading{margin:clamp(15px,6vh,60px) auto 12px}
+#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-found{min-height:45dvh;position:relative;gap:clamp(12px,4vw,45px)}
+#find-friends .pf-choice{width:clamp(130px,40vw,300px);height:clamp(185px,44vw,300px)}
+#find-friends .pf-grapes{left:72%;bottom:34%;width:18%;height:25%;animation:pf-pop .8s ease-out both}
+#find-friends .pf-apple{left:22%;bottom:10%;width:19%;height:24%;animation:pf-pop .8s ease-out both}
+@media(max-height:550px) and (orientation:landscape){#find-friends:is([data-phase="choose"],[data-phase="chosen"]) .pf-heading{margin:8px auto}#find-friends .pf-choice{height:160px;width:210px}}
+
+/* Maya celebrates only after a successful answer. */
+.pf-maya-cheer{display:inline-block;position:relative;width:clamp(90px,20vw,125px);height:110px;vertical-align:middle;pointer-events:none}
+.pf-maya-cheer img{width:100%;height:100%;object-fit:contain;transform-origin:50% 95%;animation:pf-maya-hop .7s ease-in-out 3}
+.pf-maya-cheer>span{position:absolute;right:-4px;top:8px;color:#ffc940;font-size:30px;animation:pf-pop .5s ease-out both}
+.pf-cheer-label{display:inline-block;vertical-align:middle;margin-left:12px;color:#a057c2;font-size:clamp(18px,4vw,25px)}
+#find-friends .pf-party-maya{width:34%;left:33%;bottom:12%}
+#find-friends .pf-party-maya img{display:block;object-fit:contain;transform-origin:50% 95%}
+#find-friends.pf-dancing .pf-party-maya{animation:none}
+#find-friends.pf-dancing .pf-party-maya img{animation:pf-maya-hop .8s ease-in-out infinite}
+@keyframes pf-maya-hop{0%,100%{transform:translateY(0) scale(1.04,.96)}20%{transform:translateY(0) scale(1.08,.9)}50%{transform:translateY(-22px) scale(.97,1.04) rotate(-4deg)}75%{transform:translateY(-6px) scale(1) rotate(3deg)}}
+@media(max-height:550px) and (orientation:landscape){.pf-maya-cheer{height:70px;width:80px}}
+@media(prefers-reduced-motion:reduce){#find-friends .pf-maya-cheer img,#find-friends.pf-dancing .pf-party-maya img{animation:none!important}}

@@ -1,0 +1,33 @@
+#family-song{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;border:0;padding:max(12px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));box-sizing:border-box;background:linear-gradient(#fff,#fff0f5);color:#654b85;overflow:auto}#family-song[open]{display:flex;flex-direction:column}#family-song header,#family-song footer{width:min(100%,750px);margin:auto;flex-shrink:0}#family-song header,.fs-buttons{display:flex;gap:14px;align-items:center;justify-content:space-between}#family-song button{border:0;border-radius:22px;background:#efdefa;color:#684d91;min-width:54px;min-height:54px;font-size:26px;cursor:pointer}#family-song main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}.fs-art{display:flex;align-items:center;justify-content:center;width:min(75vw,48dvh,430px);aspect-ratio:1;font-size:clamp(120px,32vmin,280px);line-height:1.2;transform-origin:50% 90%}.fs-art.fs-group{font-size:clamp(55px,14vmin,125px);white-space:nowrap}.fs-caption{font-family:'Comic Sans MS','Chalkboard SE',sans-serif;font-size:clamp(25px,6vw,44px);font-weight:800;text-align:center;min-height:3em;padding:12px;max-width:90%;color:#a74981}.fs-round{font-size:14px}.fs-seek{flex:1;min-width:60px;accent-color:#ac77ce}.fs-status{font-size:14px;text-align:center;min-height:1.3em;margin:4px 0 0}#family-song button:focus-visible,#family-song input:focus-visible{outline:3px solid #a04da0;outline-offset:3px}@keyframes fs-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg) translateY(-5px)}}@media(prefers-reduced-motion:reduce){#family-song *{animation:none!important}}.reduced #family-song *{animation:none!important}@media(max-height:500px){.fs-art{width:35dvh;font-size:25dvh}.fs-art.fs-group{font-size:12dvh}.fs-caption{min-height:1em;font-size:24px;padding:4px}#family-song button{min-width:40px;min-height:40px}}
+/* Full-body portrait characters with independently animated limbs. */
+#family-song .fs-art{width:min(65vw,30dvh,270px);height:min(48dvh,430px);aspect-ratio:auto;flex-shrink:0;overflow:visible}
+#family-song .fs-art.fs-group{width:min(90vw,680px)}
+.fs-person{display:block;width:100%;height:100%;overflow:visible}
+.fs-family-lineup{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:4px;width:100%;height:100%}
+.fs-family-lineup>div{min-height:0;display:flex;align-items:flex-end;justify-content:center}
+.fs-family-lineup>div:nth-child(n+6){transform:translateX(50%)}
+.fs-person .fp-body{animation:fp-dance 2s ease-in-out infinite;animation-delay:var(--person-delay,0s)}
+.fs-person .fp-head{animation:fp-nod 2s ease-in-out infinite}
+.fs-person .fp-left-arm{animation:fp-arm-swing 2s ease-in-out infinite}
+.fs-person .fp-right-arm{animation:fp-arm-swing 2s ease-in-out -.9s infinite}
+.fs-wave .fp-right-arm{animation:fp-wave 1s ease-in-out infinite}
+.fs-bounce .fp-body{animation:fp-bounce 1s ease-in-out infinite}
+.fs-twirl .fp-body{animation:fp-twirl 2s ease-in-out infinite}
+.fs-step .fp-left-leg{transform-origin:79px 214px;animation:fp-step 1s ease-in-out infinite}
+.fs-step .fp-right-leg{transform-origin:120px 214px;animation:fp-step 1s ease-in-out -.5s infinite}
+#family-song .fs-person g{animation-play-state:paused}
+#family-song.fs-playing .fs-person g{animation-play-state:running}
+#family-song .fs-person-me .fp-left-arm{animation-name:fp-left-wave}
+#family-song .fs-person-brother .fp-head{animation-duration:1s}
+#family-song .fs-person-auntie .fp-left-arm{animation-name:fp-left-wave}
+#family-song .fs-person-grandma .fp-body,#family-song .fs-person-grandpa .fp-body{animation-duration:3s}
+@keyframes fp-dance{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg) translateY(-3px)}}
+@keyframes fp-nod{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(3deg)}}
+@keyframes fp-arm-swing{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(9deg)}}
+@keyframes fp-wave{0%,100%{transform:rotate(-110deg)}50%{transform:rotate(-135deg)}}
+@keyframes fp-bounce{0%,100%{transform:translateY(0) scale(1.02,.98)}50%{transform:translateY(-12px) scale(.99,1.01)}}
+@keyframes fp-twirl{0%,100%{transform:rotate(-4deg) scaleX(.96)}50%{transform:rotate(4deg) scaleX(1)}}
+@keyframes fp-step{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(7deg) translateY(-4px)}}
+@media(max-height:500px){#family-song .fs-art{height:35dvh;width:23dvh}#family-song .fs-art.fs-group{width:min(80vw,450px)}}
+
+@keyframes fp-left-wave{0%,100%{transform:rotate(110deg)}50%{transform:rotate(135deg)}}

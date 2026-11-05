@@ -1,7 +1,38 @@
 {
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/primary",
+      "destination": "/kids",
+      "permanent": false
+    },
+    {
+      "source": "/highschool",
+      "destination": "/kids",
+      "permanent": false
+    },
+    {
+      "source": "/university",
+      "destination": "/kids",
+      "permanent": false
+    },
+    {
+      "source": "/stage-preview",
+      "destination": "/kids",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/kids",
+      "destination": "/kids.html"
+    },
+    {
+      "source": "/((?!.*\\.).*)",
       "destination": "/index.html"
     }
   ],

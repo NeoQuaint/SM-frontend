@@ -1,0 +1,61 @@
+
+body.sp-open{overflow:hidden}
+#spelling-puzzles{position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0;margin:0;padding:0;overflow:auto;background:#fffaf0;color:#493d2f;font-family:inherit}
+#spelling-puzzles::backdrop{background:#fffaf0}
+#spelling-puzzles *{box-sizing:border-box}
+#spelling-puzzles button{font:inherit;color:inherit;cursor:pointer;border:0;min-height:46px;touch-action:manipulation}
+#spelling-puzzles button:focus-visible{outline:4px solid #428cb4;outline-offset:4px}
+#spelling-puzzles button:disabled{cursor:default}
+.sp-wrap{max-width:1000px;margin:auto;padding:22px 34px 35px}
+.sp-header{display:flex;align-items:center;justify-content:space-between;padding:0!important;border:0!important}
+.sp-header>button{width:48px;height:48px;background:#f0e7d4;border-radius:50%;font-size:25px!important}
+.sp-header>span{font-weight:800;font-size:20px}.sp-header i{font-style:normal;margin-left:8px}
+.sp-stage{text-align:center;margin:auto;max-width:780px}
+.sp-meta{display:flex;align-items:center;justify-content:space-between;margin:26px 0 5px;font-size:11px;font-weight:800;letter-spacing:1.3px;color:#8a7858}
+.sp-meta button{background:#f8edd3;border-radius:30px;padding:7px 16px;font-size:12px!important;letter-spacing:0}
+.sp-picture{position:relative;display:grid;place-items:center;width:170px;height:145px;margin:8px auto;background:#ffe9a9;border-radius:48% 52% 45% 55%;font-size:85px}
+.sp-spark{position:absolute;font-size:25px;color:#dfac42}.s1{left:-25px;top:15px}.s2{right:-24px;bottom:20px}
+#spelling-puzzles .sp-word{display:inline-flex;align-items:center;gap:16px;font-size:45px;font-weight:850;background:transparent;padding:2px 15px;line-height:1.3}
+.sp-word small{font-size:22px}.sp-instruction{font-size:16px;margin:8px 0 26px;color:#807155}
+.sp-slots{display:flex;justify-content:center;gap:14px;padding:24px 18px;border-radius:28px;background:#f4eddc;margin:0 auto;max-width:740px}
+#spelling-puzzles .sp-slot{position:relative;display:grid;place-items:center;width:80px;height:84px;border:3px dashed #c9ba98;border-radius:15px;font-size:43px;font-weight:850;color:#a99875;background:#fffaf0;transition:background .15s,transform .15s}
+#spelling-puzzles .sp-slot.sp-filled{background:#cce5cf;color:#3c6a4d;border:3px solid #8dba96;box-shadow:0 4px 0 #aacbb0}
+#spelling-puzzles .sp-slot.sp-over{background:#fff0a0;border-color:#bf922d;transform:scale(1.06)}
+.sp-tray{display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;padding:38px 16px 12px;min-height:140px}
+#spelling-puzzles .sp-piece{position:relative;width:78px;height:78px;border-radius:15px;background:#f6ca58;box-shadow:0 6px 0 #d6a73c;font-size:43px;font-weight:850;display:grid;place-items:center;touch-action:none;user-select:none;-webkit-user-select:none}
+.sp-piece:before{content:"";position:absolute;top:-9px;left:calc(50% - 10px);width:20px;height:18px;border-radius:50%;background:inherit}
+#spelling-puzzles .sp-piece:nth-child(3n+2){background:#b9dfee;box-shadow:0 6px 0 #85b7ca}
+#spelling-puzzles .sp-piece:nth-child(3n+3){background:#e8cbee;box-shadow:0 6px 0 #c39bcb}
+#spelling-puzzles .sp-selected{outline:4px solid #568c9a;outline-offset:5px}
+#spelling-puzzles .sp-used{visibility:hidden;pointer-events:none}
+.sp-dragging{opacity:.25}
+#spelling-puzzles .sp-ghost{position:fixed;z-index:20;pointer-events:none;opacity:1;transform:rotate(-6deg);box-shadow:0 12px 20px #513d3540}
+.sp-feedback{min-height:26px;color:#75694e;font-size:15px;margin:12px auto 18px}
+.sp-nav{display:flex;justify-content:space-between;gap:10px;border-top:1px solid #eae1cc;padding-top:20px;margin-top:20px}
+.sp-nav button{border-radius:25px;padding:10px 16px;background:#f3ead5;font-size:14px!important}.sp-nav button:disabled{opacity:.35}
+.sp-done>span{color:#e8b83b;font-size:34px;letter-spacing:10px}
+.sp-done h2{margin:8px 0 18px;font-size:28px}
+#spelling-puzzles .sp-next{background:#496b53;color:white;border-radius:30px;padding:14px 26px;font-size:17px;font-weight:750;box-shadow:0 5px 0 #2f4c37}
+.sp-complete .sp-tray{display:none}.sp-complete .sp-picture{animation:sp-bounce .7s ease}
+.sp-library{text-align:center;padding:45px 0 10px}.sp-eyebrow{font-size:11px;letter-spacing:2px;color:#9c8555;font-weight:800}
+.sp-library h1{font-size:42px;letter-spacing:-1px;margin:14px 0}.sp-library>p{color:#8b795d}
+.sp-word-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:35px}
+.sp-word-grid button{position:relative;background:#f7ebce;border-radius:22px;padding:20px 10px;box-shadow:0 4px 0 #e7d8b3}
+.sp-word-grid button>span{display:block;font-size:45px}.sp-word-grid b{display:block;font-size:19px;margin-top:10px}.sp-word-grid i{position:absolute;top:8px;right:12px;color:#47764b;font-style:normal}
+@keyframes sp-bounce{50%{transform:translateY(-12px) rotate(5deg)}}
+@media(max-width:600px){
+.sp-wrap{padding:16px 15px 28px}.sp-header>span{font-size:18px}
+.sp-meta{margin:20px 0 6px;font-size:10px;letter-spacing:1px}
+.sp-picture{width:135px;height:120px;font-size:72px;margin:5px auto}
+#spelling-puzzles .sp-word{font-size:36px}.sp-instruction{font-size:14px;margin:8px 0 20px}
+.sp-slots{gap:7px;padding:22px 9px;border-radius:22px}
+#spelling-puzzles .sp-slot{width:calc((100vw - 85px)/6);max-width:65px;height:62px;font-size:32px;border-width:2px;border-radius:11px}
+.sp-tray{gap:13px;padding:30px 5px 8px;min-height:110px}
+#spelling-puzzles .sp-piece{width:44px;height:56px;font-size:31px;border-radius:11px}
+.sp-piece:before{width:15px;height:15px;left:calc(50% - 7.5px);top:-7px}
+.sp-feedback{font-size:13px;max-width:300px}.sp-nav{gap:6px;padding-top:16px}
+.sp-nav button{font-size:12px!important;padding:8px 10px}
+.sp-library{padding-top:30px}.sp-library h1{font-size:32px}.sp-word-grid{grid-template-columns:repeat(3,1fr);gap:12px}.sp-word-grid button>span{font-size:36px}.sp-word-grid b{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){#spelling-puzzles *{animation:none!important;transition:none!important}}
+body.reduced #spelling-puzzles *{animation:none!important;transition:none!important}

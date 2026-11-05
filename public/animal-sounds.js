@@ -1,0 +1,1 @@
+window.KOKORO_CLIPS['Which animal makes this sound?']='animal-sounds/maya-question.mp3';
