@@ -19,9 +19,9 @@ let active=false,letter='m',step=0,misses=0,selected=new Set(),audio=null,ticket
 const dialog=document.createElement('dialog');dialog.id='alphabet-garden';dialog.setAttribute('aria-label','Alphabet Garden');document.body.append(dialog);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function stop(){ticket++;if(audio){audio.pause();audio=null}window.speechSynthesis?.cancel()}
+function stop(){ticket++;if(audio){audio.pause();audio=null}window.KidsVoice?.cancel()}
 function say(text){stop();if($('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;const own=ticket,src=window.KOKORO_CLIPS?.[text];if(src){audio=new Audio(src);audio.play().catch(()=>fallback(text,own))}else fallback(text,own)}
-function fallback(text,own){if(own!==ticket)return;if(!window.speechSynthesis){status('Listen together: '+text);return}const utterance=new SpeechSynthesisUtterance(text);utterance.lang='en-GB';utterance.rate=.8;utterance.onerror=()=>{if(own===ticket)status('You can read together or tap to keep playing.')};speechSynthesis.speak(utterance)}
+function fallback(text,own){if(own!==ticket)return;if(!window.KidsVoice){status('Listen together: '+text);return}const utterance=new KidsVoice.Utterance(text);utterance.lang='en-GB';utterance.rate=.8;utterance.onerror=()=>{if(own===ticket)status('You can read together or tap to keep playing.')};KidsVoice.speak(utterance)}
 function status(text){const el=dialog.querySelector('[data-ag-status]');if(el)el.textContent=text}
 function save(skill,independent){const p=progress[letter]||{};p[skill]={tries:(p[skill]?.tries||0)+1,independent:(p[skill]?.independent||0)+(independent?1:0)};progress[letter]=p;try{localStorage.setItem(key,JSON.stringify(progress))}catch{}}
 function shell(body){dialog.dataset.screen=screen;dialog.innerHTML='<div class="ag-wrap"><header class="ag-top"><button data-ag="back" aria-label="'+(screen==='garden'?'Back to playroom':'Back to Alphabet Garden')+'">←</button><span>Alphabet Garden <i>✦</i></span><button data-ag="mute" aria-label="Toggle sound">'+($('#sound')?.getAttribute('aria-pressed')==='false'?'🔇':'🔊')+'</button></header>'+body+'</div>';dialog.scrollTop=0}

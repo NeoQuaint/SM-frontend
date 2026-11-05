@@ -11,3 +11,5 @@ Build with npm run build; Vercel serves dist. Landing: /. Activities: /kids. Fut
 Progress is stored in this browser on this domain. Progress on the ChatGPT-hosted domain does not transfer automatically. This replacement does not integrate the old login/payment UI. Backend accounts, subscriptions and data are not deleted or changed.
 
 Rollback by deploying the old commit through Vercel, or restoring its tree in a new commit.
+
+Narration uses Kokoro Heart (af_heart), reusing bundled clips and the existing /api/neo/speak backend through /api/kokoro. Browser speech is not used. New audio is cached locally; word highlighting is an approximate position within the audio because the service does not return word timestamps.

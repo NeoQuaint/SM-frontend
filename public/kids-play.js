@@ -14,7 +14,7 @@ let level=0,quiet=false,musicOn=true,kind='',round=0,target=null,choices=[],answ
 const shuffle=input=>{const a=input.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const sound=window.KidsSound;
 const cueNames=['One.','Two.','Three.','Four.','Five.','Six.','Seven.','Eight.','Nine.','Ten.'];
-function stop(){$('#game').classList.remove('animal-calling');if((teaching||intro)&&window.speechSynthesis)window.speechSynthesis.cancel();voiceTicket++;if(currentAudio){currentAudio.pause();currentAudio.removeAttribute('src');currentAudio.load();currentAudio=null}sound.duck(false);$('#game').classList.remove('speaking')}
+function stop(){$('#game').classList.remove('animal-calling');if((teaching||intro)&&window.KidsVoice)window.KidsVoice.cancel();voiceTicket++;if(currentAudio){currentAudio.pause();currentAudio.removeAttribute('src');currentAudio.load();currentAudio=null}sound.duck(false);$('#game').classList.remove('speaking')}
 function audioNotice(){const e=$('.audio-status');if(e)e.textContent='Tap the speaker to listen.';sound.duck(false);$('#game').classList.remove('speaking')}
 function say(text,onDone){stop();if(quiet||document.hidden)return;const src=window.KOKORO_CLIPS?.[text];if(!src){audioNotice();return}const ticket=voiceTicket;currentAudio=new Audio(src);currentAudio.preload='auto';if(teaching){currentAudio.playbackRate=1.06;currentAudio.preservesPitch=false}sound.duck(true);$('#game').classList.add('speaking');currentAudio.onended=()=>{if(ticket===voiceTicket){sound.duck(false);$('#game').classList.remove('speaking');const e=$('.audio-status');if(e)e.textContent='';onDone?.()}};currentAudio.onerror=()=>{if(ticket===voiceTicket)audioNotice()};currentAudio.play().catch(()=>{if(ticket===voiceTicket)audioNotice()})}
 $('#cards').innerHTML=games.filter(g=>!window.KIDS_OBJECTS?.[g.id]).map(g=>'<button class="activity" data-game="'+g.id+'" style="--bg:'+g.bg+';--shadow:'+g.shadow+'"><div class="art" aria-hidden="true">'+g.art+'</div><h3>'+g.title+'</h3><p>'+g.desc+'</p><span class="arrow" aria-hidden="true">↗</span></button>').join('');
@@ -47,7 +47,7 @@ function makeLesson(){
 function cancelTeaching(){cancelIntro();$('#game').classList.remove('intro-dancing');if(teaching)stop();clearTimeout(teachTimer);teaching=false;$('#game').classList.remove('is-teaching')}
 function scheduleTeaching(){clearTimeout(teachTimer);teachTimer=setTimeout(()=>{
  if(!teaching||!$('#game').open)return;
- if(document.hidden||window.speechSynthesis?.speaking||currentAudio&&!currentAudio.ended&&!currentAudio.paused){scheduleTeaching();return}
+ if(document.hidden||window.KidsVoice?.speaking||currentAudio&&!currentAudio.ended&&!currentAudio.paused){scheduleTeaching();return}
  teachIndex++;if(teachIndex<lesson.length)showTeaching();else{cancelTeaching();round=0;renderRound()}
  },5500)}
 
@@ -63,15 +63,15 @@ function repeatTeaching(){
  if(window.KOKORO_CLIPS?.[name])say(name,()=>namedAnimalCall(name));
  else{
   stop();
-  if(!quiet&&!document.hidden&&window.speechSynthesis&&window.SpeechSynthesisUtterance){
-   const ticket=voiceTicket;const utterance=new window.SpeechSynthesisUtterance(name+'!');
-   const voices=window.speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang));
+  if(!quiet&&!document.hidden&&window.KidsVoice&&window.KidsVoice.Utterance){
+   const ticket=voiceTicket;const utterance=new window.KidsVoice.Utterance(name+'!');
+   const voices=window.KidsVoice.getVoices().filter(v=>/^en[-_]/i.test(v.lang));
    const friendly=voices.find(v=>/Aria|Jenny|Samantha|Google US English|Sonia|Karen/i.test(v.name))||voices.find(v=>/Natural|Neural|Online/i.test(v.name))||voices.find(v=>v.default)||voices[0];
    if(friendly)utterance.voice=friendly;
    utterance.lang=friendly?.lang||'en-US';utterance.rate=.96;utterance.pitch=1.18;sound.duck(true);
    utterance.onend=()=>{if(ticket===voiceTicket){sound.duck(false);namedAnimalCall(name)}};
    utterance.onerror=()=>{if(ticket===voiceTicket){audioNotice();namedAnimalCall(name)}};
-   window.speechSynthesis.speak(utterance);
+   window.KidsVoice.speak(utterance);
   }else if(!quiet){audioNotice();namedAnimalCall(name)}
  }
  scheduleTeaching();
@@ -130,12 +130,12 @@ function startFindIntro(){
  introTimer=setTimeout(jingle,9000);
  if(quiet){clearTimeout(introTimer);introTimer=setTimeout(jingle,1800)}
  else if(window.KOKORO_CLIPS?.[welcome])say(welcome,jingle);
- else if(window.speechSynthesis&&window.SpeechSynthesisUtterance){
-  const u=new window.SpeechSynthesisUtterance(welcome);
-  const voices=window.speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang));
+ else if(window.KidsVoice&&window.KidsVoice.Utterance){
+  const u=new window.KidsVoice.Utterance(welcome);
+  const voices=window.KidsVoice.getVoices().filter(v=>/^en[-_]/i.test(v.lang));
   const voice=voices.find(v=>/Aria|Jenny|Samantha|Google US English|Sonia|Karen/i.test(v.name))||voices.find(v=>/Natural|Neural|Online/i.test(v.name))||voices[0];
   if(voice)u.voice=voice;u.lang=voice?.lang||'en-US';u.rate=.94;u.pitch=1.15;
-  u.onend=jingle;u.onerror=jingle;window.speechSynthesis.speak(u);
+  u.onend=jingle;u.onerror=jingle;window.KidsVoice.speak(u);
  }else{clearTimeout(introTimer);introTimer=setTimeout(jingle,2500)}
 }
 

@@ -42,11 +42,11 @@ prepareTasks();
 
 const room=document.createElement('dialog');room.id='mountain-quest';room.setAttribute('aria-label','Maya’s discovery world');document.body.append(room);
 function save(){journal.world=world;journal.states[world]={...state};try{localStorage.setItem(WORLD_KEY,JSON.stringify(journal));if(world===0)localStorage.setItem(KEY,JSON.stringify(state))}catch{}}
-function stop(){epoch++;if(clip){clip.pause();clip=null}speechSynthesis?.cancel();voice=null}
+function stop(){epoch++;if(clip){clip.pause();clip=null}KidsVoice?.cancel();voice=null}
 function say(text,animal){stop();if($('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;const id=epoch;
 const finish=()=>{if(id!==epoch||!room.open||!animal)return;clip=new Audio('animal-sounds/'+animal+'.mp3');clip.play().catch(()=>{})};
 const src=window.KOKORO_CLIPS?.[text];if(src){clip=new Audio(src);clip.onended=finish;clip.onerror=()=>fallback();clip.play().catch(fallback)}else fallback();
-function fallback(){if(id!==epoch||!window.speechSynthesis)return;voice=new SpeechSynthesisUtterance(text);voice.lang='en-GB';voice.rate=.82;voice.onend=finish;window.speechSynthesis.speak(voice)}}
+function fallback(){if(id!==epoch||!window.KidsVoice)return;voice=new KidsVoice.Utterance(text);voice.lang='en-GB';voice.rate=.82;voice.onend=finish;window.KidsVoice.speak(voice)}}
 function art(n){const extra=window.FindExtraArt(n);if(extra)return extra;
 if(['cat','cow','duck','dog','sheep','pig'].includes(n))return window.KidsBridge.animalArt(n);
 if(['umbrella','key','door','book','tree','cup','spoon','flower','cloud','shoe','lamp'].includes(n))return window.ObjectsPlayhouseArt.svg(n);

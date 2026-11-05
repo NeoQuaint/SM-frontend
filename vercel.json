@@ -28,6 +28,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/kokoro",
+      "destination": "https://smartclass-wlgb.onrender.com/api/neo/speak"
+    },
+    {
       "source": "/kids",
       "destination": "/kids.html"
     },

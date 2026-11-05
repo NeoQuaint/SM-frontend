@@ -7,9 +7,9 @@ let completed=[];try{const stored=JSON.parse(localStorage.getItem(key)||'[]');if
 let index=0,placed=[],tiles=[],selected=null,drag=null,voice=null,ticket=0,lastFocus=null;
 const room=document.createElement('dialog');room.id='spelling-puzzles';room.setAttribute('aria-label','Spelling Bee letter puzzles');document.body.append(room);
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
-function stop(){ticket++;if(voice){voice.pause();voice=null}window.speechSynthesis?.cancel()}
+function stop(){ticket++;if(voice){voice.pause();voice=null}window.KidsVoice?.cancel()}
 function speak(text){stop();if($('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;const own=ticket;const clip=window.KOKORO_CLIPS?.[text]||window.KOKORO_CLIPS?.[text.toLowerCase().replace(/\.$/,'')];if(clip){voice=new Audio(clip);voice.play().catch(()=>fallback(text,own))}else fallback(text,own)}
-function fallback(text,own){if(own!==ticket||!window.speechSynthesis)return;const u=new SpeechSynthesisUtterance(text);u.lang='en-GB';u.rate=.8;speechSynthesis.speak(u)}
+function fallback(text,own){if(own!==ticket||!window.KidsVoice)return;const u=new KidsVoice.Utterance(text);u.lang='en-GB';u.rate=.8;KidsVoice.speak(u)}
 function announce(text){const el=room.querySelector('.sp-feedback');if(el)el.textContent=text}
 function open(){lastFocus=document.activeElement;window.KidsBridge.stop();window.KidsLearning.cancel();window.KidsSpelling.cancel();window.KidsSound.close();index=Math.max(0,words.findIndex(w=>!completed.includes(w[0])));document.body.classList.add('sp-open');if(!room.open)room.showModal();start(index)}
 function close(){clearDrag();stop();room.close();document.body.classList.remove('sp-open');lastFocus?.focus()}
