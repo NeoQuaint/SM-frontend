@@ -14,8 +14,9 @@ function confidence(n){const recent=history.filter(e=>e.number===n).slice(-2);le
 function readyThrough(n){return Array.from({length:n},(_,i)=>i+1).every(i=>confidence(i)>=2)}
 function updateUnlock(){if(readyThrough(5))unlocked=Math.max(unlocked,10);if(readyThrough(10))unlocked=20;try{localStorage.setItem(unlockKey,String(unlocked))}catch{}}
 updateUnlock();
-function stopIntro(){window.CocoLessonMusic?.stop()}
-function playIntro(){window.CocoLessonMusic?.welcome()}
+let cocoWelcome=null;
+function stopIntro(){if(cocoWelcome){cocoWelcome.pause();cocoWelcome=null}window.CocoLessonMusic?.stop()}
+function playIntro(){stopIntro();window.CocoLessonMusic?.welcome();if(muted()||document.hidden)return;const a=new Audio('coco-welcome.mp3');cocoWelcome=a;a.volume=.9;window.CocoLessonMusic?.duck(true);const done=()=>{if(cocoWelcome===a){cocoWelcome=null;window.CocoLessonMusic?.duck(false)}};a.onended=done;a.onerror=done;a.play().catch(done)}
 
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 function muted(){return $('#sound')?.getAttribute('aria-pressed')==='false'}
