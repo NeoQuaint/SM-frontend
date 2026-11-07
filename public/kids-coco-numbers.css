@@ -145,3 +145,7 @@ body.reduced #coco-numbers *{animation:none!important;transition:none!important}
 #coco-numbers[data-screen=teaching] .cn-scene-content:has(.cn-teach-garden[hidden]) h1{position:absolute;top:48px;left:0;width:100%;margin:0;padding:0 18px;text-align:center}
 #coco-numbers[data-screen=teaching] .cn-scene-content:has(.cn-teach-garden[hidden]) .cn-teach-number{font-size:clamp(190px,38vw,300px);line-height:1;margin:0;width:100%;text-align:center}
 #coco-numbers .cn-meet-number{font-size:clamp(190px,38vw,280px)!important;transform:none;text-align:center;padding:0;margin:0 auto}
+
+#coco-numbers [data-number="1"]{--number-colour:#ec3c43}#coco-numbers [data-number="2"]{--number-colour:#2475df}#coco-numbers [data-number="3"]{--number-colour:#259c51}#coco-numbers [data-number="4"]{--number-colour:#f4c51d}#coco-numbers [data-number="5"]{--number-colour:#ee6baa}
+#coco-numbers .cn-teach-number[data-number],#coco-numbers .cn-number-book .cn-meet-number{color:var(--number-colour)!important;text-shadow:0 2px 1px #0002}
+#coco-numbers .cn-number-book .cn-draw-demo,#coco-numbers .cn-number-book .cn-child-ink path{stroke:var(--number-colour)}
