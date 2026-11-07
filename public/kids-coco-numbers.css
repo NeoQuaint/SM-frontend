@@ -149,3 +149,5 @@ body.reduced #coco-numbers *{animation:none!important;transition:none!important}
 #coco-numbers [data-number="1"]{--number-colour:#ec3c43}#coco-numbers [data-number="2"]{--number-colour:#2475df}#coco-numbers [data-number="3"]{--number-colour:#259c51}#coco-numbers [data-number="4"]{--number-colour:#f4c51d}#coco-numbers [data-number="5"]{--number-colour:#ee6baa}
 #coco-numbers .cn-teach-number[data-number],#coco-numbers .cn-number-book .cn-meet-number{color:var(--number-colour)!important;text-shadow:0 2px 1px #0002}
 #coco-numbers .cn-number-book .cn-draw-demo,#coco-numbers .cn-number-book .cn-child-ink path{stroke:var(--number-colour)}
+
+.cn-apple-question{gap:20px}.cn-apple-question h1{font-size:clamp(26px,6vw,38px)!important;text-align:center;margin:0!important}.cn-apple-question .cn-apple-row button{animation:none}.cn-apple-answers{margin:0!important;gap:24px!important}.cn-apple-answers button{color:var(--number-colour)!important;min-width:80px;min-height:85px}.cn-apple-feedback{min-height:48px;text-align:center;margin:0}.cn-apple-tick{color:#16a653;font-size:50px;font-weight:900;line-height:1}
