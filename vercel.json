@@ -36,7 +36,7 @@
       "destination": "/kids.html"
     },
     {
-      "source": "/((?!.*\\.).*)",
+      "source": "/((?!api/)(?!.*\\.).*)",
       "destination": "/index.html"
     }
   ],
@@ -54,5 +54,10 @@
         }
       ]
     }
-  ]
+  ],
+  "functions": {
+    "api/trace-check.js": {
+      "maxDuration": 20
+    }
+  }
 }
