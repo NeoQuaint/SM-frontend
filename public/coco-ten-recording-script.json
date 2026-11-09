@@ -1,0 +1,177 @@
+{
+  "note": "Recording plan. Current app narration is used until files are supplied. Existing correct/retry clips are reused.",
+  "lines": [
+    {
+      "file": "ten-welcome.mp3",
+      "text": "Hello, little gardener! Let’s count to five together."
+    },
+    {
+      "file": "count-1.mp3",
+      "text": "One."
+    },
+    {
+      "file": "count-2.mp3",
+      "text": "Two."
+    },
+    {
+      "file": "count-3.mp3",
+      "text": "Three."
+    },
+    {
+      "file": "count-4.mp3",
+      "text": "Four."
+    },
+    {
+      "file": "count-5.mp3",
+      "text": "Five."
+    },
+    {
+      "file": "count-6.mp3",
+      "text": "Six."
+    },
+    {
+      "file": "count-7.mp3",
+      "text": "Seven."
+    },
+    {
+      "file": "count-8.mp3",
+      "text": "Eight."
+    },
+    {
+      "file": "count-9.mp3",
+      "text": "Nine."
+    },
+    {
+      "file": "count-10.mp3",
+      "text": "Ten."
+    },
+    {
+      "file": "meet-6.mp3",
+      "text": "This is six. Say it with me. Six!"
+    },
+    {
+      "file": "grow-6.mp3",
+      "text": "Let’s grow 6 flowers. Count with me."
+    },
+    {
+      "file": "flowers-6.mp3",
+      "text": "6 flowers! Each flower has its own space."
+    },
+    {
+      "file": "write-6.mp3",
+      "text": "Let’s write six. Follow the dots."
+    },
+    {
+      "file": "meet-7.mp3",
+      "text": "This is seven. Say it with me. Seven!"
+    },
+    {
+      "file": "grow-7.mp3",
+      "text": "Let’s grow 7 flowers. Count with me."
+    },
+    {
+      "file": "flowers-7.mp3",
+      "text": "7 flowers! Each flower has its own space."
+    },
+    {
+      "file": "write-7.mp3",
+      "text": "Let’s write seven. Follow the dots."
+    },
+    {
+      "file": "meet-8.mp3",
+      "text": "This is eight. Say it with me. Eight!"
+    },
+    {
+      "file": "grow-8.mp3",
+      "text": "Let’s grow 8 flowers. Count with me."
+    },
+    {
+      "file": "flowers-8.mp3",
+      "text": "8 flowers! Each flower has its own space."
+    },
+    {
+      "file": "write-8.mp3",
+      "text": "Let’s write eight. Follow the dots."
+    },
+    {
+      "file": "meet-9.mp3",
+      "text": "This is nine. Say it with me. Nine!"
+    },
+    {
+      "file": "grow-9.mp3",
+      "text": "Let’s grow 9 flowers. Count with me."
+    },
+    {
+      "file": "flowers-9.mp3",
+      "text": "9 flowers! Each flower has its own space."
+    },
+    {
+      "file": "write-9.mp3",
+      "text": "Let’s write nine. Follow the dots."
+    },
+    {
+      "file": "meet-10.mp3",
+      "text": "This is ten. Say it with me. Ten!"
+    },
+    {
+      "file": "grow-10.mp3",
+      "text": "Let’s grow 10 flowers. Count with me."
+    },
+    {
+      "file": "flowers-10.mp3",
+      "text": "10 flowers! Each flower has its own space."
+    },
+    {
+      "file": "write-10.mp3",
+      "text": "This is ten. Write one, then zero. Together, ten!"
+    },
+    {
+      "file": "picnic-6.mp3",
+      "text": "Give Coco 6 strawberries. Tap or drag them into the basket. Tap the tick when you are ready."
+    },
+    {
+      "file": "picnic-8.mp3",
+      "text": "Give Coco 8 strawberries. Tap or drag them into the basket. Tap the tick when you are ready."
+    },
+    {
+      "file": "picnic-10.mp3",
+      "text": "Give Coco 10 strawberries. Tap or drag them into the basket. Tap the tick when you are ready."
+    },
+    {
+      "file": "find-butterflies-7.mp3",
+      "text": "Find 7 butterflies. Tap the matching group."
+    },
+    {
+      "file": "find-butterflies-6.mp3",
+      "text": "Find 6 butterflies. Tap the matching group."
+    },
+    {
+      "file": "find-butterflies-8.mp3",
+      "text": "Find 8 butterflies. Tap the matching group."
+    },
+    {
+      "file": "count-butterflies.mp3",
+      "text": "How many butterflies do you see? Tap the number."
+    },
+    {
+      "file": "ten-recount.mp3",
+      "text": "Let’s count together. We can try again."
+    },
+    {
+      "file": "ten-party.mp3",
+      "text": "You made the party! Pick a number and see what appears."
+    },
+    {
+      "file": "ten-party-pick.mp3",
+      "text": "Pick a number and see what appears."
+    },
+    {
+      "file": "ten-write-replay.mp3",
+      "text": "Write one, then zero. Together, ten!"
+    },
+    {
+      "file": "ten-complete.mp3",
+      "text": "Hooray! You explored numbers one to ten. What a wonderful garden party!"
+    }
+  ]
+}
