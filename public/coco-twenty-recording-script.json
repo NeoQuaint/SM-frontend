@@ -87,8 +87,15 @@
   ],
   "tracing": "Let’s write [number]. First [first digit], then [second digit]. Together, [number]!",
   "quantities": "Here are [number] apples. Let’s count them together.",
-  "transition": "Choo choo! The sun is setting. Our next stop is sixteen to twenty!",
-  "windowDemo": "Watch me light the first window. Then it is your turn!",
-  "windows": "Tap the glowing star. Let’s light [twelve / fifteen / twenty] windows!",
-  "completion": "You finished the one to twenty train adventure! See you on the next one!"
+  "transition": "Choo choo! The sun is setting. Next stop, the ocean! Let’s discover sixteen to twenty.",
+  "completion": "You finished the one to twenty adventure! See you on the next one!",
+  "chapters": "Train teaching and tracing: 11–15. Optional continuation to ocean teaching, bubbles and exploration: 16–20. No tracing or mandatory quiz in the ocean.",
+  "chapterEnd": "You explored eleven to fifteen! Shall we visit the ocean, or finish for now?",
+  "ocean": {
+    "quantities": "Here are ten fish. Watch the next fish join them.",
+    "total": "[Sixteen / Seventeen / Eighteen / Nineteen / Twenty] fish altogether!",
+    "demo": "Watch this bubble. Sixteen!",
+    "bubble": "Your turn! Tap a glowing bubble.",
+    "explore": "Pick any number and see its fish! Tap the tick when you are ready to finish."
+  }
 }
