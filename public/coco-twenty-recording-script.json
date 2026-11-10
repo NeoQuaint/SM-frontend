@@ -91,9 +91,9 @@
   "chapters": "Train introductions and tracing: 11–15. Optional continuation to night-time block teaching and building, then tracing 16–20.",
   "chapterEnd": "You explored eleven to fifteen! Shall we build with sixteen to twenty, or finish for now?",
   "building": {
-    "intro": "Look! Ten blocks, in two rows of five. Let’s build higher together!",
-    "total": "[Sixteen / Seventeen / Eighteen / Nineteen / Twenty] blocks!",
-    "play": "Here are fifteen blocks. Tap the block to add the next one!",
-    "castle": "Twenty blocks! You built a glowing castle! Now let’s trace sixteen to twenty."
+    "intro": "Watch the colourful blocks fall into place!",
+    "play": "Your turn! Tap to drop the next block.",
+    "completion": "Twenty! What a beautiful building! Now let’s trace sixteen to twenty.",
+    "counts": "Only sixteen, seventeen, eighteen, nineteen, twenty. The lower fifteen blocks are already in place."
   }
 }
