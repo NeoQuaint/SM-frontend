@@ -1,0 +1,94 @@
+{
+  "note": "Temporary narration. Exact lines can be mapped in CocoTwentyVoiceClips when recordings arrive.",
+  "welcome": "All aboard, my little friend! Let’s take the number train to twenty!",
+  "counts": [
+    {
+      "number": 11,
+      "file": "11.mp3"
+    },
+    {
+      "number": 12,
+      "file": "12.mp3"
+    },
+    {
+      "number": 13,
+      "file": "13.mp3"
+    },
+    {
+      "number": 14,
+      "file": "14.mp3"
+    },
+    {
+      "number": 15,
+      "file": "15.mp3"
+    },
+    {
+      "number": 16,
+      "file": "16.mp3"
+    },
+    {
+      "number": 17,
+      "file": "17.mp3"
+    },
+    {
+      "number": 18,
+      "file": "18.mp3"
+    },
+    {
+      "number": 19,
+      "file": "19.mp3"
+    },
+    {
+      "number": 20,
+      "file": "20.mp3"
+    }
+  ],
+  "introductions": [
+    {
+      "number": 11,
+      "text": "This is 11. Say it with me. 11!"
+    },
+    {
+      "number": 12,
+      "text": "This is 12. Say it with me. 12!"
+    },
+    {
+      "number": 13,
+      "text": "This is 13. Say it with me. 13!"
+    },
+    {
+      "number": 14,
+      "text": "This is 14. Say it with me. 14!"
+    },
+    {
+      "number": 15,
+      "text": "This is 15. Say it with me. 15!"
+    },
+    {
+      "number": 16,
+      "text": "This is 16. Say it with me. 16!"
+    },
+    {
+      "number": 17,
+      "text": "This is 17. Say it with me. 17!"
+    },
+    {
+      "number": 18,
+      "text": "This is 18. Say it with me. 18!"
+    },
+    {
+      "number": 19,
+      "text": "This is 19. Say it with me. 19!"
+    },
+    {
+      "number": 20,
+      "text": "This is 20. Say it with me. 20!"
+    }
+  ],
+  "tracing": "Let’s write [number]. First [first digit], then [second digit]. Together, [number]!",
+  "quantities": "Here are [number] apples. Let’s count them together.",
+  "transition": "Choo choo! The sun is setting. Our next stop is sixteen to twenty!",
+  "windowDemo": "Watch me light the first window. Then it is your turn!",
+  "windows": "Tap the glowing star. Let’s light [twelve / fifteen / twenty] windows!",
+  "completion": "You finished the one to twenty train adventure! See you on the next one!"
+}
