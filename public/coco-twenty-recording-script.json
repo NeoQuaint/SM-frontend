@@ -87,15 +87,13 @@
   ],
   "tracing": "Let’s write [number]. First [first digit], then [second digit]. Together, [number]!",
   "quantities": "Here are [number] apples. Let’s count them together.",
-  "transition": "Choo choo! The sun is setting. Next stop, the ocean! Let’s discover sixteen to twenty.",
   "completion": "You finished the one to twenty adventure! See you on the next one!",
-  "chapters": "Train teaching and tracing: 11–15. Optional continuation to ocean teaching, bubbles and exploration: 16–20. No tracing or mandatory quiz in the ocean.",
-  "chapterEnd": "You explored eleven to fifteen! Shall we visit the ocean, or finish for now?",
-  "ocean": {
-    "quantities": "Here are ten fish. Watch the next fish join them.",
-    "total": "[Sixteen / Seventeen / Eighteen / Nineteen / Twenty] fish altogether!",
-    "demo": "Watch this bubble. Sixteen!",
-    "bubble": "Your turn! Tap a glowing bubble.",
-    "explore": "Pick any number and see its fish! Tap the tick when you are ready to finish."
+  "chapters": "Train introductions and tracing: 11–15. Optional continuation to night-time block teaching and building, then tracing 16–20.",
+  "chapterEnd": "You explored eleven to fifteen! Shall we build with sixteen to twenty, or finish for now?",
+  "building": {
+    "intro": "Look! Ten blocks, in two rows of five. Let’s build higher together!",
+    "total": "[Sixteen / Seventeen / Eighteen / Nineteen / Twenty] blocks!",
+    "play": "Here are fifteen blocks. Tap the block to add the next one!",
+    "castle": "Twenty blocks! You built a glowing castle! Now let’s trace sixteen to twenty."
   }
 }
