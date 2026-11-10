@@ -12,3 +12,5 @@
 .tt-ocean .tt-ocean-numbers button{color:#27586c!important}.tt-ocean .tt-content{z-index:1}.tt-ocean .tt-world:after{z-index:0;font-size:42px;bottom:0;transform:none}
 
 .tt-station-number{opacity:0;transform:scale(.85);transition:opacity .3s,transform .4s}.tt-station-number.is-introduced{opacity:1;transform:scale(1)}.tt-station .tt-train i,.tt-station .tt-steam{animation-play-state:paused}.tt-station-moving .tt-train i,.tt-station-moving .tt-steam{animation-play-state:running;animation-duration:.65s}.tt-pie-sector{fill:var(--slice-colour,#ffd34e);stroke:var(--slice-colour,#ffd34e)}@media(prefers-reduced-motion:reduce){.tt-station-number{transition:none}}
+
+#coco-numbers.tt-active .cn-number-book{--number-colour:#9551e8}#coco-numbers.tt-active .cn-number-book[data-number="11"]{--number-colour:#ec3c43}#coco-numbers.tt-active .cn-number-book[data-number="12"]{--number-colour:#2475df}#coco-numbers.tt-active .cn-number-book[data-number="13"]{--number-colour:#259c51}#coco-numbers.tt-active .cn-number-book[data-number="14"]{--number-colour:#c69500}#coco-numbers.tt-active .cn-number-book[data-number="15"]{--number-colour:#df559d}
