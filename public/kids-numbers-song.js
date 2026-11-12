@@ -11,9 +11,9 @@ function show(i){if(current===i)return;current=i;room.style.setProperty('--ns-bg
 function progress(){if(!audio)return;let i=-1;while(i+1<cues.length&&audio.currentTime>=cues[i+1])i++;show(i);const d=audio.duration;$('.ns-seek').disabled=!Number.isFinite(d)||d<=START;$('.ns-seek').value=Number.isFinite(d)&&d>START?Math.max(0,(audio.currentTime-START)/(d-START)*100):0}
 function tick(){cancelAnimationFrame(frame);progress();if(audio&&!audio.paused)frame=requestAnimationFrame(tick)}
 function stop(){cancelAnimationFrame(frame);if(audio){audio.pause();audio.onended=null;audio=null}room.classList.remove('ns-playing')}
-function play(){audio?.play().catch(()=>{if(room.open)$('.ns-status').textContent='Tap play to start.'})}
+function play(){if(window.SmartClassMembership?.begin('singalong','numbers')===false)return;audio?.play().catch(()=>{if(room.open)$('.ns-status').textContent='Tap play to start.'})}
 function restart(){if(!audio)return;if(audio.error)audio.load();audio.currentTime=START;progress();play()}
-function open(){stop();window.KidsBridge?.stop();window.KidsSound?.close();current=-2;
+function open(){if(window.SmartClassMembership?.begin('singalong','numbers')===false)return;stop();window.KidsBridge?.stop();window.KidsSound?.close();current=-2;
 room.innerHTML='<header><button data-ns="back" aria-label="Back to song categories">←</button><strong>Numbers</strong><button data-ns="mute" aria-label="Mute song">🔊</button></header><main><div class="ns-art"></div><p class="ns-count"></p></main><footer><div class="ns-buttons"><button data-ns="restart" aria-label="Restart song">↻</button><button data-ns="play" aria-label="Play song">▶</button><span aria-hidden="true">♫</span></div><input class="ns-seek" type="range" min="0" max="100" step=".1" value="0" disabled aria-label="Song position"><p class="ns-status" role="status"></p></footer>';
 room.showModal();show(-1);audio=new Audio('numbers-remix.mp3');audio.volume=.8;audio.muted=muted;
 const mute=$('[data-ns="mute"]');mute.textContent=muted?'🔇':'🔊';mute.setAttribute('aria-label',muted?'Unmute song':'Mute song');
@@ -22,7 +22,7 @@ audio.currentTime=START;
 audio.onplay=()=>{room.classList.add('ns-playing');$('[data-ns="play"]').textContent='Ⅱ';$('[data-ns="play"]').setAttribute('aria-label','Pause song');$('.ns-status').textContent='';tick()};
 audio.onpause=()=>{cancelAnimationFrame(frame);room.classList.remove('ns-playing');$('[data-ns="play"]').textContent='▶';$('[data-ns="play"]').setAttribute('aria-label','Play song')};
 audio.ontimeupdate=progress;audio.onseeked=progress;
-audio.onended=()=>{window.KidsProgress?.explore('sing','Numbers song reached the end');$('.ns-status').textContent='Again? Tap play!'};
+audio.onended=()=>{window.KidsProgress?.complete('sing','Numbers song');$('.ns-status').textContent='Again? Tap play!'};
 audio.onerror=()=>{$('.ns-status').textContent='Could not load the song. Tap replay to try again.'};
 play()}
 room.addEventListener('click',e=>{const action=e.target.closest('[data-ns]')?.dataset.ns;if(action==='back'){room.close();return}if(!audio)return;if(action==='play'){if(audio.paused){if(audio.ended)restart();else play()}else audio.pause()}if(action==='restart')restart();if(action==='mute'){muted=!muted;audio.muted=muted;const b=$('[data-ns="mute"]');b.textContent=muted?'🔇':'🔊';b.setAttribute('aria-label',muted?'Unmute song':'Mute song')}});
