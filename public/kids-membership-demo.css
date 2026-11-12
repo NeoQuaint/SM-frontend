@@ -9,3 +9,5 @@
 
 #cards [data-path]:has(.mp-card-status.included)>.arrow{display:none}
 @media(max-width:650px){#cards .mp-card-status.included{inset:auto 15px 19px auto!important;width:18px!important;height:18px!important;font-size:12px!important}}
+
+.mp-hero-membership{display:flex;justify-content:flex-end;margin:0 0 8px;min-height:46px}.mp-hero-membership .mp-dashboard-badge{background:#fff;border-color:#e6d7f6;box-shadow:0 3px 12px #8960b111}.in-room .mp-hero-membership{display:none}
