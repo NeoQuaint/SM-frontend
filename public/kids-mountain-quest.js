@@ -20,7 +20,7 @@ const mountainTasks=[
 ['cup','We reached the picnic spot! What can Juppy drink water from?',['spoon','cup','book'],'Find the cup with a handle.','A cup for Juppy. He is so happy to see us!','Object uses'],
 ['flower','One last discovery. What has petals and grows beside our picnic?',['tree','flower','cloud'],'Look for the colourful flower. We can enjoy it where it grows.','You found the flower! We made it to Juppy together.','Nature clues']
 ];
-let freeFlow=false,flowPaused=false,flowTimer=null,flowSnapshot=null;
+let freeFlow=false,flowPaused=false,flowTimer=null,flowSnapshot=null,flowOpeningWalk=false;
 let state={step:0,solved:false},screen='map',voice=null,clip=null,tripSong=null,epoch=0,lastFocus=null;
 try{const v=JSON.parse(localStorage.getItem(KEY));if(v&&Number.isInteger(v.step)&&v.step>=0&&v.step<=15)state={step:v.step,solved:!!v.solved}}catch{}
 
@@ -100,11 +100,17 @@ function queueFlowAnswer(){
  flowTimer=setTimeout(()=>{if(freeFlow&&!flowPaused&&id===epoch&&!document.hidden)answer(target)},1400);
  },1800);
 }
-function restoreFreeFlow(){clearTimeout(flowTimer);flowTimer=null;if(!freeFlow)return;freeFlow=false;flowPaused=false;room.classList.remove('mq-free-flow','mq-flow-paused');if(flowSnapshot){({world,state,journal,helped}=flowSnapshot);flowSnapshot=null;prepareTasks()}}
+function restoreFreeFlow(){clearTimeout(flowTimer);flowTimer=null;if(!freeFlow)return;freeFlow=false;flowPaused=false;flowOpeningWalk=false;room.classList.remove('mq-free-flow','mq-flow-paused');if(flowSnapshot){({world,state,journal,helped}=flowSnapshot);flowSnapshot=null;prepareTasks()}}
 function flowCountdown(){stop();screen='countdown';let number=3;
  room.innerHTML=header()+'<main class="mq-flow-countdown">'+scene(0)+'<img src="maya-pointing-summit.png" alt="Maya is ready to explore"><div><span>Free Flow</span><strong role="status" aria-live="polite">3</strong></div></main>';
- const count=()=>{if(!freeFlow||flowPaused||document.hidden||!room.open)return;number--;if(number){room.querySelector('.mq-flow-countdown strong').textContent=number;flowTimer=setTimeout(count,1000)}else{render();say(tasks[0][1],tasks[0][6])}};
+ const count=()=>{if(!freeFlow||flowPaused||document.hidden||!room.open)return;number--;if(number){room.querySelector('.mq-flow-countdown strong').textContent=number;flowTimer=setTimeout(count,1000)}else flowIntroduction()};
  flowTimer=setTimeout(count,1000);
+}
+function beginFlowWalk(){if(!freeFlow||flowPaused||document.hidden)return;flowOpeningWalk=true;travel('walk',()=>{flowOpeningWalk=false;render();say(tasks[0][1],tasks[0][6])})}
+function flowIntroduction(){
+ map();screen='flow-intro';
+ say('Hi, explorer! I’m Maya! Come explore with me!',null,()=>{if(welcomeInstrumental)welcomeInstrumental.volume=.65;flowTimer=setTimeout(beginFlowWalk,5000)},'find-maya-welcome.mp3');
+ if($('#sound')?.getAttribute('aria-pressed')!=='false'&&!document.hidden){welcomeInstrumental=new Audio('find-welcome-jingle.wav');welcomeInstrumental.volume=.18;welcomeInstrumental.play().catch(()=>{})}
 }
 function startFreeFlow(){
  if(window.SmartClassMembership?.begin('find','0')===false)return;
@@ -118,7 +124,7 @@ function startFreeFlow(){
  P()?.explore('find','Free Flow · watching Mountain Picnic');flowCountdown();
 }
 function pauseFlow(){if(!freeFlow)return;flowPaused=true;room.classList.add('mq-flow-paused');stop();cancelTravel();const b=room.querySelector('[data-mq="flow-pause"]');if(b){b.textContent='▶';b.setAttribute('aria-label','Resume Free Flow')}}
-function resumeFlow(){if(!freeFlow)return;flowPaused=false;room.classList.remove('mq-flow-paused');if(screen==='countdown'){flowCountdown();return}if(screen==='finish'){playTripSong()}else if(screen==='checkpoint'){mountainCheckpoint()}else{screen='play';render();if(state.solved)next();else say(tasks[state.step][1],tasks[state.step][6])}const b=room.querySelector('[data-mq="flow-pause"]');if(b){b.textContent='Ⅱ';b.setAttribute('aria-label','Pause Free Flow')}}
+function resumeFlow(){if(!freeFlow)return;flowPaused=false;room.classList.remove('mq-flow-paused');if(screen==='countdown'){flowCountdown();return}if(screen==='flow-intro'){flowIntroduction();return}if(flowOpeningWalk){beginFlowWalk();return}if(screen==='finish'){playTripSong()}else if(screen==='checkpoint'){mountainCheckpoint()}else{screen='play';render();if(state.solved)next();else say(tasks[state.step][1],tasks[state.step][6])}const b=room.querySelector('[data-mq="flow-pause"]');if(b){b.textContent='Ⅱ';b.setAttribute('aria-label','Pause Free Flow')}}
 function header(){if(freeFlow)return '<header class="mq-header"><button data-mq="close" aria-label="Exit Free Flow">←</button><span>▶ Free Flow</span><button data-mq="flow-pause" aria-label="Pause Free Flow">Ⅱ</button></header>';return '<header class="mq-header"><button data-mq="close" aria-label="Save and return to playroom">←</button><span>Maya’s discovery world</span><button data-mq="map" aria-label="Journey map">⌁ Map</button></header>'}
 function open(){restoreFreeFlow();lastFocus=document.activeElement;window.KidsBridge.stop();window.KidsLearning?.cancel();window.KidsSound.close();document.body.classList.add('mq-open');if(!room.open)room.showModal();map();window.FindBackgroundMusic?.start(()=>({open:room.open,playing:['play','travel','checkpoint'].includes(screen),finale:screen==='finish',speaking:!!(voice||(clip&&!clip.paused))}));if($('#sound')?.getAttribute('aria-pressed')!=='false'&&!document.hidden){welcomeInstrumental=new Audio('find-welcome-jingle.wav');const bed=welcomeInstrumental;bed.volume=.18;bed.play().catch(()=>{});clip=new Audio('find-maya-welcome.mp3');clip.volume=.9;const restoreMusic=()=>{if(welcomeInstrumental===bed){bed.volume=.65;scheduleAutoStart()}};clip.onended=restoreMusic;clip.onerror=restoreMusic;clip.play().catch(restoreMusic)}else scheduleAutoStart()}
 function close(){window.FindBackgroundMusic?.stop();cancelTravel();stop();save();room.close();restoreFreeFlow();document.body.classList.remove('mq-open');lastFocus?.focus()}
