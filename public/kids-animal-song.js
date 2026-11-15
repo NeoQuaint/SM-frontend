@@ -22,5 +22,5 @@ function open(){if(window.SmartClassMembership?.begin('singalong','animals')===f
 room.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-as-back'))room.close();if(b.hasAttribute('data-as-replay'))intro();if(b.hasAttribute('data-as-play')){if(stage==='done')intro();else if(audio?.paused)play();else audio?.pause()}if(b.hasAttribute('data-as-mute')){muted=!muted;if(audio)audio.muted=muted;b.textContent=muted?'🔇':'🔊'}});
 room.addEventListener('input',e=>{if(e.target.matches('.as-seek')&&stage==='song'&&Number.isFinite(audio?.duration)){audio.currentTime=audio.duration*Number(e.target.value)/100;current=-1;tick(true)}});
 room.addEventListener('close',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden)audio?.pause()});document.addEventListener('click',e=>{if(e.target.closest('[data-animal-song]'))open()});
-window.AnimalSingAlong={open};
+window.AnimalSingAlong={open,close(){stop();room.close()}};
 })();

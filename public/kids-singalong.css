@@ -24,3 +24,9 @@ body.sing-open{overflow:hidden}
 @keyframes sing-sway{from{transform:rotate(-6deg) translateY(0)}to{transform:rotate(6deg) translateY(-8px)}}
 @media(max-width:600px){.sing-groups{grid-template-columns:repeat(2,1fr);gap:15px}.sing-groups>button{border-radius:25px;gap:10px}.sing-group-art{font-size:42px}.sing-groups strong{font-size:21px}.sing-header{margin-bottom:20px}.sing-category-art{font-size:70px}.sing-player{padding:18px 10px}.sing-controls{gap:13px}.sing-track-list>button{font-size:20px!important}}
 @media(prefers-reduced-motion:reduce){.sing-playing .sing-dancer{animation:none}}.reduced .sing-dancer{animation:none!important}
+
+/* Feed controls stay separate from the song's playback and scrub controls. */
+dialog.sing-feed-active{overscroll-behavior:none;padding-bottom:calc(64px + env(safe-area-inset-bottom))!important}
+.sing-feed-nav{position:fixed;bottom:env(safe-area-inset-bottom,0px);left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:14px;z-index:20;background:#fffffff2;border-radius:24px 24px 0 0;padding:5px 16px;color:#674d77;white-space:nowrap;font:700 12px/1.2 system-ui}
+.sing-feed-nav button{width:44px!important;height:44px!important;min-width:44px;border:0!important;border-radius:50%;background:#eee3ff!important;color:#674d77!important;font:700 30px/1 system-ui!important;cursor:pointer;touch-action:manipulation}
+.sing-feed-nav button:focus-visible{outline:3px solid #8959b5;outline-offset:2px}

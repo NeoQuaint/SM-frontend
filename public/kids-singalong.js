@@ -9,7 +9,50 @@ async function save(song){const d=await db();try{await new Promise((res,rej)=>{c
 function stop(){if(audio){audio.pause();audio=null}if(url){URL.revokeObjectURL(url);url=null}room.classList.remove('sing-playing')}
 function header(title){return '<header class="sing-header"><button data-sing-back aria-label="'+(group?'Back to song categories':'Back to playroom')+'">←</button><h2>'+title+'</h2><span aria-hidden="true">♫</span></header>'}
 function library(){visit++;stop();group=null;room.innerHTML=header('Sing Along')+'<div class="sing-groups">'+groups.map(g=>'<button data-sing-group="'+g[0]+'" style="--song-colour:'+g[3]+'"><span class="sing-group-art" aria-hidden="true">'+g[2]+'</span><strong>'+g[1]+'</strong><span class="sing-note" aria-hidden="true">♪</span></button>').join('')+'</div>'}
-function songs(id){if(id==='numbers'){library();window.NumbersSingAlong.open();return}if(id==='family'){library();window.FamilySingAlong.open();return}if(id==='animals'){library();window.AnimalSingAlong.open();return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
+
+// One circular feed, using the original players and their recorded timing.
+let feed=null,lastSwitch=0;
+function playlist(){return [
+ {id:'animals',title:'Animals'}, {id:'family',title:'Family'},
+ {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet'},
+ ...saved.map(s=>({id:s.id,title:s.title,group:s.group})),
+ {id:'remix',title:'Kids Remix',group:'actions'}
+]}
+function leaveFeed(){const previous=feed;feed=null;if(!previous)return;
+ previous.el.classList.remove('sing-feed-active');previous.el.querySelector('.sing-feed-nav')?.remove();
+ if(previous.el===room)stop();
+ else if(previous.id==='abc'){window.KidsLearning.cancel();window.KidsBridge.stop();window.KidsSound.close();previous.el.close()}
+ else {const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong}[previous.id];api?.close()}
+}
+function openTrack(id){const track=playlist().find(t=>t.id===id);if(!track)return;
+ const unit=id;if(window.SmartClassMembership?.begin('singalong',unit)===false)return;
+ leaveFeed();stop();library();
+ const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong}[id];
+ if(api){api.open();attachFeed(id,document.getElementById({animals:'animal-song',family:'family-song',numbers:'numbers-song'}[id]))}
+ else if(id==='abc'){window.KidsLearning.singAlphabet();attachFeed(id,document.getElementById('game'))}
+ else {group=groups.find(g=>g[0]===track.group);player(id)}
+}
+function stepSong(direction){if(!feed||performance.now()-lastSwitch<650)return;
+ const list=playlist(),index=list.findIndex(t=>t.id===feed.id);lastSwitch=performance.now();
+ openTrack(list[(index+direction+list.length)%list.length].id);
+}
+function attachFeed(id,el){if(!el?.open)return;feed={id,el};el.classList.add('sing-feed-active');
+ el.querySelector('.sing-feed-nav')?.remove();const nav=document.createElement('nav');nav.className='sing-feed-nav';nav.setAttribute('aria-label','Change song');
+ nav.innerHTML='<button type="button" data-feed-prev aria-label="Previous song">⌃</button><span>Swipe for songs</span><button type="button" data-feed-next aria-label="Next song">⌄</button>';el.append(nav);
+ nav.querySelector('[data-feed-prev]').onclick=()=>stepSong(-1);nav.querySelector('[data-feed-next]').onclick=()=>stepSong(1);
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches)el.animate([{opacity:.65,transform:'translateY(18px)'},{opacity:1,transform:'translateY(0)'}],{duration:230});
+ if(el.dataset.feedBound)return;el.dataset.feedBound='true';let touch=null,wheel=0,wheelTime=0;
+ const controls=target=>target.closest('button,input,select,textarea,a,nav');
+ el.addEventListener('touchstart',e=>{touch=e.touches.length===1&&!controls(e.target)?{x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true});
+ el.addEventListener('touchmove',e=>{if(feed?.el===el&&touch&&Math.abs(e.touches[0].clientY-touch.y)>12)e.preventDefault()},{passive:false});
+ el.addEventListener('touchend',e=>{if(feed?.el!==el||!touch)return;const dx=e.changedTouches[0].clientX-touch.x,dy=e.changedTouches[0].clientY-touch.y;touch=null;if(Math.abs(dy)>55&&Math.abs(dy)>Math.abs(dx)*1.25)stepSong(dy<0?1:-1)},{passive:true});
+ el.addEventListener('touchcancel',()=>{touch=null},{passive:true});
+ el.addEventListener('wheel',e=>{if(feed?.el!==el||controls(e.target)||Math.abs(e.deltaX)>Math.abs(e.deltaY))return;e.preventDefault();const now=performance.now();if(now-wheelTime>180)wheel=0;wheelTime=now;wheel+=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?innerHeight:1);if(Math.abs(wheel)>65){stepSong(wheel>0?1:-1);wheel=0}},{passive:false});
+ el.addEventListener('keydown',e=>{if(feed?.el!==el||controls(e.target))return;if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();stepSong(e.key==='ArrowDown'?1:-1)}});
+ el.addEventListener('close',()=>{if(feed?.el===el){feed=null;el.classList.remove('sing-feed-active');el.querySelector('.sing-feed-nav')?.remove()}});
+}
+
+function songs(id){if(['numbers','family','animals'].includes(id)){openTrack(id);return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
 room.innerHTML=header(g[1])+'<section class="sing-category" style="--song-colour:'+g[3]+'"><div class="sing-category-art" aria-hidden="true">'+g[2]+'</div><div class="sing-track-list">'+(id==='actions'?'<button data-sing-track="remix"><span>▶</span> Kids Remix</button>':'')+(id==='alphabet'?'<button data-sing-abc><span>♫</span> ABC melody & letter play</button>':'')+tracks.map(x=>'<button data-sing-track="'+x.id+'"><span>▶</span> '+esc(x.title)+'</button>').join('')+(!tracks.length&&!['actions','alphabet','animals'].includes(id)?'<div class="sing-empty"><span aria-hidden="true">🎶</span><p>A song is waiting to join us!</p><small>No song added yet.</small></div>':'')+'</div><details class="sing-grownups"><summary>Grown-ups: add a song</summary><p>Add your recording to '+g[1]+'. It stays in this browser on this device.</p><label class="sing-upload">Choose audio<input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg" id="sing-file"></label><p class="sing-save-status" role="status"></p></details></section>';
 }
 function player(id){if(window.SmartClassMembership?.begin('singalong',id)===false)return;currentSession=id;const song=id==='remix'?{title:'Kids Remix',src:'kids-remix.mp3'}:saved.find(x=>x.id===id);if(!song)return;stop();const g=group;room.innerHTML=header(g[1])+'<section class="sing-player" style="--song-colour:'+g[3]+'"><div class="sing-music-notes" aria-hidden="true">♪ ♫ ♪</div><div class="sing-dancer" aria-hidden="true">'+g[2]+'</div><h3>'+esc(song.title)+'</h3><div class="sing-controls"><button data-sing-restart aria-label="Restart song">↻</button><button data-sing-play aria-label="Pause song">Ⅱ</button><button data-sing-mute aria-label="Mute song">🔊</button></div><input class="sing-seek" type="range" min="0" max="100" value="0" aria-label="Song position"><p class="sing-play-status" role="status"></p></section>';
@@ -20,9 +63,10 @@ audio.ontimeupdate=()=>{const r=room.querySelector('.sing-seek');if(r&&Number.is
 audio.onended=()=>{window.KidsProgress?.complete('sing','Sing Along '+currentSession);room.classList.remove('sing-playing');room.querySelector('.sing-play-status').textContent='Again? Tap play!';room.querySelector('[data-sing-play]').textContent='▶'};
 audio.onerror=()=>{room.querySelector('.sing-play-status').textContent='This song could not play. Try another audio file.'};
 play();
+attachFeed(id,room);
 }
 function play(){if(window.SmartClassMembership?.begin('singalong',currentSession)===false)return;audio?.play().catch(()=>{const s=room.querySelector('.sing-play-status');if(s)s.textContent='Tap play to start.'})}
-room.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-sing-back')){if(room.querySelector('.sing-player'))songs(group[0]);else if(group)library();else room.close()}if(b.dataset.singGroup)songs(b.dataset.singGroup);if(b.dataset.singTrack)player(b.dataset.singTrack);if(b.hasAttribute('data-sing-abc')){room.close();window.KidsLearning.singAlphabet()}if(b.hasAttribute('data-sing-play')){if(audio.paused){if(audio.ended)audio.currentTime=0;play()}else audio.pause()}if(b.hasAttribute('data-sing-restart')&&audio){audio.currentTime=0;play()}if(b.hasAttribute('data-sing-mute')&&audio){audio.muted=!audio.muted;b.textContent=audio.muted?'🔇':'🔊';b.setAttribute('aria-label',audio.muted?'Unmute song':'Mute song')}});
+room.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-sing-back')){if(room.querySelector('.sing-player')){leaveFeed();library();}else if(group)library();else room.close()}if(b.dataset.singGroup)songs(b.dataset.singGroup);if(b.dataset.singTrack)player(b.dataset.singTrack);if(b.hasAttribute('data-sing-abc')){openTrack('abc')}if(b.hasAttribute('data-sing-play')){if(audio.paused){if(audio.ended)audio.currentTime=0;play()}else audio.pause()}if(b.hasAttribute('data-sing-restart')&&audio){audio.currentTime=0;play()}if(b.hasAttribute('data-sing-mute')&&audio){audio.muted=!audio.muted;b.textContent=audio.muted?'🔇':'🔊';b.setAttribute('aria-label',audio.muted?'Unmute song':'Mute song')}});
 room.addEventListener('input',e=>{if(e.target.matches('.sing-seek')&&audio&&Number.isFinite(audio.duration))audio.currentTime=audio.duration*Number(e.target.value)/100});
 room.addEventListener('change',async e=>{if(e.target.id!=='sing-file')return;const file=e.target.files[0],stamp=visit,currentGroup=group?.[0];if(!file||!currentGroup)return;const status=room.querySelector('.sing-save-status');if(file.size>30*1024*1024){status.textContent='Please choose audio smaller than 30 MB.';return}if(!file.type.startsWith('audio/')&&!/\.(mp3|wav|m4a|ogg)$/i.test(file.name)){status.textContent='Please choose an audio file.';return}const song={id:crypto.randomUUID(),group:currentGroup,title:file.name.replace(/\.[^.]+$/,''),blob:file};saved.push(song);let stored=true;try{await save(song)}catch{stored=false}if(visit===stamp&&room.open){songs(currentGroup);const s=room.querySelector('.sing-save-status');if(s)s.textContent=stored?'Song saved on this device.':'Ready for this visit. Browser storage is unavailable.'}});
 room.addEventListener('close',()=>{visit++;stop();document.body.classList.remove('sing-open')});

@@ -28,5 +28,5 @@ play()}
 room.addEventListener('click',e=>{const action=e.target.closest('[data-ns]')?.dataset.ns;if(action==='back'){room.close();return}if(!audio)return;if(action==='play'){if(audio.paused){if(audio.ended)restart();else play()}else audio.pause()}if(action==='restart')restart();if(action==='mute'){muted=!muted;audio.muted=muted;const b=$('[data-ns="mute"]');b.textContent=muted?'🔇':'🔊';b.setAttribute('aria-label',muted?'Unmute song':'Mute song')}});
 room.addEventListener('input',e=>{if(e.target.matches('.ns-seek')&&audio&&Number.isFinite(audio.duration)&&audio.duration>START){audio.currentTime=START+(audio.duration-START)*Number(e.target.value)/100;progress()}});
 room.addEventListener('close',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden)audio?.pause()});
-window.NumbersSingAlong={open};
+window.NumbersSingAlong={open,close(){stop();room.close()}};
 })();
