@@ -64,3 +64,23 @@ body.mq-open{overflow:hidden}#mountain-quest{inset:0;width:100vw;height:100dvh;m
 @keyframes mq-bulb-breathe{50%{transform:scale(1.08);filter:drop-shadow(0 0 5px #ffdd65)}}@keyframes mq-object-clue{25%,75%{transform:rotate(-6deg) translateX(-4px)}50%{transform:rotate(6deg) translateY(-6px)}}@keyframes mq-anticipation{50%{transform:translateY(-4px)}}@keyframes mq-rain-full{0%{top:-20px;transform:rotate(0);opacity:1}100%{top:110%;transform:rotate(var(--turn)) translateX(35px);opacity:.8}}
 @media(max-width:700px){.mq-play .mq-prompt{top:76px;left:6%;right:6%;padding:16px}.mq-play .mq-choices{left:7%;right:7%;gap:16px;bottom:27%}#mountain-quest .mq-play .mq-choices button{width:30%;max-width:30%}.mq-play .mq-choices button>span{font-size:17px;bottom:-30px}.mq-play .mq-story-maya{width:95px;height:125px;bottom:7%;left:3%}.mq-play .mq-tools{right:12px;top:40%;gap:12px}.mq-play .mq-tools button{width:48px;height:48px;font-size:24px!important}.mq-play .mq-previous-place{top:40%;left:12px}.mq-play .mq-place{font-size:11px;gap:7px;bottom:12px;max-width:95%}.mq-play .mq-place b{font-size:11px;padding:4px 7px}.mq-play .mq-satchel{bottom:15%;gap:6px;padding:6px 10px;font-size:19px}.mq-route-stops{flex-direction:column;gap:12px}.mq-route-stops button{min-width:0;width:100%}.mq-simple-cover .mq-map-art .mq-world-2{transform:none}}
 @media(prefers-reduced-motion:reduce){#mountain-quest *{animation:none!important;transition:none!important}}body.reduced #mountain-quest *{animation:none!important;transition:none!important}
+/* Mountain discoveries belong to Maya or to the path, at child-friendly scale. */
+.mq-soft-rain{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:5;background:linear-gradient(#809bb322,transparent 65%)}
+.mq-soft-rain i{position:absolute;left:var(--rain-x);top:-12%;width:2px;height:24px;border-radius:100%;background:linear-gradient(transparent,#b4e4ff);animation:mq-gentle-rain var(--rain-speed) var(--rain-delay) linear infinite}
+@keyframes mq-gentle-rain{to{top:112%;transform:translateX(-45px)}}
+.mq-story-maya,.mq-walker{overflow:visible}
+.mq-carried-umbrella{position:absolute;left:-16%;bottom:51%;width:132%;height:108%;z-index:6;pointer-events:none;transform:rotate(-8deg);transform-origin:55% 85%}
+.mq-carried-umbrella svg{width:100%;height:100%;overflow:visible}
+.mq-held-key{position:absolute;left:74%;top:48%;width:29%;height:29%;z-index:7;transform:rotate(-24deg)}
+.mq-held-key svg{width:100%;height:100%}
+.mq-trail-sign{position:absolute;right:18%;bottom:40%;width:76px;height:130px;z-index:2;pointer-events:none}
+.mq-trail-sign i{position:absolute;top:25%;bottom:0;width:10px;left:calc(50% - 5px);border-radius:5px;background:linear-gradient(90deg,#aa693b,#e9b671,#aa693b);box-shadow:2px 2px #6d51222b}
+.mq-trail-sign svg{position:absolute;top:0;left:0;width:100%;height:76px;filter:drop-shadow(0 3px 1px #664b4433)}
+.mq-triangle-sign{right:30%}
+.mq-cinema .mq-trail-sign{bottom:25%;right:20%;animation:mq-sign-pass 3.6s linear forwards}
+@keyframes mq-sign-pass{to{transform:translateX(-100px)}}
+.mq-encounter-tree{width:220px;height:280px;bottom:26%}.mq-encounter-flower{width:44px;height:55px;bottom:24%}.mq-encounter-flower .mq-encounter-creature,.mq-encounter-tree .mq-encounter-creature{animation:none}
+.mq-juppy-dancing{transform-origin:50% 90%;animation:mq-juppy-dance .85s ease-in-out 5}
+@keyframes mq-juppy-dance{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-13px) rotate(-10deg)}50%{transform:translateY(0) rotate(0)}75%{transform:translateY(-10px) rotate(10deg)}}
+@media(max-width:700px){.mq-trail-sign{width:54px;height:95px;right:16%;bottom:48%}.mq-trail-sign svg{height:54px}.mq-triangle-sign{right:32%}.mq-encounter-tree{width:145px;height:190px}.mq-encounter-flower{width:32px;height:42px}.mq-soft-rain i{height:18px}}
+@media(prefers-reduced-motion:reduce){.mq-soft-rain i{top:calc(var(--rain-x));height:12px}}body.reduced .mq-soft-rain i{top:calc(var(--rain-x));height:12px}
