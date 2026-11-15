@@ -69,7 +69,7 @@ body.mq-open{overflow:hidden}#mountain-quest{inset:0;width:100vw;height:100dvh;m
 .mq-soft-rain i{position:absolute;left:var(--rain-x);top:-12%;width:2px;height:24px;border-radius:100%;background:linear-gradient(transparent,#b4e4ff);animation:mq-gentle-rain var(--rain-speed) var(--rain-delay) linear infinite}
 @keyframes mq-gentle-rain{to{top:112%;transform:translateX(-45px)}}
 .mq-story-maya,.mq-walker{overflow:visible}
-.mq-carried-umbrella{position:absolute;left:-16%;bottom:51%;width:132%;height:108%;z-index:6;pointer-events:none;transform:rotate(-8deg);transform-origin:55% 85%}
+.mq-carried-umbrella{position:absolute;left:-5%;bottom:28%;width:132%;height:108%;z-index:6;pointer-events:none;transform:rotate(-8deg);transform-origin:55% 85%}
 .mq-carried-umbrella svg{width:100%;height:100%;overflow:visible}
 .mq-held-key{position:absolute;left:74%;top:48%;width:29%;height:29%;z-index:7;transform:rotate(-24deg)}
 .mq-held-key svg{width:100%;height:100%}
