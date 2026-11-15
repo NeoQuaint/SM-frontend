@@ -1,0 +1,13 @@
+/* Scenery stays behind every control and never catches gestures. */
+.song-scenery{isolation:isolate!important;background:#91d5f4!important}
+.song-scenery-bg{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;border-radius:inherit}
+.song-scenery-bg svg{width:100%;height:100%;display:block;animation:ss-arrive .65s ease-out}
+.song-scenery>header,.song-scenery>main,.song-scenery>footer,.song-scenery>.sing-player,.song-scenery>#gamebody{position:relative}
+.song-scenery .sing-player,.song-scenery .learn-focus,.song-scenery #gamebody{background:transparent!important}
+.song-scenery .fs-caption,.song-scenery .as-caption,.song-scenery .ns-count,.song-scenery .learn-caption,.song-scenery h3{color:#49365f;text-shadow:0 2px 2px #fff,0 0 12px #fff}
+.song-scenery>header,.song-scenery>footer{border-radius:24px;background:#fff4e5b8;padding:10px;box-sizing:border-box}
+.ss-cloud{animation:ss-cloud 18s ease-in-out infinite alternate}.ss-cloud-two{animation-duration:25s;animation-delay:-8s}.ss-leaves{transform-box:fill-box;transform-origin:bottom;animation:ss-sway 4s ease-in-out infinite alternate}.ss-ripples{animation:ss-wave 4s ease-in-out infinite alternate}.ss-car{animation:ss-drive 15s linear infinite}.ss-balloon{animation:ss-float 4s ease-in-out infinite alternate}.ss-star{animation:ss-twinkle 3s ease-in-out infinite alternate}
+.song-scenery:not(.fs-playing):not(.as-playing):not(.ns-playing):not(.sing-playing):not(.learning) .song-scenery-bg *{animation-play-state:paused}
+@keyframes ss-cloud{to{transform:translateX(140px)}}@keyframes ss-sway{to{transform:rotate(4deg)}}@keyframes ss-wave{to{transform:translateX(35px)}}@keyframes ss-drive{from{transform:translateX(-150px)}to{transform:translateX(1250px)}}@keyframes ss-float{to{transform:translateY(-25px) rotate(2deg)}}@keyframes ss-twinkle{to{opacity:.3}}@keyframes ss-arrive{from{opacity:.35}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.song-scenery-bg *{animation:none!important}}.reduced .song-scenery-bg *{animation:none!important}
+#numbers-song.song-scenery main{width:100%;overflow:hidden}#numbers-song.song-scenery .ns-art{width:100%;max-width:100%}.song-scenery>header{width:100%}
