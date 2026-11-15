@@ -1,5 +1,5 @@
 (()=>{
-const groups=[['animals','Animals','🐮 🐥','#ffe7aa'],['family','Family','👩‍👧‍👦','#ffdbe6'],['numbers','Numbers','1️⃣ 2️⃣ 3️⃣','#d9f0db'],['alphabet','Alphabet','🔤','#e5d9ff'],['colours','Colours','🌈','#d5efff'],['actions','Actions','👏 🎵','#ffe2cb']];
+const groups=[['family','Family','👩‍👧‍👦','#ffdbe6'],['animals','Animals','🐮 🐥','#ffe7aa'],['numbers','Numbers','1️⃣ 2️⃣ 3️⃣','#d9f0db'],['alphabet','Alphabet','🔤','#e5d9ff'],['colours','Colours','🌈','#d5efff'],['actions','Actions','👏 🎵','#ffe2cb']];
 const room=document.createElement('dialog');room.id='sing-room';room.setAttribute('aria-label','Sing Along');document.body.append(room);
 let group=null,audio=null,url=null,visit=0,saved=[],loaded=false,currentSession='song';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -13,7 +13,7 @@ function library(){visit++;stop();group=null;room.innerHTML=header('Sing Along')
 // One circular feed, using the original players and their recorded timing.
 let feed=null,lastSwitch=0;
 function playlist(){return [
- {id:'animals',title:'Animals'}, {id:'family',title:'Family'},
+ {id:'family',title:'Family'}, {id:'animals',title:'Animals'},
  {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet'},
  ...saved.map(s=>({id:s.id,title:s.title,group:s.group})),
  {id:'remix',title:'Kids Remix',group:'actions'}
@@ -25,7 +25,7 @@ function leaveFeed(){const previous=feed;feed=null;if(!previous)return;
  else {const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong}[previous.id];api?.close()}
 }
 function openTrack(id){const track=playlist().find(t=>t.id===id);if(!track)return;
- const unit=id;if(window.SmartClassMembership?.begin('singalong',unit)===false)return;
+ const unit=id;if(window.SmartClassMembership?.checkSong(unit)===false)return;
  leaveFeed();stop();library();
  const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong}[id];
  if(api){api.open();attachFeed(id,document.getElementById({animals:'animal-song',family:'family-song',numbers:'numbers-song'}[id]))}
@@ -55,7 +55,7 @@ function attachFeed(id,el){if(!el?.open)return;feed={id,el};el.classList.add('si
 function songs(id){if(['numbers','family','animals'].includes(id)){openTrack(id);return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
 room.innerHTML=header(g[1])+'<section class="sing-category" style="--song-colour:'+g[3]+'"><div class="sing-category-art" aria-hidden="true">'+g[2]+'</div><div class="sing-track-list">'+(id==='actions'?'<button data-sing-track="remix"><span>▶</span> Kids Remix</button>':'')+(id==='alphabet'?'<button data-sing-abc><span>♫</span> ABC melody & letter play</button>':'')+tracks.map(x=>'<button data-sing-track="'+x.id+'"><span>▶</span> '+esc(x.title)+'</button>').join('')+(!tracks.length&&!['actions','alphabet','animals'].includes(id)?'<div class="sing-empty"><span aria-hidden="true">🎶</span><p>A song is waiting to join us!</p><small>No song added yet.</small></div>':'')+'</div><details class="sing-grownups"><summary>Grown-ups: add a song</summary><p>Add your recording to '+g[1]+'. It stays in this browser on this device.</p><label class="sing-upload">Choose audio<input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg" id="sing-file"></label><p class="sing-save-status" role="status"></p></details></section>';
 }
-function player(id){if(window.SmartClassMembership?.begin('singalong',id)===false)return;currentSession=id;const song=id==='remix'?{title:'Kids Remix',src:'kids-remix.mp3'}:saved.find(x=>x.id===id);if(!song)return;stop();const g=group;room.innerHTML=header(g[1])+'<section class="sing-player" style="--song-colour:'+g[3]+'"><div class="sing-music-notes" aria-hidden="true">♪ ♫ ♪</div><div class="sing-dancer" aria-hidden="true">'+g[2]+'</div><h3>'+esc(song.title)+'</h3><div class="sing-controls"><button data-sing-restart aria-label="Restart song">↻</button><button data-sing-play aria-label="Pause song">Ⅱ</button><button data-sing-mute aria-label="Mute song">🔊</button></div><input class="sing-seek" type="range" min="0" max="100" value="0" aria-label="Song position"><p class="sing-play-status" role="status"></p></section>';
+function player(id){if(window.SmartClassMembership?.startSong(id)===false)return;currentSession=id;const song=id==='remix'?{title:'Kids Remix',src:'kids-remix.mp3'}:saved.find(x=>x.id===id);if(!song)return;stop();const g=group;room.innerHTML=header(g[1])+'<section class="sing-player" style="--song-colour:'+g[3]+'"><div class="sing-music-notes" aria-hidden="true">♪ ♫ ♪</div><div class="sing-dancer" aria-hidden="true">'+g[2]+'</div><h3>'+esc(song.title)+'</h3><div class="sing-controls"><button data-sing-restart aria-label="Restart song">↻</button><button data-sing-play aria-label="Pause song">Ⅱ</button><button data-sing-mute aria-label="Mute song">🔊</button></div><input class="sing-seek" type="range" min="0" max="100" value="0" aria-label="Song position"><p class="sing-play-status" role="status"></p></section>';
 url=song.blob?URL.createObjectURL(song.blob):null;audio=new Audio(url||song.src);
 audio.volume=.8;audio.onplay=()=>{room.classList.add('sing-playing');const b=room.querySelector('[data-sing-play]');b.textContent='Ⅱ';b.setAttribute('aria-label','Pause song')};
 audio.onpause=()=>{room.classList.remove('sing-playing');const b=room.querySelector('[data-sing-play]');if(b){b.textContent='▶';b.setAttribute('aria-label','Play song')}};
@@ -65,11 +65,11 @@ audio.onerror=()=>{room.querySelector('.sing-play-status').textContent='This son
 play();
 attachFeed(id,room);
 }
-function play(){if(window.SmartClassMembership?.begin('singalong',currentSession)===false)return;audio?.play().catch(()=>{const s=room.querySelector('.sing-play-status');if(s)s.textContent='Tap play to start.'})}
-room.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-sing-back')){if(room.querySelector('.sing-player')){leaveFeed();library();}else if(group)library();else room.close()}if(b.dataset.singGroup)songs(b.dataset.singGroup);if(b.dataset.singTrack)player(b.dataset.singTrack);if(b.hasAttribute('data-sing-abc')){openTrack('abc')}if(b.hasAttribute('data-sing-play')){if(audio.paused){if(audio.ended)audio.currentTime=0;play()}else audio.pause()}if(b.hasAttribute('data-sing-restart')&&audio){audio.currentTime=0;play()}if(b.hasAttribute('data-sing-mute')&&audio){audio.muted=!audio.muted;b.textContent=audio.muted?'🔇':'🔊';b.setAttribute('aria-label',audio.muted?'Unmute song':'Mute song')}});
+function play(){if(window.SmartClassMembership?.begin('singalong',currentSession)===false)return;audio?.play().then(()=>window.SmartClassMembership?.songPlayed(currentSession)).catch(()=>{const s=room.querySelector('.sing-play-status');if(s)s.textContent='Tap play to start.'})}
+room.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.hasAttribute('data-sing-back')){if(room.querySelector('.sing-player')){leaveFeed();library();}else if(group)library();else room.close()}if(b.dataset.singGroup)songs(b.dataset.singGroup);if(b.dataset.singTrack)player(b.dataset.singTrack);if(b.hasAttribute('data-sing-abc')){openTrack('abc')}if(b.hasAttribute('data-sing-play')){if(audio.paused){if(audio.ended){if(window.SmartClassMembership?.startSong(currentSession)===false)return;audio.currentTime=0;}play()}else audio.pause()}if(b.hasAttribute('data-sing-restart')&&audio){if(window.SmartClassMembership?.startSong(currentSession)===false)return;audio.currentTime=0;play()}if(b.hasAttribute('data-sing-mute')&&audio){audio.muted=!audio.muted;b.textContent=audio.muted?'🔇':'🔊';b.setAttribute('aria-label',audio.muted?'Unmute song':'Mute song')}});
 room.addEventListener('input',e=>{if(e.target.matches('.sing-seek')&&audio&&Number.isFinite(audio.duration))audio.currentTime=audio.duration*Number(e.target.value)/100});
 room.addEventListener('change',async e=>{if(e.target.id!=='sing-file')return;const file=e.target.files[0],stamp=visit,currentGroup=group?.[0];if(!file||!currentGroup)return;const status=room.querySelector('.sing-save-status');if(file.size>30*1024*1024){status.textContent='Please choose audio smaller than 30 MB.';return}if(!file.type.startsWith('audio/')&&!/\.(mp3|wav|m4a|ogg)$/i.test(file.name)){status.textContent='Please choose an audio file.';return}const song={id:crypto.randomUUID(),group:currentGroup,title:file.name.replace(/\.[^.]+$/,''),blob:file};saved.push(song);let stored=true;try{await save(song)}catch{stored=false}if(visit===stamp&&room.open){songs(currentGroup);const s=room.querySelector('.sing-save-status');if(s)s.textContent=stored?'Song saved on this device.':'Ready for this visit. Browser storage is unavailable.'}});
-room.addEventListener('close',()=>{visit++;stop();document.body.classList.remove('sing-open')});
+window.addEventListener('smartclass:song-limit',()=>audio?.pause());room.addEventListener('close',()=>{visit++;stop();document.body.classList.remove('sing-open')});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)audio?.pause()});
 window.KidsSingAlong={async open(){window.KidsBridge.stop();window.KidsSound.close();room.showModal();document.body.classList.add('sing-open');library();const stamp=visit;await read();if(room.open&&visit===stamp)library()}};
 })();
