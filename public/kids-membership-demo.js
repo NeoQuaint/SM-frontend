@@ -45,5 +45,5 @@ function begin(category,unit='activity'){
 }
 function completed(category,item){const id=category==='sing'?'singalong':category;const current=active.get(id);if(current)current.done=true}
 function parentAccount(){gateAction='account';lastFocus=document.activeElement;if(!dialog.open)dialog.showModal();gate()}
-const cards=document.getElementById('cards');if(cards)new MutationObserver(decorate).observe(cards,{childList:true});window.SmartClassMembership={decorate,begin,completed,parentAccount,hasCategory,canAccess,offer,startSong,songPlayed,checkSong};decorate();
+const cards=document.getElementById('cards');if(cards)new MutationObserver(decorate).observe(cards,{childList:true});window.SmartClassMembership={packages:()=>{pending=null;open()},decorate,begin,completed,parentAccount,hasCategory,canAccess,offer,startSong,songPlayed,checkSong};decorate();
 })();
