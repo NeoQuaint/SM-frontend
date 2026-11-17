@@ -24,3 +24,5 @@ body.ag-open{overflow:hidden}#alphabet-garden{position:fixed;inset:0;margin:0;pa
 
 /* Welcome frame: top and sides only, open at the bottom. */
 #alphabet-garden[data-phase=welcome]{background:#faf7ee}#alphabet-garden[data-phase=welcome] .at-scene{width:calc(100% - 32px);height:calc(100% - 20px);margin:20px auto 0;border-radius:35px 35px 0 0;overflow:hidden}
+
+#alphabet-garden[data-phase=welcome] .at-farm{mask-image:linear-gradient(#000 0%,#000 60%,transparent 100%)}
