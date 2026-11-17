@@ -11,3 +11,13 @@ body.ag-open{overflow:hidden}#alphabet-garden{position:fixed;inset:0;margin:0;pa
 @keyframes at-drive{0%{top:31%;transform:scale(.2);opacity:0}8%{opacity:1}100%{top:108%;transform:scale(1.65);margin-left:14%}}@keyframes at-lily-idle{50%{transform:translateX(-50%) translateY(-6px)}}@keyframes at-lily-cheer{50%{transform:translateX(-50%) translateY(-15px) rotate(5deg)}}@keyframes at-walk-depth{0%{transform:translateX(-50%) scale(1)}25%{transform:translateX(-50%) translateY(-40px) scale(.85) rotate(-5deg)}50%{transform:translateX(-50%) translateY(-75px) scale(.7) rotate(5deg)}75%{transform:translateX(-50%) translateY(-115px) scale(.5) rotate(-5deg)}100%{transform:translateX(-50%) translateY(-155px) scale(.3);opacity:0}}
 @media(max-width:650px){.at-stage{inset:13% 6% 31%}.at-lily{left:50%;height:19%;width:130px;bottom:7%}.at-progress{left:18%;right:18%;bottom:14px}.at-car{width:35px;height:58px}.at-car i{inset:10px 5px 20px;border-width:2px}.at-car b{font-size:6px;left:7px;top:1px}.at-coach{height:85px}.at-car:before,.at-car:after{height:14px;width:5px}.at-welcome-title h1{font-size:48px!important}#alphabet-garden[data-phase="welcome"] .at-lily{height:30%;width:240px;bottom:19%}#alphabet-garden[data-phase="home"] .at-stage{inset:12% 6% 25%}#alphabet-garden[data-phase="home"] .at-lily{height:18%;bottom:2%}.at-enter{bottom:6%;font-size:19px!important}.at-tools{bottom:-65px}.at-trace-tools{bottom:-65px}#alphabet-garden[data-phase="trace"] .at-stage{inset:13% 5% 28%}}
 @media(prefers-reduced-motion:reduce){#alphabet-garden *{animation:none!important;transition:none!important}}body.reduced #alphabet-garden *{animation:none!important;transition:none!important}
+
+/* Lily's bright farmhouse welcome. */
+.at-farm{position:absolute;inset:0;overflow:hidden;background:#63ceff}.at-farm>img{width:100%;height:100%;object-fit:cover;object-position:center}
+#alphabet-garden[data-phase=welcome] .at-header>button:last-child{display:none}
+#alphabet-garden[data-phase=welcome] .at-welcome-title{top:0}#alphabet-garden[data-phase=welcome] .at-welcome-title>span{display:none}
+#alphabet-garden[data-phase=welcome] .at-welcome-title h1{color:#fff8df;text-shadow:0 4px #66419b,2px 0 #66419b,-2px 0 #66419b;font-size:clamp(38px,6vw,66px)!important}
+#alphabet-garden[data-phase=welcome] .at-stage{inset:11% 6% 12%}
+#alphabet-garden[data-phase=welcome] .at-lily{bottom:19%;height:34%;width:260px}
+#alphabet-garden .at-enter{width:min(86vw,430px);min-height:58px;border-radius:26px;background:#8952d2;color:#fff;padding:15px 25px;box-shadow:0 6px #6032a2;font-size:23px!important;bottom:6%}
+@media(min-width:900px){.at-farm>img{object-fit:fill}}
