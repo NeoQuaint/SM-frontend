@@ -1,8 +1,8 @@
 (()=>{'use strict';
 const KEY='smartclass-guided-welcome-v1';let active=false,stage='find',songTimer=null,celebrationSong=null,adventureMusic=null;
 function stopAdventureMusic(){if(adventureMusic){adventureMusic.pause();adventureMusic=null}}
-function playAdventureMusic(){stopAdventureMusic();if(document.querySelector('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;adventureMusic=new Audio('find-welcome-jingle.wav');adventureMusic.volume=.18;adventureMusic.loop=true;adventureMusic.play().catch(()=>{})}
-document.addEventListener('visibilitychange',()=>{if(!adventureMusic)return;if(document.hidden)adventureMusic.pause();else if(active&&stage==='parents'&&panel.open)adventureMusic.play().catch(()=>{})});
+function playAdventureMusic(){stopAdventureMusic();if(document.querySelector('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;adventureMusic=new Audio('find-welcome-jingle.wav');adventureMusic.volume=.18;adventureMusic.loop=false;adventureMusic.play().catch(()=>{})}
+document.addEventListener('visibilitychange',()=>{if(!adventureMusic)return;if(document.hidden)adventureMusic.pause();else if(active&&stage==='parents'&&panel.open&&!adventureMusic.ended)adventureMusic.play().catch(()=>{})});
 function stopCelebration(){if(celebrationSong){celebrationSong.pause();celebrationSong=null}panel.querySelector('.ob-hug-confetti')?.remove()}
 function celebrate(){stopCelebration();panel.insertAdjacentHTML('beforeend','<div class="ob-hug-confetti" aria-hidden="true">'+Array.from({length:65},(_,i)=>'<i style="--x:'+i*37%100+'%;--delay:'+i%13*.23+'s;--colour:'+['#ffcf35','#ee75a5','#75d6be','#9c7bdf','#73bde9'][i%5]+';--drift:'+(i%2?-70:70)+'px"></i>').join('')+'</div>');if(document.querySelector('#sound')?.getAttribute('aria-pressed')!=='false'&&!document.hidden){celebrationSong=new Audio('kids-remix.mp3');celebrationSong.volume=.5;celebrationSong.play().catch(()=>{})}}
 document.addEventListener('visibilitychange',()=>{if(!celebrationSong)return;if(document.hidden)celebrationSong.pause();else if(active&&stage==='choice')celebrationSong.play().catch(()=>{})});

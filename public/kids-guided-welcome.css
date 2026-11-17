@@ -14,4 +14,4 @@ body.ob-active #kids-app{visibility:hidden}body.ob-active .ff-note{display:none!
 
 #mountain-quest .mq-onboarding-header .ob-skip{position:absolute;right:16px;top:14px;min-width:60px;min-height:44px;padding:8px 14px;border:2px solid #ffffffd9;border-radius:22px;background:#fff8ed;color:#65468b;font:800 16px system-ui;box-shadow:0 3px 10px #49336a20;pointer-events:auto}#mountain-quest .mq-onboarding-header .ob-stars{gap:7px;padding:8px 12px}#mountain-quest .mq-onboarding-header{padding-right:88px!important;padding-left:12px!important}
 
-#guided-welcome .ob-coco-peek{left:auto;right:-62px;top:58px;transform:rotate(-90deg)}
+#guided-welcome .ob-coco-peek{left:auto;right:-62px;top:85px;transform:rotate(-90deg)}
