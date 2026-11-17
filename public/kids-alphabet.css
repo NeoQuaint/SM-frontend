@@ -21,3 +21,6 @@ body.ag-open{overflow:hidden}#alphabet-garden{position:fixed;inset:0;margin:0;pa
 #alphabet-garden[data-phase=welcome] .at-lily{bottom:19%;height:34%;width:260px}
 #alphabet-garden .at-enter{width:min(86vw,430px);min-height:58px;border-radius:26px;background:#8952d2;color:#fff;padding:15px 25px;box-shadow:0 6px #6032a2;font-size:23px!important;bottom:6%}
 @media(min-width:900px){.at-farm>img{object-fit:fill}}
+
+/* Welcome frame: top and sides only, open at the bottom. */
+#alphabet-garden[data-phase=welcome]{background:#faf7ee}#alphabet-garden[data-phase=welcome] .at-scene{width:calc(100% - 32px);height:calc(100% - 20px);margin:20px auto 0;border-radius:35px 35px 0 0;overflow:hidden}
