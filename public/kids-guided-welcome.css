@@ -9,3 +9,5 @@ body.ob-active #kids-app{visibility:hidden}body.ob-active .ff-note{display:none!
 #guided-welcome[data-scene]:before{display:none}#guided-welcome[data-scene]{background-repeat:no-repeat;background-position:top center;background-size:100% 100%,100% auto}#guided-welcome[data-scene=park]{background-image:linear-gradient(to bottom,transparent 25%,#fffaf200 38%,#fffaf2 72%),url('onboarding-park.svg')}#guided-welcome[data-scene=train]{background-image:linear-gradient(to bottom,transparent 25%,#fffaf200 38%,#fffaf2 78%),url('onboarding-train.svg')}
 
 #guided-welcome .ob-lily-peek{right:-38px;top:85px;width:140px;height:150px;transform:rotate(-16deg)}
+
+#guided-welcome .ob-coco-peek{position:absolute;left:-62px;right:auto;top:48px;width:110px;height:110px;object-fit:contain;transform:rotate(90deg);clip-path:inset(0 0 25% 0);pointer-events:none}
