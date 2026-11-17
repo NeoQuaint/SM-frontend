@@ -14,7 +14,7 @@ function library(){room.classList.remove('song-scenery');visit++;stop();group=nu
 let feed=null,lastSwitch=0;
 function playlist(){return [
  {id:'family',title:'Family'}, {id:'animals',title:'Animals'},
- {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet'},
+ {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet'}, {id:'colours',title:'Mix the Colours',group:'colours'},
  ...saved.map(s=>({id:s.id,title:s.title,group:s.group})),
  {id:'remix',title:'Kids Remix',group:'actions'}
 ]}
@@ -52,15 +52,34 @@ function attachFeed(id,el){if(!el?.open)return;feed={id,el};el.classList.add('si
  el.addEventListener('close',()=>{if(feed?.el===el){feed=null;el.classList.remove('sing-feed-active');el.querySelector('.sing-feed-nav')?.remove()}});
 }
 
-function songs(id){room.classList.remove('song-scenery');if(['numbers','family','animals'].includes(id)){openTrack(id);return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
+function songs(id){room.classList.remove('song-scenery');if(['numbers','family','animals','colours'].includes(id)){openTrack(id);return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
 room.innerHTML=header(g[1])+'<section class="sing-category" style="--song-colour:'+g[3]+'"><div class="sing-category-art" aria-hidden="true">'+g[2]+'</div><div class="sing-track-list">'+(id==='actions'?'<button data-sing-track="remix"><span>▶</span> Kids Remix</button>':'')+(id==='alphabet'?'<button data-sing-abc><span>♫</span> ABC melody & letter play</button>':'')+tracks.map(x=>'<button data-sing-track="'+x.id+'"><span>▶</span> '+esc(x.title)+'</button>').join('')+(!tracks.length&&!['actions','alphabet','animals'].includes(id)?'<div class="sing-empty"><span aria-hidden="true">🎶</span><p>A song is waiting to join us!</p><small>No song added yet.</small></div>':'')+'</div><details class="sing-grownups"><summary>Grown-ups: add a song</summary><p>Add your recording to '+g[1]+'. It stays in this browser on this device.</p><label class="sing-upload">Choose audio<input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg" id="sing-file"></label><p class="sing-save-status" role="status"></p></details></section>';
 }
-function player(id){if(window.SmartClassMembership?.startSong(id)===false)return;currentSession=id;const song=id==='remix'?{title:'Kids Remix',src:'kids-remix.mp3'}:saved.find(x=>x.id===id);if(!song)return;stop();const g=group;room.innerHTML=header(g[1])+'<section class="sing-player" style="--song-colour:'+g[3]+'"><div class="sing-music-notes" aria-hidden="true">♪ ♫ ♪</div><div class="sing-dancer" aria-hidden="true">'+g[2]+'</div><h3>'+esc(song.title)+'</h3><div class="sing-controls"><button data-sing-restart aria-label="Restart song">↻</button><button data-sing-play aria-label="Pause song">Ⅱ</button><button data-sing-mute aria-label="Mute song">🔊</button></div><input class="sing-seek" type="range" min="0" max="100" value="0" aria-label="Song position"><p class="sing-play-status" role="status"></p></section>';
+function player(id){if(window.SmartClassMembership?.startSong(id)===false)return;currentSession=id;const song=id==='colours'?{title:'Mix the Colours',src:'mix-the-colours.mp3'}:id==='remix'?{title:'Kids Remix',src:'kids-remix.mp3'}:saved.find(x=>x.id===id);if(!song)return;stop();const g=group;room.innerHTML=header(g[1])+'<section class="sing-player" style="--song-colour:'+g[3]+'"><div class="sing-music-notes" aria-hidden="true">♪ ♫ ♪</div><div class="sing-dancer" aria-hidden="true">'+g[2]+'</div><h3>'+esc(song.title)+'</h3><div class="sing-controls"><button data-sing-restart aria-label="Restart song">↻</button><button data-sing-play aria-label="Pause song">Ⅱ</button><button data-sing-mute aria-label="Mute song">🔊</button></div><input class="sing-seek" type="range" min="0" max="100" value="0" aria-label="Song position"><p class="sing-play-status" role="status"></p></section>';
 window.SongScenery?.set(room,'candy');
+if(id==='colours'){
+ room.querySelector('.sing-dancer').innerHTML='<div class="colour-song-pair"></div>';
+ room.querySelector('.sing-dancer').classList.add('colour-song-art');
+ room.querySelector('h3').classList.add('colour-song-lyric');
+}
+let colourLine=-1;
+const colourPairs=[['Red','Blue'],['Green','Yellow'],['Black','White'],['Pink','Orange'],['Brown','Purple'],null,null,null,null,['Red','Blue'],['Pink','Yellow'],['Green','Yellow'],['Black','White'],['Pink','Orange'],['Brown','Purple'],null,null,null,null];
+const colourPaint={Red:'#fa3454',Blue:'#2685ff',Green:'#2cc57b',Yellow:'#ffdc38',Black:'#33364e',White:'#fffdf5',Pink:'#ff73bc',Orange:'#ff963b',Brown:'#a66c43',Purple:'#a36bf0'};
+function showColourLine(){
+ if(id!=='colours')return;
+ const duration=Number.isFinite(audio?.duration)?audio.duration:70;
+ const line=Math.min(colourPairs.length-1,Math.floor((audio?.currentTime||0)/duration*colourPairs.length));
+ if(line===colourLine)return;colourLine=line;
+ const pair=colourPairs[line],mixing=!pair;
+ room.querySelector('.colour-song-pair').innerHTML=(pair||Object.keys(colourPaint)).map((name,i)=>'<span class="colour-song-balloon" style="--paint:'+colourPaint[name]+';--delay:'+(-i*.3)+'s"><b style="color:'+(name==='Black'?'white':'#252541')+'">'+name+'</b></span>').join('');
+ room.querySelector('.colour-song-art').classList.toggle('colour-song-mixing',mixing);
+ room.querySelector('h3').textContent=pair?pair.join(' and ')+' are my friends':(line===8||line===18?'And we run, run, happy mix them!':'And we mix the colours, mix them!');
+}
+showColourLine();
 url=song.blob?URL.createObjectURL(song.blob):null;audio=new Audio(url||song.src);
 audio.volume=.8;audio.onplay=()=>{room.classList.add('sing-playing');const b=room.querySelector('[data-sing-play]');b.textContent='Ⅱ';b.setAttribute('aria-label','Pause song')};
 audio.onpause=()=>{room.classList.remove('sing-playing');const b=room.querySelector('[data-sing-play]');if(b){b.textContent='▶';b.setAttribute('aria-label','Play song')}};
-audio.ontimeupdate=()=>{window.SongScenery?.set(room,['candy','town','beach','night'][Math.floor(audio.currentTime/16)%4]);const r=room.querySelector('.sing-seek');if(r&&Number.isFinite(audio.duration))r.value=audio.currentTime/audio.duration*100};
+audio.ontimeupdate=()=>{showColourLine();window.SongScenery?.set(room,['candy','town','beach','night'][Math.floor(audio.currentTime/16)%4]);const r=room.querySelector('.sing-seek');if(r&&Number.isFinite(audio.duration))r.value=audio.currentTime/audio.duration*100};
 audio.onended=()=>{window.KidsProgress?.complete('sing','Sing Along '+currentSession);room.classList.remove('sing-playing');room.querySelector('.sing-play-status').textContent='Again? Tap play!';room.querySelector('[data-sing-play]').textContent='▶'};
 audio.onerror=()=>{room.querySelector('.sing-play-status').textContent='This song could not play. Try another audio file.'};
 play();

@@ -1,0 +1,12 @@
+#sing-room .colour-song-art{width:min(88vw,700px);height:clamp(220px,42dvh,400px);display:grid;place-items:center;font-size:initial;animation:none}
+.colour-song-pair{display:flex;justify-content:center;align-items:center;gap:clamp(20px,6vw,70px);width:100%;height:100%;flex-wrap:wrap}
+.colour-song-balloon{position:relative;display:grid;place-items:center;width:clamp(100px,25vw,190px);height:clamp(130px,32vw,240px);background:var(--paint);border-radius:50% 50% 46% 46%;box-shadow:inset -10px -8px 0 #00000012,0 5px 0 #ffffffa0;border:3px solid #fff;animation:colour-balloon-float 3s var(--delay) ease-in-out infinite}
+.colour-song-balloon:after{content:'';position:absolute;top:100%;height:30px;width:2px;background:#716389}
+.colour-song-balloon b{font:800 clamp(18px,4vw,30px) system-ui;background:#ffffffc9;padding:5px 12px;border-radius:20px;color:#252541!important}
+#sing-room .colour-song-lyric{font-size:clamp(19px,4.8vw,30px);max-width:700px;margin:15px auto;padding:8px 15px;background:#ffffffe0;border-radius:20px;color:#46335d}
+.colour-song-mixing .colour-song-pair{gap:12px;max-width:620px}
+.colour-song-mixing .colour-song-balloon{width:clamp(45px,12vw,88px);height:clamp(60px,16vw,110px)}
+.colour-song-mixing .colour-song-balloon b{font-size:clamp(10px,2vw,14px);padding:3px 5px}
+#sing-room:not(.sing-playing) .colour-song-balloon{animation-play-state:paused}
+@keyframes colour-balloon-float{50%{transform:translateY(-14px) rotate(5deg)}}
+@media(prefers-reduced-motion:reduce){.colour-song-balloon{animation:none}}
