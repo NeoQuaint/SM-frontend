@@ -10,3 +10,5 @@
 #sing-room:not(.sing-playing) .colour-song-balloon{animation-play-state:paused}
 @keyframes colour-balloon-float{50%{transform:translateY(-14px) rotate(5deg)}}
 @media(prefers-reduced-motion:reduce){.colour-song-balloon{animation:none}}
+
+#sing-room .abc-song-art{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;width:min(90vw,800px);height:clamp(240px,45dvh,430px);animation:none;font-size:initial}.abc-song-letters{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:85%;font:900 clamp(40px,12vw,110px)/1.1 system-ui;text-shadow:0 3px white}.abc-song-object{font-size:clamp(90px,22vw,175px);animation:abc-song-bounce 2s ease-in-out infinite}.abc-song-lily{position:absolute;left:0;bottom:0;width:clamp(65px,17vw,140px);max-height:50%;object-fit:contain}#sing-room:not(.sing-playing) .abc-song-object{animation-play-state:paused}@keyframes abc-song-bounce{50%{transform:translateY(-10px) rotate(4deg)}}@media(prefers-reduced-motion:reduce){.abc-song-object{animation:none}}
