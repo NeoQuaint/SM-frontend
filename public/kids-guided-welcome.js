@@ -1,4 +1,5 @@
 (()=>{'use strict';
+const preview=document.documentElement.dataset.findPreview==='true';
 const KEY='smartclass-guided-welcome-v1';let active=false,stage='find',songTimer=null,celebrationSong=null,adventureMusic=null;
 function stopAdventureMusic(){if(adventureMusic){adventureMusic.pause();adventureMusic=null}}
 function playAdventureMusic(){stopAdventureMusic();if(document.querySelector('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;adventureMusic=new Audio('find-welcome-jingle.wav');adventureMusic.volume=.18;adventureMusic.loop=false;adventureMusic.play().catch(()=>{})}
@@ -9,16 +10,17 @@ document.addEventListener('visibilitychange',()=>{if(!celebrationSong)return;if(
 const panel=document.createElement('dialog');panel.id='guided-welcome';panel.setAttribute('aria-label','Your first SmartClass adventure');document.body.append(panel);
 function remember(){try{localStorage.setItem(KEY,'done')}catch{}}
 function show(body){panel.innerHTML='<main>'+body+'</main>';if(!panel.open)panel.showModal()}
-function home(){leave()}
-function choice(){stage='choice';panel.dataset.scene='park';show('<img src="maya-juppy-hug.png" alt="Maya and Juppy hug"><div class="ob-finish-stars" aria-label="Five stars">★★★★★</div><h1>You did it!</h1><button data-ob="explore">Keep exploring ♫</button><button data-ob="home" class="ob-secondary">Home ⌂</button>');celebrate()}
+function home(){if(preview){previewChoice();return}leave()}
+function previewChoice(){stage='choice';panel.dataset.scene='park';show('<img src="maya-juppy-hug.png" alt="Maya and Juppy hug"><h1>More adventures await!</h1><button data-ob="preview-app">Explore SmartClass →</button><button data-ob="preview-replay" class="ob-secondary">Play again ↻</button>');celebrate()}
+function choice(){if(preview){previewChoice();return}stage='choice';panel.dataset.scene='park';show('<img src="maya-juppy-hug.png" alt="Maya and Juppy hug"><div class="ob-finish-stars" aria-label="Five stars">★★★★★</div><h1>You did it!</h1><button data-ob="explore">Keep exploring ♫</button><button data-ob="home" class="ob-secondary">Home ⌂</button>');celebrate()}
 function parents(){if(!active||stage!=='song')return;stage='parents';panel.dataset.scene='train';window.FamilySingAlong?.close();remember();show('<img src="maya-celebrate.png" alt="Maya celebrates"><img class="ob-coco-peek" src="coco-counting.webp" alt="Coco peeking in"><h1>More adventures await!</h1><button data-ob="account">Create account</button><button data-ob="playroom" class="ob-secondary">Not now</button><small>Progress is saved on this device. Signing in is free; no payment is taken.</small>');playAdventureMusic()}
 function song(){stopCelebration();stage='song';panel.close();window.FamilySingAlong.open();if(!document.getElementById('family-song')?.open){parents();return}const b=document.createElement('button');b.className='ob-song-next';b.textContent='Grown-ups →';b.onclick=parents;document.getElementById('family-song').append(b)}
 function leave(){stopAdventureMusic();stopCelebration();active=false;clearTimeout(songTimer);panel.close();window.FamilySingAlong?.close();document.querySelector('.ob-song-next')?.remove();document.body.classList.remove('ob-active');remember()}
-panel.addEventListener('click',e=>{switch(e.target.closest('[data-ob]')?.dataset.ob){case'explore':song();break;case'home':home();break;case'playroom':leave();break;case'account':stopAdventureMusic();window.FamilySingAlong?.close();window.guidedAccountSetup=true;if(window.ParentAccount?.user)window.dispatchEvent(new Event('smartclass:parent-signed-in'));else window.SmartClassMembership?.parentAccount();break}});panel.addEventListener('cancel',e=>{e.preventDefault();if(stage==='parents')leave();else home()});
+panel.addEventListener('click',e=>{switch(e.target.closest('[data-ob]')?.dataset.ob){case'preview-app':stopCelebration();remember();location.assign('/kids');break;case'preview-replay':stopCelebration();panel.close();stage='find';window.MountainQuest.startOnboarding({done:choice,exit:home});break;case'explore':song();break;case'home':home();break;case'playroom':leave();break;case'account':stopAdventureMusic();window.FamilySingAlong?.close();window.guidedAccountSetup=true;if(window.ParentAccount?.user)window.dispatchEvent(new Event('smartclass:parent-signed-in'));else window.SmartClassMembership?.parentAccount();break}});panel.addEventListener('cancel',e=>{e.preventDefault();if(stage==='parents')leave();else home()});
 window.addEventListener('smartclass:family-song-ended',()=>{if(active&&stage==='song')songTimer=setTimeout(parents,1200)});
 document.getElementById('family-song')?.addEventListener('close',()=>{if(active&&stage==='song')parents()});
 window.addEventListener('smartclass:family-profile-saved',()=>{if(active&&stage==='parents')leave();window.guidedAccountSetup=false});
-function begin(){let done=false;try{done=localStorage.getItem(KEY)==='done'}catch{}if(done)return;active=true;document.body.classList.add('ob-active');window.MountainQuest.startOnboarding({done:choice,exit:home})}
+function begin(){let done=false;try{done=localStorage.getItem(KEY)==='done'}catch{}if(done&&!preview)return;active=true;document.body.classList.add('ob-active');window.MountainQuest.startOnboarding({done:choice,exit:home})}
 function ready(){if(document.body.classList.contains('kids-is-loading'))return;observer.disconnect();begin()}
 const observer=new MutationObserver(ready);observer.observe(document.body,{attributes:true,attributeFilter:['class']});ready();
 })();

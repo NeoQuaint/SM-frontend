@@ -32,6 +32,10 @@
       "destination": "https://smartclass-wlgb.onrender.com/api/neo/speak"
     },
     {
+      "source": "/try-find",
+      "destination": "/try-find.html"
+    },
+    {
       "source": "/kids",
       "destination": "/kids.html"
     },
