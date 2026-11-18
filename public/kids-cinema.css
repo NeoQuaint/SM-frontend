@@ -14,3 +14,6 @@ body.reduced .caption-pop span{animation:none!important}body.reduced .cinema-cap
 /* Cover thumbnails fill their cards; reading scenes retain the full composition. */
 .cinema-cover .art-slice{width:max(100%,calc(300px * var(--art-ratio)));left:50%;transform:translate(-50%,-50%)}
 @media(max-width:700px){.cinema-cover .art-slice{width:max(100%,calc(210px * var(--art-ratio)))}}
+
+/* Story playback fills the viewport in either orientation. */
+#story-room.story-reading{position:fixed;inset:0;margin:0;padding:0;width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}
