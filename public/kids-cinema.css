@@ -9,4 +9,8 @@ body.reduced .caption-pop span{animation:none!important}body.reduced .cinema-cap
 #story-room.story-reading .cinema-play:hover{background:#ffe5a0;color:#49334f}
 
 #story-room .story-cover{display:flex;flex-direction:column;align-items:stretch}.cinema-cover{width:100%;flex:0 0 300px}.story-cover-copy{flex:1}
-@media(max-width:700px){.cinema-cover{flex-basis:210px}.cinema-backdrop{display:none}}
+@media(max-width:700px){.cinema-cover{flex-basis:210px}.cinema-backdrop{display:block}}
+
+/* Cover thumbnails fill their cards; reading scenes retain the full composition. */
+.cinema-cover .art-slice{width:max(100%,calc(300px * var(--art-ratio)));left:50%;transform:translate(-50%,-50%)}
+@media(max-width:700px){.cinema-cover .art-slice{width:max(100%,calc(210px * var(--art-ratio)))}}

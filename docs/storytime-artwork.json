@@ -1,0 +1,418 @@
+{
+  "generator": "Built-in image generation",
+  "layout": "Cropped sprite sheets with inspected per-sheet boundaries; scene crops are defined in story-books-v3.js",
+  "style": "Soft textured 3D storybook art, existing SmartClass mascot reference images, expressive action, no baked-in captions",
+  "sheets": [
+    {
+      "file": "public/story-scenes-v3/puddle-door-0.webp",
+      "generatedSource": "exec-72ef7571-b6a9-42e3-b4f6-06a507c1eff8.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        362,
+        724,
+        1086
+      ],
+      "rows": [
+        0,
+        362,
+        724,
+        1086,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/puddle-door-1.webp",
+      "generatedSource": "exec-8cff836e-9437-4c34-a56e-18a29189a85a.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        362,
+        723,
+        1086
+      ],
+      "rows": [
+        0,
+        362,
+        724,
+        1086,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/runaway-full-stop-0.webp",
+      "generatedSource": "exec-05fc77b5-feaa-491a-8d28-476f5f5afd05.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        362,
+        724,
+        1086
+      ],
+      "rows": [
+        0,
+        362,
+        724,
+        1086,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/runaway-full-stop-1.webp",
+      "generatedSource": "exec-2b0f5f8c-418b-49fc-ab79-20f0ab66fe6b.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        361,
+        723,
+        1086
+      ],
+      "rows": [
+        0,
+        332,
+        642,
+        906,
+        1158,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/shadow-circus-0.webp",
+      "generatedSource": "exec-9f814163-426a-4e7d-9e02-d08efa379fe5.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        363,
+        725,
+        1086
+      ],
+      "rows": [
+        0,
+        363,
+        725,
+        1085,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/shadow-circus-1.webp",
+      "generatedSource": "exec-8b97fdbf-ac15-4b51-802c-5c66778c4615.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        331,
+        694,
+        1086
+      ],
+      "rows": [
+        0,
+        362,
+        724,
+        1084,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/twenty-second-rocket-0.webp",
+      "generatedSource": "exec-fffbfc03-e934-4914-b5f1-596e3ad70910.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        362,
+        723,
+        1086
+      ],
+      "rows": [
+        0,
+        362,
+        723,
+        1085,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/twenty-second-rocket-1.webp",
+      "generatedSource": "exec-ab367e3c-b25d-45b0-9d99-658ad2790a73.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        331,
+        723,
+        1086
+      ],
+      "rows": [
+        0,
+        361,
+        724,
+        1086,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/footprints-up-0.webp",
+      "generatedSource": "exec-b41facd8-d7e0-49b1-976f-abbdf39b7641.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        361,
+        723,
+        1086
+      ],
+      "rows": [
+        0,
+        362,
+        724,
+        1085,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/footprints-up-1.webp",
+      "generatedSource": "exec-60472464-1f6a-48eb-9b01-b95557fdcdfd.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        343,
+        715,
+        1086
+      ],
+      "rows": [
+        0,
+        363,
+        724,
+        1046,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/unzipped-night-0.webp",
+      "generatedSource": "exec-8aed1474-f60f-4273-a963-98374824b976.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        361,
+        725,
+        1086
+      ],
+      "rows": [
+        0,
+        361,
+        723,
+        1085,
+        1448
+      ]
+    },
+    {
+      "file": "public/story-scenes-v3/unzipped-night-1.webp",
+      "generatedSource": "exec-c4f7b252-4dee-4b34-aa61-769f91288bf1.png",
+      "width": 1086,
+      "height": 1448,
+      "columns": [
+        0,
+        361,
+        725,
+        1086
+      ],
+      "rows": [
+        0,
+        361,
+        723,
+        1085,
+        1448
+      ]
+    }
+  ],
+  "stories": [
+    {
+      "id": "puddle-door",
+      "title": "Maya and the Door Beneath the Puddle",
+      "scenePrompts": [
+        "Maya crouches by a puddle on a bright wet garden path; her reflection winks independently.",
+        "Close view of a tiny blue fish with red postbag emerging from Maya’s magical puddle.",
+        "Maya slides safely down a wide silver water slide through a glowing magical tunnel.",
+        "Maya stands on the ceiling inside an upside-down pastel house, astonished at furniture overhead.",
+        "Maya tests walking along the ceiling while the blue post-fish floats nearby.",
+        "Wide upside-down town with window-swimming fish and potted clouds; Maya touches a tiny raincloud.",
+        "A floating yellow boot filled with bread sails past Maya at an upside-down bakery.",
+        "Maya and post-fish turn toward a tall distant staircase as clouds tremble at a deep knock.",
+        "Maya studies a turquoise river flowing uphill on a broad staircase, leaves floating upward.",
+        "Maya sits securely inside a wide green leaf boat beside post-fish at the staircase base.",
+        "Leaf boat carries Maya up waterfall stairs past a balcony of bright drying rainbows.",
+        "Maya exits leaf boat onto landing facing a tiny round blue door, listening intently.",
+        "Maya crouches at a tiny door; an enormous gentle blue eye is visible through the opening.",
+        "Tiny blue door opens slightly; a soft blue whale nose gently peeks through while Maya watches.",
+        "Maya pulls a golden ribbon, magically widening the circular blue doorway.",
+        "Enormous friendly baby blue whale floats through expanded doorway above tiny delighted Maya.",
+        "Whale Pip has puffed cheeks and rainbow feather on nose; Maya braces with ribbon.",
+        "Whale sneezes sparkling bubbles; pastel houses, leaf boat and potted clouds float gently upward.",
+        "Maya rides a floating yellow bread boot holding the post-fish bag beside airborne whale and town.",
+        "Whale blows gently as bubble-carried houses and flowerpots settle safely back into place.",
+        "Pip holds a flipper beside a large bubble showing Maya’s sunny home garden.",
+        "Maya steps from whale flipper through a glowing garden bubble, waving to the post-fish.",
+        "Maya returns to original garden puddle; tiny yellow bread boot floats on its surface.",
+        "Maya smiles gently at blue whale tail reflected deep in puddle; one tiny sparkling bubble rises."
+      ]
+    },
+    {
+      "id": "runaway-full-stop",
+      "title": "Lily and the Runaway Full Stop",
+      "scenePrompts": [
+        "Lily blue fluffy cloud mascot opens a large picture book showing a red train and black dot.",
+        "Small black full stop with two tiny feet jumps off book lettering; Lily looks surprised.",
+        "Lily reaches a hand into magical book while red train begins moving inside the illustration.",
+        "Lily stands inside a bright illustrated railway station with duck conductor and huge page doorway behind.",
+        "Lily boards first carriage while black dot dances on roof of small red engine.",
+        "Three ducks board a new yellow carriage beside a pond while Lily counts them.",
+        "Wheeled bathtub with rubber duck rolls onto an added carriage; Lily looks amazed.",
+        "A floating birthday cake and balloons approach Lily’s train, followed by party furniture.",
+        "Birthday party fills three train carriages; Lily catches a balloon while cake wobbles safely.",
+        "Long colourful train curves around a rounded hill; Lily sees dot hopping across carriage roofs.",
+        "Lily carefully travels through connected carriage interiors past ducks, bathtub and birthday bunting.",
+        "Lily notices black dot on hanging book page above a track leading toward an unfinished bridge.",
+        "Red train approaches blank white paper gap at book edge; Lily and driver look alert, not terrified.",
+        "Lily draws a broad blue crayon curve that becomes a safe new railway track.",
+        "Train travels a new looping blue track around the page; ducks cheer and Lily concentrates.",
+        "Lily watches rhythmic black-dot hops and holds a small open ticket box.",
+        "Black dot lands in ticket box on low carriage roof; Lily gently closes lid.",
+        "Lily carries ticket box to engine; duck driver points toward unfinished sentence with clear ending gap.",
+        "Lily places black full stop at sentence ending; tiny feet fold away.",
+        "Entire train and party settle peacefully; Lily exhales, balloons and cake still.",
+        "At station, ducks leave for pond, guests carry cake and wheeled bathtub rolls away.",
+        "Lily bows to black dot then steps from giant open book doorway onto home carpet.",
+        "Lily on carpet opens book a crack; small duck conductor peeks from between pages.",
+        "Peaceful book on carpet with bookmark at station and black dot showing tiny playful toes; Lily laughs."
+      ]
+    },
+    {
+      "id": "shadow-circus",
+      "title": "Suzy and the Circus of Giant Shadows",
+      "scenePrompts": [
+        "Orange octopus Suzy holds lantern outside striped circus tent at dusk; shadow has extra waving arms.",
+        "Suzy stares curiously as her independent many-armed shadow bows and lifts tent curtain.",
+        "Suzy peers under raised circus curtain into golden shadow circus; tiny mouse beside enormous drum silhouette.",
+        "Suzy enters circular circus ring with mouse, central lamp, ordinary spoon and button on table.",
+        "Mouse holds small spoon before lamp creating gigantic spoon-shaped slide shadow across tent.",
+        "Suzy slides down solid magical spoon shadow, tentacles spread playfully, mouse watches.",
+        "Suzy experiments moving button near and far from lamp, changing round shadow size.",
+        "Button shadow becomes giant round moon above ring; mouse in silver hat looks toward Suzy.",
+        "Suzy drums and claps tentacles; huge many-armed shadow band forms behind her.",
+        "Mouse tumbles harmlessly into oversized silver hat beside bouncing spoon shadow and moon.",
+        "Friendly moths, beetles and crickets arrive with tiny cushions as Suzy opens curtain.",
+        "Wide circus ring with insect audience, Suzy and matching shadow bowing under warm golden lights.",
+        "Three cricket performers descend giant spoon slide, one safely lands backwards before amused audience.",
+        "Mouse pretends to carry giant moon shadow while Suzy carefully positions real button near lamp.",
+        "Suzy’s tentacle shadows transform into magnificent arches, wheels and giant flower across circus tent.",
+        "First dawn light enters tent and shadow ribbons shrink; Suzy notices with thoughtful surprise.",
+        "Suzy shades lamp with tentacles, restoring some shadow size as mouse points toward dawn.",
+        "Suzy discovers button creates miniature moon shadow inside her translucent paper lantern.",
+        "Mouse and crickets carry tiny circus props toward open lantern held steadily by Suzy.",
+        "Close-up glowing paper lantern containing miniature spoon slide, moon and dancing shadow ribbons.",
+        "Suzy lifts magical lantern in now sunlit ordinary circus tent; tiny shadow show visible inside.",
+        "Suzy walks sunny path holding lantern, her ordinary shadow now mirrors her wave correctly.",
+        "Cosy bedroom at evening, lantern beside Suzy’s bed reveals tiny mouse and moon shadow.",
+        "Sleepy Suzy tucked in bed giggles at miniature backwards cricket slide glowing inside bedside lantern."
+      ]
+    },
+    {
+      "id": "twenty-second-rocket",
+      "title": "Coco and the Twenty-Second Rocket",
+      "scenePrompts": [
+        "Yellow star Coco discovers small round red rocket with blue seat and golden button by garden shed.",
+        "Coco points excitedly at pale daytime moon beside rocket with twenty-dot gauge.",
+        "Coco buckles blue safety belt inside red rocket cockpit and studies glowing golden button.",
+        "Small red rocket launches on silver bubble trail above colourful garden with Coco visible inside.",
+        "Red rocket lands securely on broad cloud platform beside tiny weather shed; Coco steps out.",
+        "Coco meets friendly tiny cloud keeper among rain jars and receives a jar of sparkling wind.",
+        "Coco pours sparkling wind from jar into rocket tank, twenty gauge dots glow.",
+        "Rocket leaves cloud and passes gently through side of enormous transparent floating bubble.",
+        "Inside giant bubble, belted Coco watches map and cushion float around red rocket cockpit.",
+        "Silver flying fish with sparkling ribbon tail talks to Coco through rocket window inside bubble.",
+        "Coco catches tiny fizz bubbles in jar beside rocket; silver fish circles cheerfully.",
+        "Rocket lands on enormous striped hat brim with giant feather, misty sky all around.",
+        "Wide reveal of kind sleeping cloud giant wearing striped hat, tiny Coco and rocket on broad brim.",
+        "Coco quietly catches a gentle visible puff of giant’s snore in glass jar on hat brim.",
+        "Sleeping giant gently straightens hat while Coco braces safely beside rocket and feather.",
+        "Red rocket lifts softly from giant’s hat on faint silver trail, Coco waves quietly.",
+        "Rocket lands in broad shallow silver moon crater under starry violet sky.",
+        "Coco touches moon crater floor with one foot as golden musical ripple spreads, surprised face.",
+        "Coco hops among adjacent shallow moon bowls with distinct glowing musical ripples.",
+        "Moon craters glow in rhythmic pattern with Coco; distant Earth garden and listening giant below.",
+        "Coco performs moon-bowl concert while bubble fish, cloud keeper and giant listen across sky.",
+        "Coco beside rocket with glowing musical fuel tank gives moon surface one final gentle tap.",
+        "Rocket descends past familiar hat, bubble and cloud toward garden where mascot friends wait.",
+        "Coco and Maya beside landed red rocket in twilight garden, moon overhead and tiny musical glow."
+      ]
+    },
+    {
+      "id": "footprints-up",
+      "title": "Juppy and the Footprints That Went Up",
+      "scenePrompts": [
+        "Green frog Juppy compares own foot with giant three-toed muddy footprints beside garden gate.",
+        "Juppy with magnifying glass and blue satchel follows tracks to tree and looks upward.",
+        "Juppy discovers yellow feather and tiny striped sock on branches beside upward muddy tracks.",
+        "Juppy climbs safe broad leafy stair-branch toward small white tooth-shaped object on twig.",
+        "Juppy inspects hollow white tooth-like clue under leaves as yellow feathers drift downward.",
+        "Juppy at broad treetop branch discovers solid cloud walkway marked by muddy footprints.",
+        "Juppy walks across broad safe cloud path with faraway house silhouette ahead.",
+        "Juppy listens beside huge cauliflower-shaped cloud, following distant clucking and creaking.",
+        "Reveal cosy small wooden house walking on huge yellow chicken feet across clouds, kettle chimney.",
+        "Tiny snail wearing one striped sock leans from walking house window to greet Juppy.",
+        "Juppy returns tiny striped sock and shows feather; snail cheers from low house window.",
+        "Juppy matches white tooth-shaped shard to chipped white doorstep of walking house.",
+        "House crouches on cloud with ladder unfolded; Juppy boards through cosy front door.",
+        "Juppy and tiny snail in whimsical house kitchen with large rocking chair and round walls.",
+        "Juppy and snail inspect gentle crack in round house wall revealing soft yellow down.",
+        "Juppy realises house is huge egg as snail opens cupboard containing picnic blanket and whistle.",
+        "Juppy and snail move tea things onto broad cloud picnic blanket safely away from egg-house.",
+        "Giant fluffy yellow sky chick hatches from round house shell, roof lifting gently; friends watch.",
+        "Newly hatched sky chick shakes feathers; egg-house halves form shelter and bowl beside picnic.",
+        "Gentle giant chick takes tiny biscuit offered by Juppy while snail offers plate.",
+        "Juppy and snail settle securely in feather nest on giant chick’s back with picnic basket.",
+        "Giant yellow sky chick flies gently across clouds carrying Juppy and snail toward garden.",
+        "Sky chick lands beside original garden gate; Maya greets Juppy and snail in amazement.",
+        "Friends picnic under tree shaded by sky chick wing; tiny snail wears matching striped socks."
+      ]
+    },
+    {
+      "id": "unzipped-night",
+      "title": "The Friends Who Unzipped the Night",
+      "scenePrompts": [
+        "Five SmartClass mascots at twilight picnic spot a huge golden zipper across violet sky.",
+        "Maya gently pulls reachable golden sky zipper from hilltop while friends watch with wonder.",
+        "Five friends climb broad folded-cloud staircase through glowing opening in evening sky.",
+        "Reveal magical night workshop with star trays, drying clouds, rolled gold sunrise and spectacled moth.",
+        "Tiny moth with oversized spectacles shows Suzy rolled golden sunrise carpet in workshop.",
+        "Lily and Coco inspect star polishing tray while Juppy discovers basket of damp clouds.",
+        "Maya carefully opens corner of layered pink orange gold sunrise carpet lighting her paws.",
+        "Suzy accidentally tips small warm glowing sun out of wooden cradle, surprised expression.",
+        "Small glowing sun rolls across workshop past cloud cushion as five mascots follow.",
+        "Maya watches sun bounce down cloud steps, little sunrise flashes illuminating sleepy rooster far below.",
+        "Maya Lily Juppy catch warm sun gently in picnic blanket across broad staircase landing.",
+        "Suzy holds cradle steady as friends carefully return sun, Coco folds picnic blanket.",
+        "Five friends choose workshop jobs with spectacled moth and tiny clock in background.",
+        "Coco polishes stars with cloth, small star reacting playfully while moth arranges tray.",
+        "Lily and Juppy hang differently sized clouds on matching clothes pegs as silver drops fall.",
+        "Suzy carefully operates golden lift carrying sun securely in cradle, focused expression.",
+        "Maya unrolls pink orange gold sunrise across long frame; horizon outside begins glowing.",
+        "Juppy passes fluffy clouds through hatch while Lily arranges them in glowing dawn sky.",
+        "Coco smilingly puts polished stars on night shelf as moth explains beside dawn hatch.",
+        "All five mascots check completed sunrise machinery; sun at top of lift and moth signals readiness.",
+        "Workshop opens to spectacular sunrise over rolling hills; five friends watch in awe from threshold.",
+        "Sunlit homes, birds and crowing rooster below; five mascots wave from broad cloud staircase.",
+        "Friends return to picnic hill as Maya closes sky zipper leaving tiny gold stitch; Suzy checks basket.",
+        "Five friends quietly share biscuit on morning picnic hill beneath their smiling cloud, peaceful satisfied faces."
+      ]
+    }
+  ]
+}
