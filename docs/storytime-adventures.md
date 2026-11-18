@@ -963,3 +963,7 @@ They climbed back to the picnic hill. Maya pulled the golden zip closed. The sky
 They shared the biscuit and watched the clouds drift past. One long cloud curved into a familiar smile. Coco pointed. “That is ours.” And for a while, nobody needed to say anything more.
 
 *Illustration: Five friends quietly share biscuit on morning picnic hill beneath their smiling cloud, peaceful satisfied faces.*
+
+## Responsive scene artwork
+
+All 144 scenes include dedicated portrait compositions for upright phones. Portrait frames fill the stage with minimal edge trimming; landscape uses the original compositions fitted within a matching blurred backdrop. Rotation preserves the scene and narration position. The 24 optimized WebP sheets load on demand, with the following sheet preloaded. Artwork provenance and crop boundaries are in storytime-portrait-artwork.json.

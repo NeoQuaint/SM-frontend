@@ -1,4 +1,4 @@
-// Six original adventures; scene text and artwork advance together.
+// Six original adventures; responsive scene artwork advances with narration.
 window.STORY_BOOKS=[
   {
     "id": "puddle-door",
@@ -29,7 +29,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Strange Splash",
@@ -44,7 +54,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-0.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Strange Splash",
@@ -59,7 +79,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-0.webp",
+          "crop": [
+            0.6685082872928176,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Strange Splash",
@@ -74,7 +104,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Walking on the Ceiling",
@@ -89,7 +129,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-0.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Walking on the Ceiling",
@@ -104,7 +154,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-0.webp",
+          "crop": [
+            0.6685082872928176,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Walking on the Ceiling",
@@ -119,7 +179,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4965469613259669
+          ],
+          "ratio": 0.49791376912378305
+        }
       },
       {
         "title": "Walking on the Ceiling",
@@ -134,7 +204,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-1.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "The Upstairs River",
@@ -149,7 +229,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-1.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "The Upstairs River",
@@ -164,7 +254,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5006906077348067,
+            0.3296500920810313,
+            0.4979281767955801
+          ],
+          "ratio": 0.49653259361997226
+        }
       },
       {
         "title": "The Upstairs River",
@@ -179,7 +279,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-1.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5006906077348067,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "The Upstairs River",
@@ -194,7 +304,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-1.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5006906077348067,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "The Enormous Knock",
@@ -209,7 +329,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Enormous Knock",
@@ -224,7 +354,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-2.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "The Enormous Knock",
@@ -239,7 +379,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-2.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Enormous Knock",
@@ -254,7 +404,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Whale of a Sneeze",
@@ -269,7 +429,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-2.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "A Whale of a Sneeze",
@@ -284,7 +454,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-2.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "A Whale of a Sneeze",
@@ -299,7 +479,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Whale of a Sneeze",
@@ -314,7 +504,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-3.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Home Through the Rain",
@@ -329,7 +529,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-3.webp",
+          "crop": [
+            0.6685082872928176,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Home Through the Rain",
@@ -344,7 +554,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Home Through the Rain",
@@ -359,7 +579,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-3.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Home Through the Rain",
@@ -374,7 +604,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/puddle-door-3.webp",
+          "crop": [
+            0.6685082872928176,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       }
     ],
     "cover": {
@@ -422,7 +662,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Dot That Ran",
@@ -437,7 +687,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-0.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Dot That Ran",
@@ -452,7 +712,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-0.webp",
+          "crop": [
+            0.6685082872928176,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Dot That Ran",
@@ -467,7 +737,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "All Aboard the Page",
@@ -482,7 +762,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-0.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "All Aboard the Page",
@@ -497,7 +787,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-0.webp",
+          "crop": [
+            0.6685082872928176,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "All Aboard the Page",
@@ -512,7 +812,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "All Aboard the Page",
@@ -527,7 +837,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-1.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Long Train",
@@ -542,7 +862,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-1.webp",
+          "crop": [
+            0.6685082872928176,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Long Train",
@@ -557,7 +887,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Long Train",
@@ -572,7 +912,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-1.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Very Long Train",
@@ -587,7 +937,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-1.webp",
+          "crop": [
+            0.6685082872928176,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Edge of the Story",
@@ -602,7 +962,17 @@ window.STORY_BOOKS=[
           0.2265193370165746
         ],
         "ratio": 1.0884146341463414,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Edge of the Story",
@@ -617,7 +987,17 @@ window.STORY_BOOKS=[
           0.2265193370165746
         ],
         "ratio": 1.0945121951219512,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-2.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "The Edge of the Story",
@@ -632,7 +1012,17 @@ window.STORY_BOOKS=[
           0.21132596685082872
         ],
         "ratio": 1.1666666666666667,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-2.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Edge of the Story",
@@ -647,7 +1037,17 @@ window.STORY_BOOKS=[
           0.21132596685082872
         ],
         "ratio": 1.1699346405228759,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Catch That Dot",
@@ -662,7 +1062,17 @@ window.STORY_BOOKS=[
           0.21132596685082872
         ],
         "ratio": 1.173202614379085,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-2.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "Catch That Dot",
@@ -677,7 +1087,17 @@ window.STORY_BOOKS=[
           0.17955801104972377
         ],
         "ratio": 1.373076923076923,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-2.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "Catch That Dot",
@@ -692,7 +1112,17 @@ window.STORY_BOOKS=[
           0.17955801104972377
         ],
         "ratio": 1.3807692307692307,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "Catch That Dot",
@@ -707,7 +1137,17 @@ window.STORY_BOOKS=[
           0.1712707182320442
         ],
         "ratio": 1.439516129032258,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "One More Little Adventure",
@@ -722,7 +1162,17 @@ window.STORY_BOOKS=[
           0.1712707182320442
         ],
         "ratio": 1.4435483870967742,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "One More Little Adventure",
@@ -737,7 +1187,17 @@ window.STORY_BOOKS=[
           0.19751381215469613
         ],
         "ratio": 1.2482517482517483,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "One More Little Adventure",
@@ -752,7 +1212,17 @@ window.STORY_BOOKS=[
           0.19751381215469613
         ],
         "ratio": 1.2517482517482517,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "One More Little Adventure",
@@ -767,7 +1237,17 @@ window.STORY_BOOKS=[
           0.19751381215469613
         ],
         "ratio": 1.2552447552447552,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/runaway-full-stop-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       }
     ],
     "cover": {
@@ -815,7 +1295,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "The Extra Arms",
@@ -830,7 +1320,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9972144846796658,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-0.webp",
+          "crop": [
+            0.3360957642725598,
+            0.0013812154696132596,
+            0.3278084714548803,
+            0.4979281767955801
+          ],
+          "ratio": 0.49375866851595007
+        }
       },
       {
         "title": "The Extra Arms",
@@ -845,7 +1345,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-0.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "The Extra Arms",
@@ -860,7 +1370,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5020718232044199,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Behind the Curtain",
@@ -875,7 +1395,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-0.webp",
+          "crop": [
+            0.3360957642725598,
+            0.5020718232044199,
+            0.3278084714548803,
+            0.4965469613259669
+          ],
+          "ratio": 0.4951321279554937
+        }
       },
       {
         "title": "Behind the Curtain",
@@ -890,7 +1420,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-0.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5020718232044199,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Behind the Curtain",
@@ -905,7 +1445,17 @@ window.STORY_BOOKS=[
           0.24585635359116023
         ],
         "ratio": 1.0084269662921348,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Behind the Curtain",
@@ -920,7 +1470,17 @@ window.STORY_BOOKS=[
           0.24585635359116023
         ],
         "ratio": 1.0056179775280898,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-1.webp",
+          "crop": [
+            0.3360957642725598,
+            0.0013812154696132596,
+            0.3268876611418048,
+            0.4965469613259669
+          ],
+          "ratio": 0.4937413073713491
+        }
       },
       {
         "title": "A Very Small Rehearsal",
@@ -935,7 +1495,17 @@ window.STORY_BOOKS=[
           0.24585635359116023
         ],
         "ratio": 1.002808988764045,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-1.webp",
+          "crop": [
+            0.6666666666666666,
+            0.0013812154696132596,
+            0.3314917127071823,
+            0.4965469613259669
+          ],
+          "ratio": 0.5006954102920723
+        }
       },
       {
         "title": "A Very Small Rehearsal",
@@ -950,7 +1520,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5006906077348067,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "A Very Small Rehearsal",
@@ -965,7 +1545,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9972144846796658,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-1.webp",
+          "crop": [
+            0.3360957642725598,
+            0.5006906077348067,
+            0.3268876611418048,
+            0.4979281767955801
+          ],
+          "ratio": 0.492371705963939
+        }
       },
       {
         "title": "A Very Small Rehearsal",
@@ -980,7 +1570,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-1.webp",
+          "crop": [
+            0.6666666666666666,
+            0.5006906077348067,
+            0.3314917127071823,
+            0.4979281767955801
+          ],
+          "ratio": 0.49930651872399445
+        }
       },
       {
         "title": "The Biggest Little Show",
@@ -995,7 +1595,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9134078212290503,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "The Biggest Little Show",
@@ -1010,7 +1620,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-2.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Biggest Little Show",
@@ -1025,7 +1645,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0837988826815643,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-2.webp",
+          "crop": [
+            0.6685082872928176,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Biggest Little Show",
@@ -1040,7 +1670,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9134078212290503,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "Here Comes the Sun",
@@ -1055,7 +1695,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-2.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "Here Comes the Sun",
@@ -1070,7 +1720,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0837988826815643,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-2.webp",
+          "crop": [
+            0.6685082872928176,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Here Comes the Sun",
@@ -1085,7 +1745,17 @@ window.STORY_BOOKS=[
           0.24585635359116023
         ],
         "ratio": 0.9185393258426966,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "Here Comes the Sun",
@@ -1100,7 +1770,17 @@ window.STORY_BOOKS=[
           0.24585635359116023
         ],
         "ratio": 1.0084269662921348,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3314917127071823,
+            0.4965469613259669
+          ],
+          "ratio": 0.5006954102920723
+        }
       },
       {
         "title": "A Circus to Carry Home",
@@ -1115,7 +1795,17 @@ window.STORY_BOOKS=[
           0.24585635359116023
         ],
         "ratio": 1.0898876404494382,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-3.webp",
+          "crop": [
+            0.6694290976058932,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "A Circus to Carry Home",
@@ -1130,7 +1820,17 @@ window.STORY_BOOKS=[
           0.24861878453038674
         ],
         "ratio": 0.9083333333333333,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5006906077348067,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "A Circus to Carry Home",
@@ -1145,7 +1845,17 @@ window.STORY_BOOKS=[
           0.24861878453038674
         ],
         "ratio": 0.9972222222222222,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5006906077348067,
+            0.3314917127071823,
+            0.4979281767955801
+          ],
+          "ratio": 0.49930651872399445
+        }
       },
       {
         "title": "A Circus to Carry Home",
@@ -1160,7 +1870,17 @@ window.STORY_BOOKS=[
           0.24861878453038674
         ],
         "ratio": 1.0777777777777777,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/shadow-circus-3.webp",
+          "crop": [
+            0.6694290976058932,
+            0.5006906077348067,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       }
     ],
     "cover": {
@@ -1208,7 +1928,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "Somewhere Nearby",
@@ -1223,7 +1953,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-0.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "Somewhere Nearby",
@@ -1238,7 +1978,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-0.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "Somewhere Nearby",
@@ -1253,7 +2003,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0028011204481793,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "A Cloud for a Landing",
@@ -1268,7 +2028,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-0.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "A Cloud for a Landing",
@@ -1283,7 +2053,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0056022408963585,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-0.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "A Cloud for a Landing",
@@ -1298,7 +2078,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4965469613259669
+          ],
+          "ratio": 0.49791376912378305
+        }
       },
       {
         "title": "A Cloud for a Landing",
@@ -1313,7 +2103,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-1.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "Inside a Bubble",
@@ -1328,7 +2128,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-1.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Inside a Bubble",
@@ -1343,7 +2153,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9972144846796658,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5006906077348067,
+            0.3296500920810313,
+            0.4979281767955801
+          ],
+          "ratio": 0.49653259361997226
+        }
       },
       {
         "title": "Inside a Bubble",
@@ -1358,7 +2178,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-1.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5006906077348067,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "Inside a Bubble",
@@ -1373,7 +2203,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-1.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5006906077348067,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "The Sleeping Hat",
@@ -1388,7 +2228,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 0.9159663865546218,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Sleeping Hat",
@@ -1403,7 +2253,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0868347338935573,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-2.webp",
+          "crop": [
+            0.3351749539594843,
+            0.0013812154696132596,
+            0.3278084714548803,
+            0.4972375690607735
+          ],
+          "ratio": 0.49444444444444446
+        }
       },
       {
         "title": "The Sleeping Hat",
@@ -1418,7 +2278,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0056022408963585,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-2.webp",
+          "crop": [
+            0.6666666666666666,
+            0.0013812154696132596,
+            0.3314917127071823,
+            0.4972375690607735
+          ],
+          "ratio": 0.5
+        }
       },
       {
         "title": "The Sleeping Hat",
@@ -1433,7 +2303,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9108635097493036,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The Last Little Flight",
@@ -1448,7 +2328,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1.0807799442896935,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-2.webp",
+          "crop": [
+            0.3351749539594843,
+            0.5013812154696132,
+            0.3278084714548803,
+            0.4972375690607735
+          ],
+          "ratio": 0.49444444444444446
+        }
       },
       {
         "title": "The Last Little Flight",
@@ -1463,7 +2353,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-2.webp",
+          "crop": [
+            0.6666666666666666,
+            0.5013812154696132,
+            0.3314917127071823,
+            0.4972375690607735
+          ],
+          "ratio": 0.5
+        }
       },
       {
         "title": "The Last Little Flight",
@@ -1478,7 +2378,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9134078212290503,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Last Little Flight",
@@ -1493,7 +2403,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0837988826815643,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-3.webp",
+          "crop": [
+            0.3360957642725598,
+            0.0013812154696132596,
+            0.3278084714548803,
+            0.4972375690607735
+          ],
+          "ratio": 0.49444444444444446
+        }
       },
       {
         "title": "The Moon Goes Bong",
@@ -1508,7 +2428,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Moon Goes Bong",
@@ -1523,7 +2453,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9134078212290503,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Moon Goes Bong",
@@ -1538,7 +2478,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0837988826815643,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-3.webp",
+          "crop": [
+            0.3360957642725598,
+            0.5013812154696132,
+            0.3278084714548803,
+            0.4972375690607735
+          ],
+          "ratio": 0.49444444444444446
+        }
       },
       {
         "title": "The Moon Goes Bong",
@@ -1553,7 +2503,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/twenty-second-rocket-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       }
     ],
     "cover": {
@@ -1601,7 +2561,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "Mud on the Leaves",
@@ -1616,7 +2586,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-0.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4979281767955801
+          ],
+          "ratio": 0.49653259361997226
+        }
       },
       {
         "title": "Mud on the Leaves",
@@ -1631,7 +2611,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-0.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "Mud on the Leaves",
@@ -1646,7 +2636,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5020718232044199,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "A Trail in the Tree",
@@ -1661,7 +2661,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-0.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5020718232044199,
+            0.3296500920810313,
+            0.4965469613259669
+          ],
+          "ratio": 0.49791376912378305
+        }
       },
       {
         "title": "A Trail in the Tree",
@@ -1676,7 +2686,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.0027932960893855,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-0.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5020718232044199,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "A Trail in the Tree",
@@ -1691,7 +2711,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "A Trail in the Tree",
@@ -1706,7 +2736,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0028011204481793,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-1.webp",
+          "crop": [
+            0.3360957642725598,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "Footprints in the Clouds",
@@ -1721,7 +2761,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0056022408963585,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-1.webp",
+          "crop": [
+            0.6685082872928176,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4979281767955801
+          ],
+          "ratio": 0.49653259361997226
+        }
       },
       {
         "title": "Footprints in the Clouds",
@@ -1736,7 +2786,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5020718232044199,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Footprints in the Clouds",
@@ -1751,7 +2811,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9972144846796658,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-1.webp",
+          "crop": [
+            0.3360957642725598,
+            0.5020718232044199,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "Footprints in the Clouds",
@@ -1766,7 +2836,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-1.webp",
+          "crop": [
+            0.6685082872928176,
+            0.5020718232044199,
+            0.3296500920810313,
+            0.4965469613259669
+          ],
+          "ratio": 0.49791376912378305
+        }
       },
       {
         "title": "The Walking House",
@@ -1781,7 +2861,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9442896935933147,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Walking House",
@@ -1796,7 +2886,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1.0250696378830084,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-2.webp",
+          "crop": [
+            0.3360957642725598,
+            0.0013812154696132596,
+            0.3278084714548803,
+            0.4972375690607735
+          ],
+          "ratio": 0.49444444444444446
+        }
       },
       {
         "title": "The Walking House",
@@ -1811,7 +2911,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1.0222841225626742,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-2.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The Walking House",
@@ -1826,7 +2936,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 0.9495798319327731,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "A House With a Heartbeat",
@@ -1841,7 +2961,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0308123249299719,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-2.webp",
+          "crop": [
+            0.3360957642725598,
+            0.5013812154696132,
+            0.3278084714548803,
+            0.4972375690607735
+          ],
+          "ratio": 0.49444444444444446
+        }
       },
       {
         "title": "A House With a Heartbeat",
@@ -1856,7 +2986,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0280112044817926,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-2.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "A House With a Heartbeat",
@@ -1871,7 +3011,17 @@ window.STORY_BOOKS=[
           0.21961325966850828
         ],
         "ratio": 1.0660377358490567,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "A House With a Heartbeat",
@@ -1886,7 +3036,17 @@ window.STORY_BOOKS=[
           0.21961325966850828
         ],
         "ratio": 1.1572327044025157,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The First Flying Picnic",
@@ -1901,7 +3061,17 @@ window.STORY_BOOKS=[
           0.21961325966850828
         ],
         "ratio": 1.1540880503144655,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       },
       {
         "title": "The First Flying Picnic",
@@ -1916,7 +3086,17 @@ window.STORY_BOOKS=[
           0.27486187845303867
         ],
         "ratio": 0.8517587939698492,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5013812154696132,
+            0.3287292817679558,
+            0.4972375690607735
+          ],
+          "ratio": 0.49583333333333335
+        }
       },
       {
         "title": "The First Flying Picnic",
@@ -1931,7 +3111,17 @@ window.STORY_BOOKS=[
           0.27486187845303867
         ],
         "ratio": 0.9246231155778895,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5013812154696132,
+            0.3296500920810313,
+            0.4972375690607735
+          ],
+          "ratio": 0.49722222222222223
+        }
       },
       {
         "title": "The First Flying Picnic",
@@ -1946,7 +3136,17 @@ window.STORY_BOOKS=[
           0.27486187845303867
         ],
         "ratio": 0.9221105527638191,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/footprints-up-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5013812154696132,
+            0.3305709023941068,
+            0.4972375690607735
+          ],
+          "ratio": 0.4986111111111111
+        }
       }
     ],
     "cover": {
@@ -1994,7 +3194,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.32044198895027626,
+            0.4979281767955801
+          ],
+          "ratio": 0.4826629680998613
+        }
       },
       {
         "title": "A Golden Zip",
@@ -2009,7 +3219,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0084033613445378,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-0.webp",
+          "crop": [
+            0.3259668508287293,
+            0.0013812154696132596,
+            0.3397790055248619,
+            0.4979281767955801
+          ],
+          "ratio": 0.5117891816920943
+        }
       },
       {
         "title": "A Golden Zip",
@@ -2024,7 +3244,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-0.webp",
+          "crop": [
+            0.6694290976058932,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "A Golden Zip",
@@ -2039,7 +3269,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-0.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5020718232044199,
+            0.32044198895027626,
+            0.4965469613259669
+          ],
+          "ratio": 0.48400556328233657
+        }
       },
       {
         "title": "Behind the Stars",
@@ -2054,7 +3294,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.005586592178771,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-0.webp",
+          "crop": [
+            0.3259668508287293,
+            0.5020718232044199,
+            0.3397790055248619,
+            0.4965469613259669
+          ],
+          "ratio": 0.5132127955493742
+        }
       },
       {
         "title": "Behind the Stars",
@@ -2069,7 +3319,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-0.webp",
+          "crop": [
+            0.6694290976058932,
+            0.5020718232044199,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "Behind the Stars",
@@ -2084,7 +3344,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Behind the Stars",
@@ -2099,7 +3369,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.005586592178771,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-1.webp",
+          "crop": [
+            0.3360957642725598,
+            0.0013812154696132596,
+            0.3278084714548803,
+            0.4965469613259669
+          ],
+          "ratio": 0.4951321279554937
+        }
       },
       {
         "title": "Making Tomorrow",
@@ -2114,7 +3394,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-1.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Making Tomorrow",
@@ -2129,7 +3419,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-1.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5006906077348067,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "Making Tomorrow",
@@ -2144,7 +3444,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1.0027855153203342,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-1.webp",
+          "crop": [
+            0.3360957642725598,
+            0.5006906077348067,
+            0.3278084714548803,
+            0.4979281767955801
+          ],
+          "ratio": 0.49375866851595007
+        }
       },
       {
         "title": "Making Tomorrow",
@@ -2159,7 +3469,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-1.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5006906077348067,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       },
       {
         "title": "Catch the Sun",
@@ -2174,7 +3494,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "Catch the Sun",
@@ -2189,7 +3519,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1.0084033613445378,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-2.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "Catch the Sun",
@@ -2204,7 +3544,17 @@ window.STORY_BOOKS=[
           0.24654696132596685
         ],
         "ratio": 1,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-2.webp",
+          "crop": [
+            0.6666666666666666,
+            0.0013812154696132596,
+            0.3314917127071823,
+            0.4979281767955801
+          ],
+          "ratio": 0.49930651872399445
+        }
       },
       {
         "title": "Catch the Sun",
@@ -2219,7 +3569,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-2.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5020718232044199,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "A Sky Full of Almost",
@@ -2234,7 +3594,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.005586592178771,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-2.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5020718232044199,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "A Sky Full of Almost",
@@ -2249,7 +3619,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-2.webp",
+          "crop": [
+            0.6666666666666666,
+            0.5020718232044199,
+            0.3314917127071823,
+            0.4965469613259669
+          ],
+          "ratio": 0.5006954102920723
+        }
       },
       {
         "title": "A Sky Full of Almost",
@@ -2264,7 +3644,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.0013812154696132596,
+            0.3287292817679558,
+            0.4965469613259669
+          ],
+          "ratio": 0.4965229485396384
+        }
       },
       {
         "title": "A Sky Full of Almost",
@@ -2279,7 +3669,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 1.005586592178771,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.0013812154696132596,
+            0.3296500920810313,
+            0.4965469613259669
+          ],
+          "ratio": 0.49791376912378305
+        }
       },
       {
         "title": "Our Very Own Morning",
@@ -2294,7 +3694,17 @@ window.STORY_BOOKS=[
           0.2472375690607735
         ],
         "ratio": 0.9972067039106145,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.0013812154696132596,
+            0.3305709023941068,
+            0.4965469613259669
+          ],
+          "ratio": 0.4993045897079277
+        }
       },
       {
         "title": "Our Very Own Morning",
@@ -2309,7 +3719,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-3.webp",
+          "crop": [
+            0.001841620626151013,
+            0.5006906077348067,
+            0.3287292817679558,
+            0.4979281767955801
+          ],
+          "ratio": 0.49514563106796117
+        }
       },
       {
         "title": "Our Very Own Morning",
@@ -2324,7 +3744,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 1.0027855153203342,
-        "holdMs": 1500
+        "holdMs": 1500,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-3.webp",
+          "crop": [
+            0.3342541436464088,
+            0.5006906077348067,
+            0.3296500920810313,
+            0.4979281767955801
+          ],
+          "ratio": 0.49653259361997226
+        }
       },
       {
         "title": "Our Very Own Morning",
@@ -2339,7 +3769,17 @@ window.STORY_BOOKS=[
           0.2479281767955801
         ],
         "ratio": 0.9944289693593314,
-        "holdMs": 2200
+        "holdMs": 2200,
+        "portrait": {
+          "sheet": "story-scenes-portrait/unzipped-night-3.webp",
+          "crop": [
+            0.6675874769797422,
+            0.5006906077348067,
+            0.3305709023941068,
+            0.4979281767955801
+          ],
+          "ratio": 0.49791955617198336
+        }
       }
     ],
     "cover": {
