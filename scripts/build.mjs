@@ -7,8 +7,13 @@ console.log('SmartClass Kids: static production build ready.');
 
 // A shareable entry point reuses the live game and never requires an account.
 const kids=await readFile(new URL('../public/kids.html',import.meta.url),'utf8');
-const preview=kids.replace('<html lang="en">','<html lang="en" data-find-preview="true">')
+let preview=kids.replace('<html lang="en">','<html lang="en" data-find-preview="true">')
 .replaceAll('SmartClass Kids | Play, Learn and Explore (Ages 3-6)','Try Mountain Picnic | SmartClass')
 .replaceAll('https://www.smartclasss.com/kids','https://www.smartclasss.com/try-find')
 .replaceAll('Help your child learn to read, count, and explore with fun, interactive 3D games. The perfect school-readiness app for toddlers. Start your free trial today.','Play a free Mountain Picnic adventure with Maya. Five playful discoveries. No login or signup needed.');
+preview=preview.replaceAll('https://www.smartclasss.com/maya-pointing-summit-fast.webp','https://www.smartclasss.com/find-preview-share-v1.png')
+.replace('<meta property="og:image:width" content="1254">','<meta property="og:image:width" content="1122">')
+.replace('<meta property="og:image:height" content="1254">','<meta property="og:image:height" content="1402">')
+.replace('Maya, the friendly purple SmartClass mascot, invites children to explore and learn.','Little Explorer: Mountain Picnic. Maya and Juppy celebrate five discoveries together.')
+.replace('</head>','<meta name="twitter:image:alt" content="Little Explorer: Mountain Picnic with Maya and Juppy."></head>');
 await writeFile(new URL('try-find.html',output),preview);
