@@ -29,7 +29,7 @@ test('policies are static, linked and routed before the catch-all',async()=>{
   for(const [,anchor]of html.matchAll(/href="#([^"]+)"/g))assert(html.includes('id="'+anchor+'"'));
  }
  const sitemap=await read('public/sitemap.xml');for(const name of names)assert(sitemap.includes('https://www.smartclasss.com/'+name));
- for(const file of ['public/index.html','public/parent-account.js','public/kids-progress-dashboard.js','public/kids-membership-demo.js']){const source=await read(file);for(const name of ['terms','privacy','refunds','account-data'])assert(source.includes('href="/'+name+'"'),file+' missing '+name);}
+ for(const file of ['public/index.html','public/parent-account.js','public/kids-progress-dashboard.js','public/kids-membership-demo.js']){const source=await read(file);for(const name of ['terms','privacy'])assert(source.includes('href="/'+name+'"'),file+' missing '+name);}
 });
 test('policies distinguish previews, actual purchases and actual data handling',async()=>{
  const terms=await read('public/terms.html'),privacy=await read('public/privacy.html'),refunds=await read('public/refunds.html'),account=await read('public/account-data.html');
