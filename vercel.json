@@ -24,9 +24,54 @@
       "source": "/stage-preview",
       "destination": "/kids",
       "permanent": false
+    },
+    {
+      "source": "/terms-and-conditions",
+      "destination": "/terms",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/refund-policy",
+      "destination": "/refunds",
+      "permanent": true
+    },
+    {
+      "source": "/cancellation-policy",
+      "destination": "/refunds",
+      "permanent": true
+    },
+    {
+      "source": "/delete-account",
+      "destination": "/account-data",
+      "permanent": true
     }
   ],
   "rewrites": [
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/refunds",
+      "destination": "/refunds.html"
+    },
+    {
+      "source": "/account-data",
+      "destination": "/account-data.html"
+    },
+    {
+      "source": "/legal",
+      "destination": "/legal.html"
+    },
     {
       "source": "/api/kokoro",
       "destination": "https://smartclass-wlgb.onrender.com/api/neo/speak"

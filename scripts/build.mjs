@@ -1,4 +1,7 @@
 import {cp,mkdir,rm,readFile,writeFile} from 'node:fs/promises';
+import {generateLegal} from './generate-legal.mjs';
+// Missing merchant identity must never become public policy text.
+await generateLegal({draft:process.argv.includes('--legal-draft')});
 const output=new URL('../dist/',import.meta.url);
 await rm(output,{recursive:true,force:true});
 await mkdir(output,{recursive:true});
