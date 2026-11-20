@@ -6,9 +6,9 @@ const root=new URL('../public/',import.meta.url),context={window:{}};
 for(const file of ['story-books-v3.js','story-recordings.js'])vm.runInNewContext(await readFile(new URL(file,root),'utf8'),context);
 test('each supplied recording covers its own complete story in chronological scene and sentence cues',async()=>{
  const {STORY_BOOKS:books,STORY_RECORDINGS:recordings}=context.window;
- assert.equal(Object.keys(recordings).length,3);
- for(const name of ['Maya','Suzy','Lily']){
-  const book=books.find(b=>b.friend===name),recording=recordings[book.id];
+ assert.equal(Object.keys(recordings).length,6);
+ for(const name of ['Maya','Suzy','Lily','Coco','Juppy','Friends']){
+  const book=(name==='Friends'?books[5]:books.find(b=>b.friend===name)),recording=recordings[book.id];
   assert.equal(recording.src,'story-audio/'+name.toLowerCase()+'.mp3');
   assert((await stat(new URL(recording.src,root))).size>100000);
   assert.equal(recording.scenes.length,book.pages.length);
