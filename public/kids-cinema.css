@@ -17,3 +17,6 @@ body.reduced .caption-pop span{animation:none!important}body.reduced .cinema-cap
 
 /* Story playback fills the viewport in either orientation. */
 #story-room.story-reading{position:fixed;inset:0;margin:0;padding:0;width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0}
+
+/* The scene is the pause target; only three controls appear while paused. */
+#story-room .cinema-controls[hidden]{display:none!important}#cinema-stage:focus{outline:none}.cinema-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#story-room.is-reading #story-end{display:none}#story-room .cinema-shade{background:linear-gradient(transparent 50%,#15122515 65%,#15122599 100%)}#story-room.story-reading .cinema-controls button{min-width:52px;min-height:52px}.cinema-controls{gap:18px}#story-room:not(.is-reading) .cinema-controls{animation:story-word-in .18s ease-out}#story-room #story-end{background:transparent;padding:0}
