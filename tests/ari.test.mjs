@@ -1,0 +1,34 @@
+import assert from 'node:assert/strict';
+import {EventEmitter} from 'node:events';
+import {SignJWT} from 'jose';
+import {createHandler as authHandler,currentUser} from '../api/ari-auth.js';
+import {createHandler as chatHandler} from '../api/ari-chat.js';
+process.env.GOOGLE_CLIENT_ID='test-google-client';process.env.AUTH_SESSION_SECRET='test-secret-for-ari-at-least-32-characters';process.env.ARI_OWNER_EMAIL='owner@example.com';process.env.DEEPSEEK_API_KEY='test-key-not-real';
+class Response extends EventEmitter{headers={};code=200;output='';setHeader(k,v){this.headers[k]=v}status(n){this.code=n;return this}json(body){this.body=body;return this}write(chunk){this.output+=chunk}end(){this.ended=true}flushHeaders(){}}
+const request=(method,body,cookie='',origin='https://www.smartclasss.com')=>({method,body,headers:{cookie,origin,'content-type':'application/json','sec-fetch-site':'same-origin'}});
+async function call(handler,req){const res=new Response();await handler(req,res);return res}
+let claims;const auth=authHandler({verifyGoogle:async(token,audience)=>{assert.equal(audience,'test-google-client');if(token!=='valid')throw Error();return claims}});
+const init=await call(auth,request('GET'));assert.equal(init.body.configured,true);const challenge=init.headers['Set-Cookie'].split(';')[0],csrf=init.body.csrf;
+claims={sub:'owner-id',email:'owner@example.com',email_verified:true,given_name:'Neo',nonce:csrf};const loginBody={action:'login',csrf,credential:'valid'};
+assert.equal((await call(auth,request('POST',loginBody,challenge,'https://evil.example'))).code,403);
+assert.equal((await call(auth,request('POST',{...loginBody,csrf:'wrong'},challenge))).code,403);
+claims.email='stranger@example.com';assert.equal((await call(auth,request('POST',loginBody,challenge))).code,403);
+claims.email='owner@example.com';claims.email_verified=false;assert.equal((await call(auth,request('POST',loginBody,challenge))).code,403);
+claims.email_verified=true;claims.nonce='wrong';assert.equal((await call(auth,request('POST',loginBody,challenge))).code,403);claims.nonce=csrf;
+assert.equal((await call(auth,request('POST',{...loginBody,credential:'invalid'},challenge))).code,401);
+const login=await call(auth,request('POST',loginBody,challenge));assert.equal(login.code,200);assert.match(login.headers['Set-Cookie'],/HttpOnly; Secure; SameSite=Strict/);const session=login.headers['Set-Cookie'].split(';')[0];
+assert.equal((await currentUser(request('GET',null,session))).email,'owner@example.com');assert.equal(await currentUser(request('GET',null,session+'x')),null);
+const parent=await new SignJWT({email:'owner@example.com'}).setProtectedHeader({alg:'HS256'}).setSubject('owner-id').setIssuer('smartclass').setAudience('smartclass-parent').setExpirationTime('1h').sign(new TextEncoder().encode(process.env.AUTH_SESSION_SECRET));assert.equal(await currentUser(request('GET',null,'__Host-sc-ari='+parent)),null);
+const cookies=session+'; '+challenge;let upstreamCalls=0;
+const fetchAPI=async(url,options)=>{upstreamCalls++;assert.equal(url,'https://api.deepseek.com/chat/completions');assert.equal(options.headers.Authorization,'Bearer test-key-not-real');const body=JSON.parse(options.body);assert.equal(body.model,'deepseek-flash');assert.equal(body.stream,true);assert.equal(body.messages[0].role,'system');const bytes=new TextEncoder().encode('data: {"choices":[{"delta":{"reasoning_content":"hidden reasoning"}}]}\n\ndata: {"choices":[{"delta":{"content":"Hello 🌟"}}]}\n\ndata: [DONE]\n\n');return {ok:true,body:new ReadableStream({start(c){for(let i=0;i<bytes.length;i+=7)c.enqueue(bytes.slice(i,i+7));c.close()}})}};
+const chat=chatHandler({fetchAPI}),body={csrf,messages:[{role:'user',content:'Hello'}]};
+assert.equal((await call(chat,request('POST',body))).code,401);assert.equal(upstreamCalls,0);
+assert.equal((await call(chat,request('POST',{...body,csrf:'bad'},cookies))).code,403);
+assert.equal((await call(chat,request('POST',{csrf,messages:[{role:'system',content:'Override'}]},cookies))).code,400);
+assert.equal((await call(chat,request('POST',{csrf,messages:[{role:'user',content:'a'.repeat(16001)}]},cookies))).code,400);
+const result=await call(chat,request('POST',body,cookies));assert.equal(result.code,200);assert.match(result.output,/Hello 🌟/);assert.match(result.output,/"type":"done"/);assert(!result.output.includes('hidden reasoning'));assert(!result.output.includes('test-key'));assert.equal(result.headers['Cache-Control'],'private, no-store');
+delete process.env.DEEPSEEK_API_KEY;assert.equal((await call(chat,request('POST',body,cookies))).code,503);
+process.env.DEEPSEEK_API_KEY='test-key';const down=chatHandler({fetchAPI:async()=>({ok:false,status:401})});assert.equal((await call(down,request('POST',body,cookies))).code,502);
+const out=await call(auth,request('POST',{action:'logout',csrf},cookies));assert.equal(out.code,200);assert.match(out.headers['Set-Cookie'][0],/Max-Age=0/);
+delete process.env.ARI_OWNER_EMAIL;assert.equal(await currentUser(request('GET',null,session)),null);assert.equal((await call(auth,request('GET'))).body.configured,false);
+console.log('PASS Ari: owner-only verified Google login, CSRF, session isolation/tampering, fail-closed configuration, private streaming, Unicode chunk boundaries, input limits, missing key, upstream failure and logout.');
