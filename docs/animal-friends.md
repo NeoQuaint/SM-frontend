@@ -10,3 +10,5 @@ Prompt set: one separate asset per animal, centered full body with transparent p
 CSS gives each new animal its own whole-body motion, rather than skeletal animation: lamb bounce, pig dance, duck waddle, monkey swing, snake slither, bird float. Chorus groups show four animals. Motion pauses with the audio and respects reduced-motion settings. Farm, pond, savannah, jungle, town and park scenery follow the animals.
 
 Run node --test tests/animal-friends.test.mjs. Browser checks cover lyric changes, image loading, scenery, pause, seek and close.
+
+Onboarding preloading: starting the normal Find onboarding fetches the song in the background and loads it into a paused audio element via a local blob URL. Keep exploring, replay and reopening reuse this element. No audio plays or membership play is counted during preloading. An early tap starts normal streaming immediately; a late preload response cannot replace the playing source. Animal images also warm ahead. The standalone Find preview does not download this song.
