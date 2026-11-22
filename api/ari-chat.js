@@ -1,7 +1,12 @@
+import {validImage} from '../lib/ari-image.js';
 import {currentUser,checkRequest,privateHeaders} from './ari-auth.js';
 import {systemPrompt} from '../lib/ari-persona.js';
 export const maxDuration=60;
-export function validMessages(value){return Array.isArray(value)&&value.length>0&&value.length<=40&&value.at(-1)?.role==='user'&&value.every(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string'&&m.content.trim().length>0&&m.content.length<=16000)&&value.reduce((n,m)=>n+m.content.length,0)<=64000}
+export function validMessages(value){
+ if(!Array.isArray(value)||!value.length||value.length>40||value.at(-1)?.role!=='user')return false;
+ let text=0,images=0,bytes=0;
+ return value.every(m=>{if(!m||!['user','assistant'].includes(m.role))return false;const parts=typeof m.content==='string'?[{type:'text',text:m.content}]:m.content;if(!Array.isArray(parts)||!parts.length||parts.length>4)return false;return parts.every(p=>{if(p.type==='text'){if(typeof p.text!=='string'||!p.text.trim()||p.text.length>16000)return false;text+=p.text.length;return text<=64000}if(p.type!=='image_url'||m.role!=='user'||!validImage(p.image_url?.url))return false;images++;bytes+=p.image_url.url.length;return images<=4&&bytes<=3000000})});
+}
 export function createHandler({fetchAPI=fetch,authenticate=currentUser,csrf=checkRequest}={}){return async(req,res)=>{
 privateHeaders(res);if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Method not allowed'})}
 if(!await authenticate(req))return res.status(401).json({error:'Please sign in to your private space.'});
@@ -12,7 +17,7 @@ if(!process.env.DEEPSEEK_API_KEY)return res.status(503).json({error:'The DeepSee
 const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),50000);const disconnected=()=>controller.abort();res.on?.('close',disconnected);let streaming=false;
 const send=data=>{if(!res.destroyed)res.write('data: '+JSON.stringify(data)+'\n\n')};
 try{
- const upstream=await fetchAPI('https://api.deepseek.com/chat/completions',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+process.env.DEEPSEEK_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:process.env.DEEPSEEK_MODEL||'deepseek-flash',stream:true,thinking:{type:'disabled'},max_tokens:body.voice===true?768:4096,messages:[{role:'system',content:systemPrompt(body.voice===true)},...body.messages.map(({role,content})=>({role,content}))]})});
+ const upstream=await fetchAPI('https://api.deepseek.com/chat/completions',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+process.env.DEEPSEEK_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:body.messages.some(m=>Array.isArray(m.content))?'deepseek-flash':process.env.DEEPSEEK_MODEL||'deepseek-flash',stream:true,thinking:{type:'disabled'},max_tokens:body.voice===true?768:4096,messages:[{role:'system',content:systemPrompt(body.voice===true)},...body.messages.map(({role,content})=>({role,content}))]})});
  if(!upstream.ok||!upstream.body)return res.status(upstream.status===429?429:502).json({error:upstream.status===429?'DeepSeek is busy. Please try again shortly.':'Could not reach DeepSeek. Check the API key and account balance.'});
  res.setHeader('Content-Type','text/event-stream; charset=utf-8');res.setHeader('X-Accel-Buffering','no');res.flushHeaders?.();streaming=true;
  const reader=upstream.body.getReader(),decoder=new TextDecoder();let buffer='',complete=false,output=0;

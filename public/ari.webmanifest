@@ -1,0 +1,25 @@
+{
+  "id": "/ari",
+  "name": "Ari",
+  "short_name": "Ari",
+  "start_url": "/ari",
+  "scope": "/ari",
+  "display": "standalone",
+  "background_color": "#e8e1ff",
+  "theme_color": "#e8e1ff",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/ari-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/ari-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

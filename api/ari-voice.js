@@ -20,7 +20,7 @@ if(body.action==='transcribe'){
 }else{
  if(typeof body.text!=='string'||!body.text.trim()||body.text.length>600)return res.status(400).json({error:'Speech text must be between 1 and 600 characters.'});
  if(!process.env.DEEPINFRA_API_KEY)return res.status(503).json({error:'Ari’s Kokoro voice is not connected yet.'});
- const maleVoices=new Set(['am_michael','am_fenrir','am_onyx','bm_george','bm_daniel']);const voice=maleVoices.has(process.env.ARI_KOKORO_VOICE)?process.env.ARI_KOKORO_VOICE:'am_michael';
+ const maleVoices=new Set(['af_heart','am_michael','am_fenrir','am_onyx','bm_george','bm_daniel']);const voice=maleVoices.has(process.env.ARI_KOKORO_VOICE)?process.env.ARI_KOKORO_VOICE:'af_heart';
  url='https://api.deepinfra.com/v1/text-to-speech/'+voice;options={method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+process.env.DEEPINFRA_API_KEY},body:JSON.stringify({text:body.text.trim(),model_id:'hexgrad/Kokoro-82M',output_format:'mp3'})};
 }
 const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);const close=()=>controller.abort();res.on?.('close',close);

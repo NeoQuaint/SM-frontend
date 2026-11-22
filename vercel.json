@@ -171,6 +171,9 @@
     },
     "api/ari-voice.js": {
       "maxDuration": 60
+    },
+    "api/ari-image.js": {
+      "maxDuration": 60
     }
   }
 }
