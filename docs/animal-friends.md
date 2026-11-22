@@ -1,5 +1,5 @@
 # Animal Friends
-The supplied Animal Friends.mp3 is served unchanged as public/animal-friends.mp3 (122.4 seconds), replacing the Animals song in the existing sing-along feed. Maya's existing greeting remains before the song. The old audio asset is retained for rollback.
+The supplied Animal Friends.mp3 is served unchanged as public/animal-friends.mp3 (122.4 seconds), replacing the Animals song in the existing sing-along feed. Playback starts directly with the song, without Maya's separate spoken greeting. The onboarding Keep exploring action uses Animal Friends and opens the account card after completion. The old audio asset is retained for rollback.
 
 The original supplied lyrics are in public/animal-friends-lyrics.js. Forty-eight lyric cues were locally aligned and reviewed against recognized animal/verse anchors; sung sound words are harder to recognize than speech. public/animal-friends-timing.js drives the lyrics and visuals from the audio clock, not a fixed cadence. Word emphasis is distributed within each lyric line, not phoneme-level lip sync. The final lyric's emphasis stops at 109.44 seconds; the full musical ending remains.
 
