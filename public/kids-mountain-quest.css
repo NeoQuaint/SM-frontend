@@ -151,3 +151,4 @@ body.mq-open{overflow:hidden}#mountain-quest{inset:0;width:100vw;height:100dvh;m
 @keyframes lake-clock-tick{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.lake-found,.lake-curtains,.lake-door-open,.lake-lamp-glow,.lake-glint,.lake-clock-hand{animation:none!important}}
 .mq-world-travel-2.mq-region-1 .mq-walkway,.mq-world-travel-2.mq-region-2 .mq-walkway{display:none}
+.mq-world-travel-2.mq-region-1 .mq-walker{bottom:8%}
