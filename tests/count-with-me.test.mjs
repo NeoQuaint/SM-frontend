@@ -12,11 +12,18 @@ test('new sing-along covers supplied lyrics and all twenty numbers',async()=>{
  for(let i=0;i<pages.length;i++){const cue=r.scenes[i];assert(cue.end>cue.start);if(i)assert.equal(cue.start,r.scenes[i-1].end);assert.equal(cue.captions.map(x=>x.text).join(' ').replace(/\s/g,''),pages[i].text.replace(/\s/g,''));}
  const numbers=[...new Set(pages.flatMap(p=>p.numbers))].sort((a,b)=>a-b);
  assert.deepEqual(numbers,Array.from({length:20},(_,i)=>i+1));
- for(const n of numbers)assert((await stat(new URL('numbers-song/number-'+n+'.png',base))).size>1000);
+ for(const n of numbers)assert((await stat(new URL('numbers-song/number-'+n+'.webp',base))).size>1000);
 });
 test('Numbers lesson retains its existing song and audio bytes',async()=>{
  const old=await readFile(new URL('numbers-remix.mp3',base));
  assert.equal(createHash('sha256').update(old).digest('hex'),'94132000bc6682a1ef56fec0f83982891372154cc2d38cda9dfc7f7eda01897f');
  const lesson=await readFile(new URL('kids-coco-twenty.js',base),'utf8');
  assert(lesson.includes("new Audio('numbers-remix.mp3')"));assert(!lesson.includes('count-with-me.mp3'));
+});
+
+test('sing-along artwork stays lightweight',async()=>{
+ let bytes=0;for(let n=1;n<=20;n++)bytes+=(await stat(new URL('numbers-song/number-'+n+'.webp',base))).size;
+ assert(bytes<1800000);
+ const player=await readFile(new URL('kids-numbers-song.js',base),'utf8');
+ assert(!player.includes(".png"));assert(player.includes('warmArtwork()'));
 });

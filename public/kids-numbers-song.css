@@ -7,3 +7,19 @@
 
 #numbers-song .ns-art{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
 #numbers-song .ns-art img{min-height:0;max-height:100%}
+
+/* Decoded, lightweight artwork with a visible fallback on slow connections. */
+#numbers-song .ns-number-slot{position:relative;display:grid;place-items:center;width:90%;height:90%;min-height:0;grid-template: minmax(0,1fr) / minmax(0,1fr)}
+#numbers-song .ns-number-slot img{width:100%;height:100%;animation-duration:var(--dance-speed,1.15s);will-change:transform}
+#numbers-song .ns-art.ns-group .ns-number-slot{width:28%;height:40%}
+#numbers-song .ns-art.ns-group .ns-number-slot img{width:100%;height:100%}
+#numbers-song .ns-number-slot [hidden]{display:none!important}
+.ns-number-fallback{font:900 clamp(80px,24vw,210px)/1 'Comic Sans MS',sans-serif;color:#a050da;text-shadow:0 5px #fff1c3}
+#numbers-song .ns-group .ns-number-fallback{font-size:clamp(40px,12vw,90px)}
+@keyframes ns-wiggle{0%,100%{transform:rotate(-9deg) skewX(-3deg)}25%{transform:translateY(-18px) rotate(7deg)}50%{transform:rotate(9deg) skewX(3deg)}75%{transform:translateY(-18px) rotate(-7deg)}}
+@keyframes ns-squish{0%,100%{transform:scale(1.09,.91) rotate(-5deg)}45%{transform:translateY(-24px) scale(.93,1.08) rotate(6deg)}70%{transform:scale(1.08,.93)}}
+@keyframes ns-sway{0%,100%{transform:translateX(-12px) rotate(-10deg)}50%{transform:translateX(12px) translateY(-17px) rotate(10deg)}}
+@keyframes ns-bounce{0%,100%{transform:scale(1.1,.9) rotate(-4deg)}40%{transform:translateY(-30px) scale(.94,1.06) rotate(7deg)}75%{transform:translateY(-6px) rotate(-5deg)}}
+@keyframes ns-float{0%,100%{transform:translate(-10px,0) rotate(-8deg)}50%{transform:translate(10px,-26px) rotate(8deg)}}
+@media(prefers-reduced-motion:reduce){#numbers-song .ns-number-slot img{animation:none!important;will-change:auto}}
+body.reduce-motion #numbers-song .ns-number-slot img,.reduced #numbers-song .ns-number-slot img{animation:none!important;will-change:auto}

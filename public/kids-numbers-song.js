@@ -1,6 +1,25 @@
 (()=>{
 const START=0,recording=window.COUNT_RECORDINGS['count-with-me'],pages=window.COUNT_LYRICS[0].pages;
 const moves=['wiggle','squish','sway','bounce','squish','sway','wiggle','float','bounce','sway','float','squish','wiggle','sway','bounce','float','wiggle','squish','sway','bounce'];
+const artwork=new Map();
+function preloadNumber(n){
+ if(artwork.has(n))return artwork.get(n);
+ const image=new Image();image.alt='Number '+n;image.decoding='async';image.style.setProperty('--move','ns-'+moves[n-1]);image.style.setProperty('--dance-speed',(.95+(n%4)*.12)+'s');
+ const entry={image,ready:false,promise:null};artwork.set(n,entry);
+ entry.promise=new Promise(resolve=>{image.onload=async()=>{try{await image.decode()}catch{}entry.ready=true;resolve(true)};image.onerror=()=>{artwork.delete(n);resolve(false)}});
+ image.src='numbers-song/number-'+n+'.webp';return entry;
+}
+function warmArtwork(){
+ let next=1;async function worker(){while(next<=20){const n=next++;await preloadNumber(n).promise}}
+ for(let i=0;i<4;i++)worker();
+}
+function numberArt(n){
+ const slot=document.createElement('span');slot.className='ns-number-slot';
+ const fallback=document.createElement('span');fallback.className='ns-number-fallback';fallback.textContent=n;fallback.setAttribute('aria-hidden','true');
+ const entry=preloadNumber(n);entry.image.hidden=!entry.ready;fallback.hidden=entry.ready;slot.append(fallback,entry.image);
+ entry.promise.then(ok=>{if(ok){entry.image.hidden=false;fallback.hidden=true}});
+ return slot;
+}
 const colours=['#fff0e9','#e6fbfb','#fff2dc','#fff6db','#f7eaff','#ecf9de','#eaf1ff','#f0edff','#fff8d8','#fff0ee'];
 const room=document.createElement('dialog');room.id='numbers-song';room.setAttribute('aria-label','Numbers sing-along');document.body.append(room);
 let audio=null,current=-2,muted=false,frame=0;
@@ -12,10 +31,10 @@ function show(i){
  const key=page.numbers.join(',');
  if(art.dataset.numbers!==key||!art.innerHTML){
   art.dataset.numbers=key;art.classList.toggle('ns-group',page.numbers.length>1);
-  art.innerHTML=page.numbers.length?page.numbers.map(n=>'<img src="numbers-song/number-'+n+'.png" alt="Number '+n+'" style="--move:ns-'+moves[n-1]+'">').join(''):'<div class="ns-intro" aria-label="Sing together">♫<span>♪</span></div>';
+  if(page.numbers.length)art.replaceChildren(...page.numbers.map(numberArt));else art.innerHTML='<div class="ns-intro" aria-label="Sing together">♫<span>♪</span></div>';
  }
  $('.ns-count').textContent=page.text;
- const next=pages[i+1];if(next)next.numbers.forEach(n=>{const image=new Image();image.src='numbers-song/number-'+n+'.png'});
+ pages.slice(i+1,i+5).flatMap(p=>p.numbers).forEach(preloadNumber);
 }
 function progress(){
  if(!audio)return;
@@ -26,7 +45,7 @@ function tick(){cancelAnimationFrame(frame);progress();if(audio&&!audio.paused)f
 function stop(){cancelAnimationFrame(frame);if(audio){audio.pause();audio.onended=null;audio.onplay=null;audio.onpause=null;audio.onloadedmetadata=null;audio.ontimeupdate=null;audio.onseeked=null;audio.onerror=null;audio.removeAttribute('src');audio.load();audio=null}room.classList.remove('ns-playing')}
 function play(){if(window.SmartClassMembership?.begin('singalong','numbers')===false)return;audio?.play().then(()=>window.SmartClassMembership?.songPlayed('numbers')).catch(()=>{if(room.open)$('.ns-status').textContent='Tap play to start.'})}
 function restart(){if(!audio||window.SmartClassMembership?.startSong('numbers')===false)return;if(audio.error)audio.load();audio.currentTime=START;progress();play()}
-function open(){if(window.SmartClassMembership?.startSong('numbers')===false)return;stop();window.KidsBridge?.stop();window.KidsSound?.close();current=-2;
+function open(){if(window.SmartClassMembership?.startSong('numbers')===false)return;stop();window.KidsBridge?.stop();window.KidsSound?.close();current=-2;warmArtwork();
 room.innerHTML='<header><button data-ns="back" aria-label="Back to song categories">←</button><strong>Count with me</strong><button data-ns="mute" aria-label="Mute song">🔊</button></header><main><div class="ns-art"></div><p class="ns-count"></p></main><footer><div class="ns-buttons"><button data-ns="restart" aria-label="Restart song">↻</button><button data-ns="play" aria-label="Play song">▶</button><span aria-hidden="true">♫</span></div><input class="ns-seek" type="range" min="0" max="100" step=".01" value="0" disabled aria-label="Song position"><p class="ns-status" role="status"></p></footer>';
 room.showModal();show(0);audio=new Audio(recording.src);audio.volume=.8;audio.muted=muted;
 const mute=$('[data-ns="mute"]');mute.textContent=muted?'🔇':'🔊';mute.setAttribute('aria-label',muted?'Unmute song':'Mute song');
