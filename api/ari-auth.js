@@ -16,7 +16,7 @@ privateHeaders(res);
 if(req.method==='GET'){
  if(!configured())return res.status(200).json({configured:false,user:null});
  const nonce=randomBytes(24).toString('base64url');const challenge=await new SignJWT({nonce}).setProtectedHeader({alg:'HS256'}).setIssuer('smartclass-ari').setAudience('ari-challenge').setIssuedAt().setExpirationTime('10m').sign(key());
- res.setHeader('Set-Cookie',cookie(CHALLENGE,challenge,600));const user=await currentUser(req);return res.status(200).json({configured:true,clientId:process.env.GOOGLE_CLIENT_ID,csrf:nonce,user,ready:user?!!process.env.DEEPSEEK_API_KEY:undefined});
+ res.setHeader('Set-Cookie',cookie(CHALLENGE,challenge,600));const user=await currentUser(req);return res.status(200).json({configured:true,clientId:process.env.GOOGLE_CLIENT_ID,csrf:nonce,user,ready:user?!!process.env.DEEPSEEK_API_KEY:undefined,voiceReady:user?!!process.env.DEEPINFRA_API_KEY&&!!process.env.DEEPSEEK_API_KEY:undefined});
 }
 if(req.method!=='POST'){res.setHeader('Allow','GET, POST');return res.status(405).json({error:'Method not allowed'})}
 if(!configured())return res.status(503).json({error:'Private access is not configured yet.'});

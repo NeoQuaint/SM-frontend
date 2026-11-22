@@ -1,4 +1,5 @@
 import {currentUser,checkRequest,privateHeaders} from './ari-auth.js';
+import {systemPrompt} from '../lib/ari-persona.js';
 export const maxDuration=60;
 export function validMessages(value){return Array.isArray(value)&&value.length>0&&value.length<=40&&value.at(-1)?.role==='user'&&value.every(m=>m&&['user','assistant'].includes(m.role)&&typeof m.content==='string'&&m.content.trim().length>0&&m.content.length<=16000)&&value.reduce((n,m)=>n+m.content.length,0)<=64000}
 export function createHandler({fetchAPI=fetch,authenticate=currentUser,csrf=checkRequest}={}){return async(req,res)=>{
@@ -11,7 +12,7 @@ if(!process.env.DEEPSEEK_API_KEY)return res.status(503).json({error:'The DeepSee
 const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),50000);const disconnected=()=>controller.abort();res.on?.('close',disconnected);let streaming=false;
 const send=data=>{if(!res.destroyed)res.write('data: '+JSON.stringify(data)+'\n\n')};
 try{
- const upstream=await fetchAPI('https://api.deepseek.com/chat/completions',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+process.env.DEEPSEEK_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:process.env.DEEPSEEK_MODEL||'deepseek-flash',stream:true,thinking:{type:'disabled'},max_tokens:4096,messages:[{role:'system',content:'You are Ari, a private personal AI assistant. Be clear, thoughtful, direct and helpful. Adapt to the user. Never claim to access files, accounts, websites or perform actions you cannot actually access or perform. You have no tools in this chat.'},...body.messages.map(({role,content})=>({role,content}))]})});
+ const upstream=await fetchAPI('https://api.deepseek.com/chat/completions',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+process.env.DEEPSEEK_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({model:process.env.DEEPSEEK_MODEL||'deepseek-flash',stream:true,thinking:{type:'disabled'},max_tokens:body.voice===true?768:4096,messages:[{role:'system',content:systemPrompt(body.voice===true)},...body.messages.map(({role,content})=>({role,content}))]})});
  if(!upstream.ok||!upstream.body)return res.status(upstream.status===429?429:502).json({error:upstream.status===429?'DeepSeek is busy. Please try again shortly.':'Could not reach DeepSeek. Check the API key and account balance.'});
  res.setHeader('Content-Type','text/event-stream; charset=utf-8');res.setHeader('X-Accel-Buffering','no');res.flushHeaders?.();streaming=true;
  const reader=upstream.body.getReader(),decoder=new TextDecoder();let buffer='',complete=false,output=0;
