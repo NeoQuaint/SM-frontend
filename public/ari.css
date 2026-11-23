@@ -36,3 +36,8 @@ body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap{animat
 @media(max-width:600px){.orb-wrap{--ari-rim-size:185px}body.texting:not(.voice-mode) .presence{top:-62.5px;width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap,body.texting:not(.voice-mode) #orb{width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap{--ari-rim-size:125px}}
 @media(max-height:500px){body.voice-mode .orb-wrap{--ari-rim-size:65dvh}}
 @media(prefers-reduced-motion:reduce){body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap,.orb-wrap::after{animation:none!important}}
+
+/* Follow the visible viewport when mobile keyboards resize or pan it. */
+body{position:fixed;top:0;left:0;width:100%;height:var(--ari-view-height,100dvh);transform:translateY(var(--ari-view-top,0px))}
+#composer,#attachments{flex-shrink:0}
+body.keyboard-open main{padding-bottom:10px}
