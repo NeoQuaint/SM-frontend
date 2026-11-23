@@ -20,3 +20,19 @@ body[data-state=responding] #orb,body[data-state=speaking] #orb{animation:ari-re
 @keyframes ari-edge-glow{from{opacity:.6;box-shadow:inset 0 0 12px 3px #b68aef,0 0 10px #d2b0ff}to{opacity:1;box-shadow:inset 0 0 24px 7px #b68aef,0 0 18px #e3ccff}}
 @keyframes ari-reply-bounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.025)}}
 @media(prefers-reduced-motion:reduce){body[data-state=responding] #orb,body[data-state=speaking] #orb, #orb::after{animation:none!important}}
+
+/* Smaller header presence, with light outside the circular silhouette. */
+body.texting:not(.voice-mode) .presence{top:-35px;width:140px;height:140px}
+body.texting:not(.voice-mode) .orb-wrap,body.texting:not(.voice-mode) #orb{width:140px;height:140px}
+body.texting:not(.voice-mode) .messages{padding-top:42px;mask-image:linear-gradient(to bottom,transparent,#000 42px);-webkit-mask-image:linear-gradient(to bottom,transparent,#000 42px)}
+#orb::after{display:none}
+body[data-state=responding] #orb,body[data-state=speaking] #orb{filter:none;animation:none}
+.orb-wrap::after{content:'';position:absolute;left:50%;top:50%;width:var(--ari-rim-size,210px);height:var(--ari-rim-size,210px);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;opacity:0;border:2px solid #dac3ff;box-shadow:0 0 9px 3px #c598ff,0 0 24px 8px #ae7ce980;transition:opacity .2s}
+body.texting:not(.voice-mode) .orb-wrap{--ari-rim-size:140px}
+body.voice-mode .orb-wrap{--ari-rim-size:min(72vw,350px)}
+body[data-state=responding] .orb-wrap::after,body[data-state=speaking] .orb-wrap::after{opacity:1;animation:ari-outer-glow 1s ease-in-out infinite alternate}
+body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap{animation:ari-reply-bounce 1.2s ease-in-out infinite}
+@keyframes ari-outer-glow{from{opacity:.7;box-shadow:0 0 8px 2px #c598ff,0 0 20px 5px #ae7ce970}to{opacity:1;box-shadow:0 0 12px 4px #d8baff,0 0 30px 10px #ae7ce999}}
+@media(max-width:600px){.orb-wrap{--ari-rim-size:185px}body.texting:not(.voice-mode) .presence{top:-30px;width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap,body.texting:not(.voice-mode) #orb{width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap{--ari-rim-size:125px}}
+@media(max-height:500px){body.voice-mode .orb-wrap{--ari-rim-size:65dvh}}
+@media(prefers-reduced-motion:reduce){body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap,.orb-wrap::after{animation:none!important}}
