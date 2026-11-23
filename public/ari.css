@@ -6,8 +6,17 @@ body{min-height:0}header{padding:24px 30px}.wordmark{background:transparent;padd
 /* Compact text conversation and circular orb hit area. */
 #sidebar{width:min(280px,76vw);padding:22px 14px}.message{font-size:16px}.message strong{font-weight:700}.message code{font-size:.94em;background:#ffffff70;padding:1px 4px;border-radius:4px}textarea{font-size:17px}.thread .thread-title,.sidebar-bottom button{font-size:15px}#sidebar-new{font-size:16px}
 #orb{appearance:none;-webkit-appearance:none;border:0;border-radius:50%;clip-path:circle(50% at 50% 50%);overflow:hidden;aspect-ratio:1;-webkit-tap-highlight-color:transparent;box-shadow:none}#orb:focus-visible{outline:none;box-shadow:inset 0 0 0 3px #8165cb}.orb-wrap{border-radius:50%;background:transparent}.orb-shadow{pointer-events:none}.orb-body{pointer-events:none}
-body.texting:not(.voice-mode) .presence{position:fixed;top:-157.5px;left:50%;transform:translateX(-50%);height:210px;min-height:0;width:210px;z-index:4;flex:none}
+body.texting:not(.voice-mode) .presence{position:fixed;top:-70px;left:50%;transform:translateX(-50%);height:210px;min-height:0;width:210px;z-index:4;flex:none}
 body.texting:not(.voice-mode) .orb-wrap{width:210px;height:210px}body.texting:not(.voice-mode) #orb{width:210px;height:210px}body.texting:not(.voice-mode) .orbit,body.texting:not(.voice-mode) .orb-shadow{display:none}
 body.texting:not(.voice-mode) main{padding-top:90px}body.texting:not(.voice-mode) .conversation{flex:1;height:100%;max-height:none;min-height:0}body.texting:not(.voice-mode) .messages{flex:1;max-height:none;min-height:0;scroll-behavior:auto}body.texting:not(.voice-mode) .messages:empty{display:block}
-@media(max-width:600px){.message{font-size:17px}body.texting:not(.voice-mode) .presence{top:-138.75px;width:185px;height:185px}body.texting:not(.voice-mode) .orb-wrap{width:185px;height:185px}body.texting:not(.voice-mode) #orb{width:185px;height:185px}body.texting:not(.voice-mode) main{padding-top:76px}}
+@media(max-width:600px){.message{font-size:17px}body.texting:not(.voice-mode) .presence{top:-55px;width:185px;height:185px}body.texting:not(.voice-mode) .orb-wrap{width:185px;height:185px}body.texting:not(.voice-mode) #orb{width:185px;height:185px}body.texting:not(.voice-mode) main{padding-top:76px}}
 #orb:focus-visible .orb-body{box-shadow:inset 0 0 0 3px #8165cb,inset 0 0 24px #ffffffc0}
+
+/* Orb overlaps the conversation; scrolling text dissolves beneath it. */
+body.texting:not(.voice-mode) .messages{padding-top:64px;mask-image:linear-gradient(to bottom,transparent 0,#000 64px);-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 64px)}
+#orb::after{content:'';position:absolute;inset:3px;border-radius:50%;pointer-events:none;opacity:0;border:2px solid #f8f0ff;box-shadow:inset 0 0 16px 5px #b68aef,0 0 12px 3px #d2b0ff;transition:opacity .25s}
+body[data-state=responding] #orb::after,body[data-state=speaking] #orb::after{opacity:1;animation:ari-edge-glow 1.1s ease-in-out infinite alternate}
+body[data-state=responding] #orb,body[data-state=speaking] #orb{animation:ari-reply-bounce 1.2s ease-in-out infinite;filter:drop-shadow(0 0 12px #ad81ed99)}
+@keyframes ari-edge-glow{from{opacity:.6;box-shadow:inset 0 0 12px 3px #b68aef,0 0 10px #d2b0ff}to{opacity:1;box-shadow:inset 0 0 24px 7px #b68aef,0 0 18px #e3ccff}}
+@keyframes ari-reply-bounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.025)}}
+@media(prefers-reduced-motion:reduce){body[data-state=responding] #orb,body[data-state=speaking] #orb, #orb::after{animation:none!important}}
