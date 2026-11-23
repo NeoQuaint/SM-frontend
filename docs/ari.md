@@ -72,3 +72,5 @@ Image API: https://deepinfra.com/black-forest-labs/FLUX-1-schnell/api
 Vision API: https://api-docs.deepseek.com/guides/vision/
 
 Text mode docks the orb at one quarter of its resting diameter in the header, while voice mode retains the large centred orb. Replies are paced independently of network chunk size, respect reduced motion, stop on cancellation and preserve scroll position when reading earlier messages. Bold and inline code use safe DOM nodes, never raw model HTML. The latest tone preference overrides older stern-manager profile wording and defaults to brief, warm conversation.
+
+In text chat the full-size orb sits above the viewport with only its bottom quarter visible.
