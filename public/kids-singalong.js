@@ -1,5 +1,5 @@
 (()=>{
-const groups=[['family','Family','👩‍👧‍👦','#ffdbe6'],['animals','Animals','🐮 🐥','#ffe7aa'],['numbers','Numbers','1️⃣ 2️⃣ 3️⃣','#d9f0db'],['alphabet','Alphabet','🔤','#e5d9ff'],['colours','Colours','🌈','#d5efff'],['actions','Actions','👏 🎵','#ffe2cb']];
+const groups=[['family','Family','👩‍👧‍👦','#ffdbe6'],['animals','Animals','🐮 🐥','#ffe7aa'],['numbers','Numbers','1️⃣ 2️⃣ 3️⃣','#d9f0db'],['alphabet','Alphabet','🔤','#e5d9ff'],['colours','Colours','🌈','#d5efff'],['shapes','Shapes','<svg viewBox="0 0 180 100" width="150" height="90" aria-hidden="true"><circle cx="40" cy="42" r="29" fill="#ff735b"/><path d="M112 13L146 74H78Z" fill="#52cd90"/><rect x="49" y="47" width="44" height="44" rx="5" fill="#559ff5"/></svg>','#ffe2cb'],['actions','Actions','👏 🎵','#ffe2cb']];
 const room=document.createElement('dialog');room.id='sing-room';room.setAttribute('aria-label','Sing Along');document.body.append(room);
 let group=null,audio=null,url=null,visit=0,saved=[],loaded=false,currentSession='song';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -14,7 +14,7 @@ function library(){room.classList.remove('song-scenery');visit++;stop();group=nu
 let feed=null,lastSwitch=0;
 function playlist(){return [
  {id:'family',title:'Family'}, {id:'animals',title:'Animals'},
- {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet',group:'alphabet'}, {id:'colours',title:'Mix the Colours',group:'colours'},
+ {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet',group:'alphabet'}, {id:'colours',title:'Mix the Colours',group:'colours'}, {id:'shapes',title:'Shapes Everywhere',group:'shapes'},
  ...saved.map(s=>({id:s.id,title:s.title,group:s.group})),
  {id:'remix',title:'Kids Remix',group:'actions'}
 ]}
@@ -22,13 +22,13 @@ function leaveFeed(){const previous=feed;feed=null;if(!previous)return;
  previous.el.classList.remove('sing-feed-active');previous.el.querySelector('.sing-feed-nav')?.remove();
  if(previous.el===room)stop();
 
- else {const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong}[previous.id];api?.close()}
+ else {const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong,shapes:window.ShapesSingAlong}[previous.id];api?.close()}
 }
 function openTrack(id){const track=playlist().find(t=>t.id===id);if(!track)return;
  const unit=id;if(window.SmartClassMembership?.checkSong(unit)===false)return;
  leaveFeed();stop();library();
- const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong}[id];
- if(api){api.open();attachFeed(id,document.getElementById({animals:'animal-song',family:'family-song',numbers:'numbers-song'}[id]))}
+ const api={animals:window.AnimalSingAlong,family:window.FamilySingAlong,numbers:window.NumbersSingAlong,shapes:window.ShapesSingAlong}[id];
+ if(api){api.open();attachFeed(id,document.getElementById({animals:'animal-song',family:'family-song',numbers:'numbers-song',shapes:'shapes-song'}[id]))}
 
  else {group=groups.find(g=>g[0]===track.group);player(id)}
 }
@@ -52,7 +52,7 @@ function attachFeed(id,el){if(!el?.open)return;feed={id,el};el.classList.add('si
  el.addEventListener('close',()=>{if(feed?.el===el){feed=null;el.classList.remove('sing-feed-active');el.querySelector('.sing-feed-nav')?.remove()}});
 }
 
-function songs(id){room.classList.remove('song-scenery');if(['numbers','family','animals','colours'].includes(id)){openTrack(id);return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
+function songs(id){room.classList.remove('song-scenery');if(['numbers','family','animals','colours','shapes'].includes(id)){openTrack(id);return}visit++;stop();group=groups.find(g=>g[0]===id);if(!group)return library();const g=group,tracks=saved.filter(x=>x.group===id);
 room.innerHTML=header(g[1])+'<section class="sing-category" style="--song-colour:'+g[3]+'"><div class="sing-category-art" aria-hidden="true">'+g[2]+'</div><div class="sing-track-list">'+(id==='actions'?'<button data-sing-track="remix"><span>▶</span> Kids Remix</button>':'')+(id==='alphabet'?'<button data-sing-abc><span>♫</span> ABC melody & letter play</button>':'')+tracks.map(x=>'<button data-sing-track="'+x.id+'"><span>▶</span> '+esc(x.title)+'</button>').join('')+(!tracks.length&&!['actions','alphabet','animals'].includes(id)?'<div class="sing-empty"><span aria-hidden="true">🎶</span><p>A song is waiting to join us!</p><small>No song added yet.</small></div>':'')+'</div><details class="sing-grownups"><summary>Grown-ups: add a song</summary><p>Add your recording to '+g[1]+'. It stays in this browser on this device.</p><label class="sing-upload">Choose audio<input type="file" accept="audio/*,.mp3,.wav,.m4a,.ogg" id="sing-file"></label><p class="sing-save-status" role="status"></p></details></section>';
 }
 function player(id){if(window.SmartClassMembership?.startSong(id)===false)return;currentSession=id;const song=id==='abc'?{title:'ABC Sing-Along',src:'abc-sing-along.mp3'}:id==='colours'?{title:'Mix the Colours',src:'mix-the-colours.mp3'}:id==='remix'?{title:'Kids Remix',src:'kids-remix.mp3'}:saved.find(x=>x.id===id);if(!song)return;stop();const g=group;room.innerHTML=header(g[1])+'<section class="sing-player" style="--song-colour:'+g[3]+'"><div class="sing-music-notes" aria-hidden="true">♪ ♫ ♪</div><div class="sing-dancer" aria-hidden="true">'+g[2]+'</div><h3>'+esc(song.title)+'</h3><div class="sing-controls"><button data-sing-restart aria-label="Restart song">↻</button><button data-sing-play aria-label="Pause song">Ⅱ</button><button data-sing-mute aria-label="Mute song">🔊</button></div><input class="sing-seek" type="range" min="0" max="100" value="0" aria-label="Song position"><p class="sing-play-status" role="status"></p></section>';
