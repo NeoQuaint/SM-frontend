@@ -38,6 +38,8 @@ body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap{animat
 @media(prefers-reduced-motion:reduce){body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap,.orb-wrap::after{animation:none!important}}
 
 /* Follow the visible viewport when mobile keyboards resize or pan it. */
-body{position:fixed;top:0;left:0;width:100%;height:var(--ari-view-height,100dvh);transform:translateY(var(--ari-view-top,0px))}
+main{position:fixed;top:var(--ari-view-top,0px);left:0;width:100%;height:var(--ari-view-height,100dvh)}
 #composer,#attachments{flex-shrink:0}
 body.keyboard-open main{padding-bottom:10px}
+
+header{pointer-events:none}header button{pointer-events:auto}
