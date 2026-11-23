@@ -22,7 +22,7 @@ body[data-state=responding] #orb,body[data-state=speaking] #orb{animation:ari-re
 @media(prefers-reduced-motion:reduce){body[data-state=responding] #orb,body[data-state=speaking] #orb, #orb::after{animation:none!important}}
 
 /* Smaller header presence, with light outside the circular silhouette. */
-body.texting:not(.voice-mode) .presence{top:-35px;width:140px;height:140px}
+body.texting:not(.voice-mode) .presence{top:-70px;width:140px;height:140px}
 body.texting:not(.voice-mode) .orb-wrap,body.texting:not(.voice-mode) #orb{width:140px;height:140px}
 body.texting:not(.voice-mode) .messages{padding-top:42px;mask-image:linear-gradient(to bottom,transparent,#000 42px);-webkit-mask-image:linear-gradient(to bottom,transparent,#000 42px)}
 #orb::after{display:none}
@@ -33,6 +33,6 @@ body.voice-mode .orb-wrap{--ari-rim-size:min(72vw,350px)}
 body[data-state=responding] .orb-wrap::after,body[data-state=speaking] .orb-wrap::after{opacity:1;animation:ari-outer-glow 1s ease-in-out infinite alternate}
 body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap{animation:ari-reply-bounce 1.2s ease-in-out infinite}
 @keyframes ari-outer-glow{from{opacity:.7;box-shadow:0 0 8px 2px #c598ff,0 0 20px 5px #ae7ce970}to{opacity:1;box-shadow:0 0 12px 4px #d8baff,0 0 30px 10px #ae7ce999}}
-@media(max-width:600px){.orb-wrap{--ari-rim-size:185px}body.texting:not(.voice-mode) .presence{top:-30px;width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap,body.texting:not(.voice-mode) #orb{width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap{--ari-rim-size:125px}}
+@media(max-width:600px){.orb-wrap{--ari-rim-size:185px}body.texting:not(.voice-mode) .presence{top:-62.5px;width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap,body.texting:not(.voice-mode) #orb{width:125px;height:125px}body.texting:not(.voice-mode) .orb-wrap{--ari-rim-size:125px}}
 @media(max-height:500px){body.voice-mode .orb-wrap{--ari-rim-size:65dvh}}
 @media(prefers-reduced-motion:reduce){body[data-state=responding] .orb-wrap,body[data-state=speaking] .orb-wrap,.orb-wrap::after{animation:none!important}}
