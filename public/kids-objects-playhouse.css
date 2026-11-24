@@ -144,3 +144,10 @@ body.reduced #objects-playhouse *{animation:none!important;transition:none!impor
 .op-walking .op-object{pointer-events:none}
 @keyframes op-walk-room{0%{left:39%;transform:rotate(0)}15%{transform:translateY(-9px) rotate(-7deg)}30%{transform:translateY(0) rotate(7deg)}45%{transform:translateY(-9px) rotate(-7deg)}60%{transform:translateY(0) rotate(7deg)}75%{transform:translateY(-9px) rotate(-7deg)}100%{left:110%;transform:translateY(0) rotate(7deg)}}
 @media(max-width:650px){.guided-journey .op-wrap{padding:0}.guided-journey .op-scene{height:100dvh;border-radius:0}.guided-journey .op-companion>img{width:29%;left:36%;height:22%}.guided-journey .op-speech{top:78px;padding:8px 12px;gap:8px}.guided-journey .op-object{max-width:38%}.guided-journey .journey-basket span{width:24px;font-size:21px}}
+
+/* Keep the original furnished scene; evening changes the light, not its layout. */
+.objects-bedtime .op-background{filter:brightness(.68) saturate(.8)}
+.objects-bedtime.journey-lit .op-background{filter:brightness(.86)}
+.guided-journey .op-selected .op-object-art{animation:op-gentle-use .9s ease-in-out 2}
+@keyframes op-gentle-use{50%{transform:translateY(-4px) rotate(3deg)}}
+@media(prefers-reduced-motion:reduce){.guided-journey .op-selected .op-object-art{animation:none}}
