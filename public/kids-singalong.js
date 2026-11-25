@@ -1,5 +1,6 @@
 (()=>{
 const groups=[["family","Family","👩‍👧‍👦","#ffdbe6"],["animals","Animals","🐮 🐥","#ffe7aa"],["numbers","Numbers","1️⃣ 2️⃣ 3️⃣","#d9f0db"],["alphabet","Alphabet","🔤","#e5d9ff"],["colours","Colours","🌈","#d5efff"],["shapes","Shapes","<svg viewBox=\"0 0 180 100\" width=\"150\" height=\"90\" aria-hidden=\"true\"><circle cx=\"40\" cy=\"42\" r=\"29\" fill=\"#ff735b\"/><path d=\"M112 13L146 74H78Z\" fill=\"#52cd90\"/><rect x=\"49\" y=\"47\" width=\"44\" height=\"44\" rx=\"5\" fill=\"#559ff5\"/></svg>","#ffe2cb"],["actions","Buzz Bee","🐝 🎵","#ffe2cb"]];
+groups.sort((a,b)=>['numbers','colours','shapes','family','alphabet','animals','actions'].indexOf(a[0])-['numbers','colours','shapes','family','alphabet','animals','actions'].indexOf(b[0]));
 const room=document.createElement('dialog');room.id='sing-room';room.setAttribute('aria-label','Sing Along');document.body.append(room);
 let group=null,audio=null,url=null,visit=0,saved=[],loaded=false,currentSession='song';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -10,11 +11,26 @@ function stop(){if(audio){audio.pause();audio=null}if(url){URL.revokeObjectURL(u
 function header(title){return '<header class="sing-header"><button data-sing-back aria-label="'+(group?'Back to song categories':'Back to playroom')+'">←</button><h2>'+title+'</h2><span aria-hidden="true">♫</span></header>'}
 function library(){room.classList.remove('song-scenery');visit++;stop();group=null;room.innerHTML=header('Sing Along')+'<div class="sing-groups">'+groups.map(g=>'<button data-sing-group="'+g[0]+'" style="--song-colour:'+g[3]+'"><span class="sing-group-art" aria-hidden="true">'+g[2]+'</span><strong>'+g[1]+'</strong><span class="sing-note" aria-hidden="true">♪</span></button>').join('')+'</div>'}
 
+
+const hugs=['coco','juppy','lily','suzy'];
+function hugArt(i){return '<img class="song-hug" src="song-maya-'+hugs[i%4]+'-hug.webp" alt="Maya and '+hugs[i%4]+' hugging">'}
+function watchSong(media,el){let timer;const clear=()=>{clearTimeout(timer);timer=null};media.addEventListener('ended',()=>{clear();if(feed?.el!==el)return;const active=feed;timer=setTimeout(()=>{if(feed===active&&el.open&&media.ended&&!document.hidden)stepSong(1)},5000)});media.addEventListener('play',clear);media.addEventListener('seeking',clear);el.addEventListener('close',clear,{once:true});}
+window.SongFeedMedia={watch:watchSong,hug:hugArt};
+function uniformControls(el){
+ if(el.querySelector('.unified-song-controls'))return;
+ const buttons=[...el.querySelectorAll('button')];
+ const find=word=>buttons.find(b=>(b.getAttribute('aria-label')||'').toLowerCase().includes(word));
+ const restart=find('restart')||find('replay'),play=find('pause')||find('play song')||buttons.find(b=>b.hasAttribute('data-as-play')),mute=find('mute')||find('sound'),seek=el.querySelector('input[type=range]');
+ if(!restart||!play||!seek)return;
+ const header=el.querySelector('header');if(mute&&header){header.lastElementChild?.matches('span[aria-hidden]')&&header.lastElementChild.remove();header.append(mute)}
+ const footer=document.createElement('div');footer.className='unified-song-controls';const row=document.createElement('div');row.className='unified-song-buttons';play.classList.add('unified-song-play');row.append(restart,play);const spacer=document.createElement('span');spacer.textContent='♫';spacer.setAttribute('aria-hidden','true');row.append(spacer);footer.append(row,seek);el.append(footer);el.classList.add('uniform-song');
+}
+
 // One circular feed, using the original players and their recorded timing.
 let feed=null,lastSwitch=0;
 function playlist(){return [
- {id:'family',title:'Family'}, {id:'animals',title:'Animals'},
- {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet',group:'alphabet'}, {id:'colours',title:'Mix the Colours',group:'colours'}, {id:'shapes',title:'Shapes Everywhere',group:'shapes'},
+ {id:'numbers',title:'Numbers'}, {id:'colours',title:'Mix the Colours',group:'colours'}, {id:'shapes',title:'Shapes Everywhere',group:'shapes'},
+ {id:'family',title:'Family'}, {id:'abc',title:'Alphabet',group:'alphabet'}, {id:'animals',title:'Animals'},
  ...saved.map(s=>({id:s.id,title:s.title,group:s.group})),
  {id:'remix',title:'Buzz Bee',group:'actions'}
 ]}
@@ -36,7 +52,7 @@ function stepSong(direction){if(!feed||performance.now()-lastSwitch<650)return;
  const list=playlist(),index=list.findIndex(t=>t.id===feed.id);lastSwitch=performance.now();
  openTrack(list[(index+direction+list.length)%list.length].id);
 }
-function attachFeed(id,el){if(!el?.open)return;feed={id,el};el.classList.add('sing-feed-active');
+function attachFeed(id,el){if(!el?.open)return;feed={id,el};uniformControls(el);el.classList.add('sing-feed-active');
  el.querySelector('.sing-feed-nav')?.remove();const nav=document.createElement('nav');nav.className='sing-feed-nav';nav.setAttribute('aria-label','Change song');
  nav.innerHTML='<button type="button" data-feed-prev aria-label="Previous song">⌃</button><span>Swipe for songs</span><button type="button" data-feed-next aria-label="Next song">⌄</button>';el.append(nav);
  nav.querySelector('[data-feed-prev]').onclick=()=>stepSong(-1);nav.querySelector('[data-feed-next]').onclick=()=>stepSong(1);
@@ -65,13 +81,14 @@ if(id==='colours'){
 let abcLine=-1;
 function showABC(){if(id!=='abc')return;const scenes=window.ABCSongScenes||[];if(!scenes.length)return;const duration=Number.isFinite(audio?.duration)?audio.duration:150;const n=Math.min(scenes.length-1,Math.floor((audio?.currentTime||0)/duration*scenes.length));if(n===abcLine)return;abcLine=n;const scene=scenes[n];room.querySelector('.sing-dancer').classList.add('abc-song-art');room.querySelector('.sing-dancer').innerHTML='<img class="abc-song-lily" src="lily-full-body.png" alt="Lily"><div class="abc-song-letters">'+scene.letters.split('').map((letter,i)=>'<b style="color:'+['#f94367','#298df2','#28b77d','#eaa916','#a96ae7'][i%5]+'">'+letter+'</b>').join('')+'</div><div class="abc-song-object" aria-hidden="true">'+scene.icon+'</div>';room.querySelector('h3').classList.add('colour-song-lyric');room.querySelector('h3').textContent=scene.text;}
 showABC();
+if(id==='remix'){room.querySelector('.sing-dancer').innerHTML=hugArt(0);room.querySelector('.sing-dancer').classList.add('sing-hug-art')}
 let colourLine=-1;
 const colourPairs=[['Red','Blue'],['Green','Yellow'],['Black','White'],['Pink','Orange'],['Brown','Purple'],null,null,null,null,['Red','Blue'],['Pink','Yellow'],['Green','Yellow'],['Black','White'],['Pink','Orange'],['Brown','Purple'],null,null,null,null];
 const colourPaint={Red:'#fa3454',Blue:'#2685ff',Green:'#2cc57b',Yellow:'#ffdc38',Black:'#33364e',White:'#fffdf5',Pink:'#ff73bc',Orange:'#ff963b',Brown:'#a66c43',Purple:'#a36bf0'};
 function showColourLine(){
  if(id!=='colours')return;
  const duration=Number.isFinite(audio?.duration)?audio.duration:70;
- const line=Math.min(colourPairs.length-1,Math.floor((audio?.currentTime||0)/duration*colourPairs.length));
+ const line=Math.min(colourPairs.length-1,Math.floor(((audio?.currentTime||0)<duration/colourPairs.length+1?0:(audio?.currentTime||0))/duration*colourPairs.length));
  if(line===colourLine)return;colourLine=line;
  const pair=colourPairs[line],mixing=!pair;
  room.querySelector('.colour-song-pair').innerHTML=(pair||Object.keys(colourPaint)).map((name,i)=>'<span class="colour-song-balloon" style="--paint:'+colourPaint[name]+';--delay:'+(-i*.3)+'s"><b style="color:'+(name==='Black'?'white':'#252541')+'">'+name+'</b></span>').join('');
@@ -80,9 +97,9 @@ function showColourLine(){
 }
 showColourLine();
 url=song.blob?URL.createObjectURL(song.blob):null;audio=new Audio(url||song.src);
-audio.volume=.8;audio.onplay=()=>{room.classList.add('sing-playing');const b=room.querySelector('[data-sing-play]');b.textContent='Ⅱ';b.setAttribute('aria-label','Pause song')};
+watchSong(audio,room);audio.volume=.8;audio.onplay=()=>{room.classList.add('sing-playing');const b=room.querySelector('[data-sing-play]');b.textContent='Ⅱ';b.setAttribute('aria-label','Pause song')};
 audio.onpause=()=>{room.classList.remove('sing-playing');const b=room.querySelector('[data-sing-play]');if(b){b.textContent='▶';b.setAttribute('aria-label','Play song')}};
-audio.ontimeupdate=()=>{showABC();showColourLine();window.SongScenery?.set(room,['candy','town','beach','night'][Math.floor(audio.currentTime/16)%4]);const r=room.querySelector('.sing-seek');if(r&&Number.isFinite(audio.duration))r.value=audio.currentTime/audio.duration*100};
+audio.ontimeupdate=()=>{if(id==='remix'){const art=room.querySelector('.sing-dancer'),pair=Math.floor(audio.currentTime/10)%4;if(art.dataset.hug!==String(pair)){art.dataset.hug=pair;art.innerHTML=hugArt(pair);art.classList.add('sing-hug-art')}}showABC();showColourLine();window.SongScenery?.set(room,['candy','town','beach','night'][Math.floor(audio.currentTime/16)%4]);const r=room.querySelector('.sing-seek');if(r&&Number.isFinite(audio.duration))r.value=audio.currentTime/audio.duration*100};
 audio.onended=()=>{window.KidsProgress?.complete('sing','Sing Along '+currentSession);room.classList.remove('sing-playing');room.querySelector('.sing-play-status').textContent='Again? Tap play!';room.querySelector('[data-sing-play]').textContent='▶'};
 audio.onerror=()=>{room.querySelector('.sing-play-status').textContent='This song could not play. Try another audio file.'};
 play();

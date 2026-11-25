@@ -30,3 +30,20 @@ dialog.sing-feed-active{overscroll-behavior:none;padding-bottom:calc(64px + env(
 .sing-feed-nav{position:fixed;bottom:env(safe-area-inset-bottom,0px);left:50%;transform:translateX(-50%);display:flex;align-items:center;justify-content:center;gap:14px;z-index:20;background:#fffffff2;border-radius:24px 24px 0 0;padding:5px 16px;color:#674d77;white-space:nowrap;font:700 12px/1.2 system-ui}
 .sing-feed-nav button{width:44px!important;height:44px!important;min-width:44px;border:0!important;border-radius:50%;background:#eee3ff!important;color:#674d77!important;font:700 30px/1 system-ui!important;cursor:pointer;touch-action:manipulation}
 .sing-feed-nav button:focus-visible{outline:3px solid #8959b5;outline-offset:2px}
+
+/* Shared Count with Me controls for every song. */
+dialog.uniform-song{padding-bottom:165px!important;box-sizing:border-box}
+.uniform-song>footer,.uniform-song .sing-controls,.uniform-song .sing-play-status,.uniform-song .sing-music-notes{display:none!important}
+.uniform-song .unified-song-controls{position:absolute;bottom: max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(520px,90%);z-index:8;text-align:center}
+.uniform-song .unified-song-buttons{display:flex;justify-content:center;align-items:center;gap:32px}
+.uniform-song .unified-song-buttons button,.uniform-song header button{width:52px!important;height:52px!important;border:0!important;border-radius:50%!important;background:#ffffffd9!important;color:#624587!important;font:700 25px system-ui!important;box-shadow:0 5px 18px #715d8012}
+.uniform-song .unified-song-buttons .unified-song-play{width:78px!important;height:78px!important;background:#8755ce!important;color:white!important;font-size:32px!important}
+.uniform-song .unified-song-buttons span{width:52px;font-size:28px;color:#a887c1}
+.uniform-song .unified-song-controls input{display:block!important;width:100%!important;margin:18px 0 0!important;accent-color:#8755ce}
+.song-hug{width:100%;height:100%;object-fit:contain;animation:song-hug-sway 2.8s ease-in-out infinite}
+.sing-hug-art{height:min(48dvh,440px)!important;width:min(85vw,520px)!important;animation:none!important}
+@keyframes song-hug-sway{0%,100%{transform:rotate(-2deg) scale(.98)}50%{transform:rotate(2deg) scale(1.02)}}
+@media(max-height:500px){dialog.uniform-song{padding-bottom:100px!important}.uniform-song .unified-song-buttons .unified-song-play{width:48px!important;height:48px!important}.uniform-song .unified-song-buttons button{width:40px!important;height:40px!important}.uniform-song .unified-song-controls input{margin-top:6px!important}}
+@media(prefers-reduced-motion:reduce){.song-hug{animation:none!important}}
+
+.uniform-song .sing-feed-nav{position:absolute!important;left:auto!important;right:8px!important;top:42%!important;bottom:auto!important;transform:none!important;flex-direction:column!important;width:38px!important;padding:4px!important;gap:6px!important}.uniform-song .sing-feed-nav span{display:none!important}.uniform-song .sing-feed-nav button{width:32px!important;height:32px!important;font-size:22px!important}

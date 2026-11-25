@@ -28,10 +28,10 @@ function show(i){
  if(current===i)return;current=i;
  const page=pages[i],art=$('.ns-art');window.SongScenery?.set(room,page.theme);
  room.style.setProperty('--ns-bg',colours[i%colours.length]);
- const key=page.numbers.join(',');
+ const hugIndex=pages.slice(0,i+1).filter(p=>!p.numbers.length).length-1;const key=page.numbers.length?page.numbers.join(','):'hug-'+hugIndex;
  if(art.dataset.numbers!==key||!art.innerHTML){
   art.dataset.numbers=key;art.classList.toggle('ns-group',page.numbers.length>1);
-  if(page.numbers.length)art.replaceChildren(...page.numbers.map(numberArt));else art.innerHTML='<div class="ns-intro" aria-label="Sing together">♫<span>♪</span></div>';
+  if(page.numbers.length)art.replaceChildren(...page.numbers.map(numberArt));else art.innerHTML=window.SongFeedMedia.hug(hugIndex);
  }
  $('.ns-count').textContent=page.text;
  pages.slice(i+1,i+5).flatMap(p=>p.numbers).forEach(preloadNumber);
@@ -47,7 +47,7 @@ function play(){if(window.SmartClassMembership?.begin('singalong','numbers')===f
 function restart(){if(!audio||window.SmartClassMembership?.startSong('numbers')===false)return;if(audio.error)audio.load();audio.currentTime=START;progress();play()}
 function open(){if(window.SmartClassMembership?.startSong('numbers')===false)return;stop();window.KidsBridge?.stop();window.KidsSound?.close();current=-2;warmArtwork();
 room.innerHTML='<header><button data-ns="back" aria-label="Back to song categories">←</button><strong>Count with me</strong><button data-ns="mute" aria-label="Mute song">🔊</button></header><main><div class="ns-art"></div><p class="ns-count"></p></main><footer><div class="ns-buttons"><button data-ns="restart" aria-label="Restart song">↻</button><button data-ns="play" aria-label="Play song">▶</button><span aria-hidden="true">♫</span></div><input class="ns-seek" type="range" min="0" max="100" step=".01" value="0" disabled aria-label="Song position"><p class="ns-status" role="status"></p></footer>';
-room.showModal();show(0);audio=new Audio(recording.src);audio.volume=.8;audio.muted=muted;
+room.showModal();show(0);audio=new Audio(recording.src);audio.volume=.8;window.SongFeedMedia?.watch(audio,room);audio.muted=muted;
 const mute=$('[data-ns="mute"]');mute.textContent=muted?'🔇':'🔊';mute.setAttribute('aria-label',muted?'Unmute song':'Mute song');
 audio.onloadedmetadata=()=>{audio.currentTime=START;progress()};
 audio.currentTime=START;
