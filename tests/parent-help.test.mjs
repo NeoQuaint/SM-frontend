@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {validate} from '../api/parent-help.js';
+const base={action:'message',id:'12345678-1234-4234-8234-123456789012'};
+assert.equal(validate({...base,message:'word '.repeat(400)}).message.split(/\s+/).length,400);
+assert.throws(()=>validate({...base,message:'word '.repeat(401)}),/400 words/);
+assert.throws(()=>validate({...base,message:' '}),/write a message/);
+assert.throws(()=>validate({...base,action:'deletion'}),/confirm/);
+assert.equal(validate({...base,action:'deletion',confirm:true}).action,'deletion');
+assert.throws(()=>validate({...base,id:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',message:'Hi'}));
+console.log('PASS: 400-word maximum, empty messages, deletion confirmation and valid request IDs');
