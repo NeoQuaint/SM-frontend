@@ -1,6 +1,6 @@
 import {configured} from '../lib/stitch-setup.js';
 import {billingUser,checkPost} from '../lib/billing-auth.js';
-import {PLANS,config,problem,newOrder,subscriptionRequest,createClient,checkoutUrl,nextRenewal} from '../lib/stitch-core.js';
+import {PLANS,config,problem,newOrder,subscriptionRequest,createClient,checkoutUrl,nextRenewal,checkoutEnabled} from '../lib/stitch-core.js';
 import {accountOrder,registerOrder,storeSubscription,markUnknown,cancelOrder} from '../lib/stitch-db.js';
 export const maxDuration=60;
 export default async function handler(req,res){
@@ -13,7 +13,7 @@ export default async function handler(req,res){
   if(req.method==='GET'){
    const order=await accountOrder(user.customerId,cfg.mode);
    const access=order&&new Date(order.access_until)>new Date()&&PLANS[order.plan];
-   return res.status(200).json({configured:true,mode:cfg.mode,csrf:user.csrf,plan:access?order.plan:'preview',packages:PLANS,quoteRenewal:nextRenewal().toISOString(),subscription:order?{plan:order.plan,status:order.status,accessUntil:order.access_until,nextRenewal:order.next_renewal,canCancel:!!order.provider_id&&order.status!=='cancelled',pending:!access&&['pending','creating','unknown'].includes(order.status)}:null});
+   return res.status(200).json({configured:true,checkoutEnabled:checkoutEnabled(cfg,user),mode:cfg.mode,csrf:user.csrf,plan:access?order.plan:'preview',packages:PLANS,quoteRenewal:nextRenewal().toISOString(),subscription:order?{plan:order.plan,status:order.status,accessUntil:order.access_until,nextRenewal:order.next_renewal,canCancel:!!order.provider_id&&order.status!=='cancelled',pending:!access&&['pending','creating','unknown'].includes(order.status)}:null});
   }
   checkPost(req,user);
   const body=typeof req.body==='string'?JSON.parse(req.body):req.body;
@@ -25,7 +25,7 @@ export default async function handler(req,res){
    return res.status(200).json({cancelled:true,accessUntil:order.access_until});
   }
   if(body.action!=='checkout'||body.recurringConsent!==true||!Object.hasOwn(PLANS,body.plan))throw problem('Please choose a package and confirm the monthly subscription.');
-  if(cfg.mode==='live'&&process.env.STITCH_LIVE_ENABLED!=='true')throw problem('Live checkout has not been activated yet.',503);
+  if(!checkoutEnabled(cfg,user))throw problem('Checkout is not open yet. Please sign in with the owner account for the payment test.',403);
   const result=await registerOrder(newOrder(user,body.plan,cfg.mode)),order=result.order;
   if(!result.created){
    if(order.plan!==body.plan)throw problem('You already have a package or unfinished checkout. Manage that subscription before choosing another.',409);

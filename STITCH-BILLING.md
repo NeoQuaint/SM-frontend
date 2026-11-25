@@ -8,7 +8,7 @@ Production Vercel project: sm-simple.
 - DATABASE_URL: the shared SmartClass/admin database, using TLS.
 - STITCH_WEBHOOK_SECRET: optional override. The owner-only /billing-setup page otherwise registers and stores the signing secret encrypted in sc_stitch_configuration, keyed by the client ID fingerprint. Encryption uses AUTH_SESSION_SECRET; preserve or re-encrypt this setting when rotating that key. Never log the signing secret.
 - ARI_OWNER_EMAIL: only this signed-in parent may use test checkout.
-- STITCH_LIVE_ENABLED=true: explicit final gate for real checkout, only after testing and switching to Live credentials and the corresponding webhook secret.
+- STITCH_LIVE_ENABLED=owner: permit the verified ARI_OWNER_EMAIL account to perform an explicitly authorized real payment test. All other accounts remain blocked. Setting true opens public live checkout only after verification. Missing or any other value disables live checkout.
 - AUTH_SESSION_SECRET: existing parent authentication key.
 
 Register https://www.smartclasss.com/billing-return as a redirect URL and https://www.smartclasss.com/api/stitch-webhook as the webhook URL. Use the owner-only /billing-setup page to verify both API scopes and register these addresses. It captures the signing secret server-side without sending it to the browser. A persisted registration-started marker prevents unsafe retries if the one-time response is lost.
@@ -24,4 +24,5 @@ Prices are server-owned: R59 / R79 / R129 monthly. First payment is immediate. R
 Only a verified signed notification, independently checked against Stitch's payment endpoint and the stored order, grants access. Redirect parameters never grant access. Duplicate payments are ignored. Test payments never appear as real revenue. Cancellation preserves paid access through its end date.
 Plan changes while a subscription or paid period exists are not supported yet. Refunds currently require merchant processing through Stitch and coordinated access correction; there is no automated refund reconciliation. Unknown subscription-creation outcomes require reconciliation rather than blindly creating a second subscription.
 Existing activity reports remain on the family's device. Only parent billing identifiers are sent to Stitch. This integration does not protect public static media URLs from direct access.
+
 
