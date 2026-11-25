@@ -53,6 +53,14 @@
   ],
   "rewrites": [
     {
+      "source": "/billing-setup",
+      "destination": "/billing-setup.html"
+    },
+    {
+      "source": "/billing-return",
+      "destination": "/billing-return.html"
+    },
+    {
       "source": "/ari",
       "destination": "/ari.html"
     },
