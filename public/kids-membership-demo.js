@@ -17,7 +17,7 @@ const SONG_KEY='smartclass-free-songs-v1';
 function songCounts(){let counts={family:0};try{const x=JSON.parse(localStorage.getItem(SONG_KEY)||'{}');for(const [id,n] of Object.entries(x))if(id!=='__proto__'&&id!=='constructor'&&Number.isInteger(n)&&n>=0)counts[id]=Math.min(2,n)}catch{}return counts}
 function songAvailable(id){const counts=songCounts();return Object.hasOwn(counts,id)?counts[id]<2:Object.keys(counts).length<3}
 function checkSong(id){if(hasCategory('singalong')||songAvailable(id))return true;window.dispatchEvent(new Event('smartclass:song-limit'));pending='singalong';open('locked');return false}
-function startSong(id){if(!checkSong(id))return false;active.set('singalong',{unit:id,done:false,counted:false});return true}
+function startSong(id){if(!checkSong(id))return false;active.delete('singalong');active.set('singalong',{unit:id,done:false,counted:false});return true}
 function songPlayed(id){const current=active.get('singalong');if(!current||current.unit!==id||current.counted)return;current.counted=true;if(hasCategory('singalong'))return;const counts=songCounts();counts[id]=Math.min(2,(counts[id]||0)+1);try{localStorage.setItem(SONG_KEY,JSON.stringify(counts))}catch{}}
 function canAccess(id,unit){return hasCategory(id)||isStarter(id,unit)}
 function access(id){return hasCategory(id)?'included':'preview'}
@@ -43,9 +43,9 @@ dialog.addEventListener('cancel',e=>{e.preventDefault();close()});window.addEven
 function begin(category,unit='activity'){
  const id=category==='sing'?'singalong':category;
  if(id==='singalong'){const current=active.get(id);if(current?.unit===unit&&!current.done)return true;if(!checkSong(unit))return false;return true}if(!canAccess(id,unit)){pending=id;open('locked');return false}
- active.set(id,{unit,done:false});return true;
+ active.delete(id);active.set(id,{unit,done:false});return true;
 }
 function completed(category,item){const id=category==='sing'?'singalong':category;const current=active.get(id);if(current)current.done=true}
 function parentAccount(){gateAction='account';lastFocus=document.activeElement;if(!dialog.open)dialog.showModal();gate()}
-const cards=document.getElementById('cards');if(cards)new MutationObserver(decorate).observe(cards,{childList:true});window.SmartClassMembership={badge,setVerifiedPlan:id=>{state.plan=Object.hasOwn(plans,id)?id:'preview';save()},packagesAfterSignup:()=>{pending=null;lastFocus=document.activeElement;if(!dialog.open)dialog.showModal();renderPlans();if(!matchMedia('(prefers-reduced-motion: reduce)').matches)dialog.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:450,easing:'ease-out'})},packages:()=>{pending=null;open()},decorate,begin,completed,parentAccount,hasCategory,canAccess,offer,startSong,songPlayed,checkSong};decorate();
+const cards=document.getElementById('cards');if(cards)new MutationObserver(decorate).observe(cards,{childList:true});window.SmartClassMembership={badge,returnCategory:()=>{if(pending)return pending;if(!document.querySelector('dialog[open]:not(#membership-demo):not(#billing-dialog):not(#settings)'))return null;return [...active.entries()].filter(([,item])=>!item.done).map(([id])=>id).at(-1)||null},setVerifiedPlan:id=>{state.plan=Object.hasOwn(plans,id)?id:'preview';save()},packagesAfterSignup:()=>{pending=null;lastFocus=document.activeElement;if(!dialog.open)dialog.showModal();renderPlans();if(!matchMedia('(prefers-reduced-motion: reduce)').matches)dialog.animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'translateY(0)'}],{duration:450,easing:'ease-out'})},packages:()=>{pending=null;open()},decorate,begin,completed,parentAccount,hasCategory,canAccess,offer,startSong,songPlayed,checkSong};decorate();
 })();

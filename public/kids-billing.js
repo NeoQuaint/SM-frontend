@@ -4,7 +4,10 @@ const names={explorer:'Little Explorer',smart:'Smart Start',academy:'Full Academ
 const dialog=document.createElement('dialog');dialog.id='billing-dialog';dialog.setAttribute('aria-labelledby','billing-title');document.body.append(dialog);
 const date=value=>value?new Intl.DateTimeFormat('en-ZA',{day:'numeric',month:'long',year:'numeric',timeZone:'Africa/Johannesburg'}).format(new Date(value)):'—';
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function setPlan(plan){window.SmartClassMembership?.setVerifiedPlan(plan||'preview')}
+function setPlan(plan){window.SmartClassMembership?.setVerifiedPlan(plan||'preview');resumeActivity(plan)}
+let resumeStarted=false;
+function resumeActivity(plan){if(resumeStarted||!names[plan]||!location.pathname.startsWith('/kids')||new URLSearchParams(location.search).get('payment')!=='complete')return;resumeStarted=true;const url=new URL(location.href);url.searchParams.delete('payment');history.replaceState(null,'',url.pathname+url.search+url.hash);let saved;try{saved=JSON.parse(sessionStorage.getItem('sc-checkout-return'));sessionStorage.removeItem('sc-checkout-return')}catch{}if(!saved||Date.now()-saved.at>3600000||!window.SmartClassMembership?.hasCategory(saved.category))return;let attempts=0;const open=()=>{if(document.body.classList.contains('kids-is-loading')&&attempts++<100){setTimeout(open,100);return}const card=[...document.querySelectorAll('#cards [data-path]')].find(el=>el.dataset.path===saved.category);card?.click()};open()}
+
 async function refresh(){
  const r=await fetch('/api/billing',{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(15000)});
  if(r.status===401){state=null;setPlan('preview');return null}
@@ -21,7 +24,7 @@ async function checkout(plan){
  if(state.subscription&&state.subscription.status!=='cancelled'&&state.subscription.status!=='closed'&&(!state.subscription.pending||state.subscription.plan!==plan))return manage();
  show(names[plan],'<p class="billing-price">R'+prices[plan]+'<small> / month</small></p><p>'+(state.mode==='test'?'<strong>Test checkout. No real payment.</strong>':'Your first payment is taken today.')+'</p><p>First renewal: <strong>'+date(state.quoteRenewal)+'</strong>, then monthly. Cancel renewal in Grown-Ups; paid access lasts until its end date.</p><label class="billing-consent"><input type="checkbox" id="billing-consent"> I agree to the monthly subscription and the <a href="/terms" target="_blank" rel="noopener">Terms &amp; cancellation policy</a>.</label><button class="billing-primary" data-billing-pay disabled>Continue to secure checkout</button><p class="billing-small">Card details are entered securely with Stitch. Seven-day money-back guarantee on your first website payment. Refund requests: <a href="mailto:billing@smartclassedu.com">billing@smartclassedu.com</a>.</p>');
  const checkbox=dialog.querySelector('#billing-consent'),button=dialog.querySelector('[data-billing-pay]');checkbox.onchange=()=>button.disabled=!checkbox.checked;
- button.onclick=async()=>{if(busy||!checkbox.checked)return;busy=true;button.disabled=true;status('Opening Stitch…');try{const d=await post({action:'checkout',plan,recurringConsent:true});const u=new URL(d.url);if(u.origin!=='https://express.stitch.money')throw Error('Unexpected checkout address.');location.assign(u.href)}catch(e){status(e.message);button.disabled=false}finally{busy=false}};
+ button.onclick=async()=>{if(busy||!checkbox.checked)return;busy=true;button.disabled=true;status('Opening Stitch…');try{const d=await post({action:'checkout',plan,recurringConsent:true});const u=new URL(d.url);if(u.origin!=='https://express.stitch.money')throw Error('Unexpected checkout address.');try{sessionStorage.setItem('sc-checkout-return',JSON.stringify({category:window.SmartClassMembership?.returnCategory()||null,at:Date.now()}))}catch{}location.assign(u.href)}catch(e){status(e.message);button.disabled=false}finally{busy=false}};
  }catch(e){status(e.message)}
 }
 async function manage(){
