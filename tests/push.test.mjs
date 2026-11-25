@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {createECDH,randomBytes} from 'node:crypto';
+import fs from 'node:fs';import vm from 'node:vm';
+import {validSubscription,reminderDue,cronAuthorized,payload} from '../lib/push.js';
+import cron from '../api/push-reminders.js';
+const key=createECDH('prime256v1');key.generateKeys();const sub={endpoint:'https://fcm.googleapis.com/fcm/send/test',keys:{p256dh:key.getPublicKey().toString('base64url'),auth:randomBytes(16).toString('base64url')}};
+assert.equal(validSubscription(sub).endpoint,sub.endpoint);
+for(const endpoint of ['http://fcm.googleapis.com/a','https://localhost/a','https://127.0.0.1/a','https://fcm.googleapis.com.evil.test/a','https://user:pass@fcm.googleapis.com/a','https://web.push.apple.com:8443/a'])assert.throws(()=>validSubscription({...sub,endpoint}));
+assert.throws(()=>validSubscription({...sub,keys:{...sub.keys,auth:'bad'}}));assert.equal(cronAuthorized('Bearer secret','secret'),true);assert.equal(cronAuthorized('Bearer wrong','secret'),false);assert.equal(cronAuthorized(undefined,undefined),false);
+const now=new Date('2026-12-20T14:00:00Z'),p={last_seen:'2026-12-16T14:00:00Z',last_sent:null,reminder_count:0};assert.equal(reminderDue(p,now),true);assert.equal(reminderDue({...p,last_seen:'2026-12-19'},now),false);assert.equal(reminderDue({...p,last_sent:'2026-12-18'},now),false);assert.equal(reminderDue({...p,reminder_count:2},now),false);
+const res={setHeader(){},status(n){this.code=n;return this},json(){return this},end(){return this}};await cron({method:'GET',headers:{}},res);assert.equal(res.code,401);
+let shown,focused=false,navigated=false;const handlers={};const self={location:{origin:'https://www.smartclasss.com'},addEventListener:(name,fn)=>handlers[name]=fn,registration:{showNotification:async(title,options)=>{shown={title,...options}}},clients:{claim:async()=>{},matchAll:async()=>[{url:'https://www.smartclasss.com/kids',focus:async()=>{focused=true},navigate:async()=>{navigated=true}}],openWindow:async()=>{}},skipWaiting:async()=>{}};
+vm.runInNewContext(fs.readFileSync('public/smartclass-sw.js','utf8'),{self,URL});let work;handlers.push({data:{json:()=>({...payload(),url:'https://evil.test',title:'fake'})},waitUntil:p=>work=p});await work;assert.equal(shown.title,'SmartClass');assert.equal(shown.icon,'/smartclass-icon-192.png');assert.equal(shown.data.url,'/kids');handlers.notificationclick({action:'',notification:{close(){}},waitUntil:p=>work=p});await work;assert.equal(focused,true);assert.equal(navigated,false);
+console.log('PASS: push endpoint restrictions, key validation, reminder limits, cron authentication, logo payload, and safe notification taps preserving an open activity.');
