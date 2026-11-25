@@ -1,6 +1,6 @@
 (()=>{
 const groups=[["family","Family","👩‍👧‍👦","#ffdbe6"],["animals","Animals","🐮 🐥","#ffe7aa"],["numbers","Numbers","1️⃣ 2️⃣ 3️⃣","#d9f0db"],["alphabet","Alphabet","🔤","#e5d9ff"],["colours","Colours","🌈","#d5efff"],["shapes","Shapes","<svg viewBox=\"0 0 180 100\" width=\"150\" height=\"90\" aria-hidden=\"true\"><circle cx=\"40\" cy=\"42\" r=\"29\" fill=\"#ff735b\"/><path d=\"M112 13L146 74H78Z\" fill=\"#52cd90\"/><rect x=\"49\" y=\"47\" width=\"44\" height=\"44\" rx=\"5\" fill=\"#559ff5\"/></svg>","#ffe2cb"],["actions","Buzz Bee","🐝 🎵","#ffe2cb"]];
-groups.sort((a,b)=>['numbers','alphabet','shapes','family','colours','animals','actions'].indexOf(a[0])-['numbers','alphabet','shapes','family','colours','animals','actions'].indexOf(b[0]));
+groups.sort((a,b)=>['numbers','colours','shapes','family','alphabet','animals','actions'].indexOf(a[0])-['numbers','colours','shapes','family','alphabet','animals','actions'].indexOf(b[0]));
 const room=document.createElement('dialog');room.id='sing-room';room.setAttribute('aria-label','Sing Along');document.body.append(room);
 let group=null,audio=null,url=null,visit=0,saved=[],loaded=false,currentSession='song';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -29,8 +29,8 @@ function uniformControls(el){
 // One circular feed, using the original players and their recorded timing.
 let feed=null,lastSwitch=0;
 function playlist(){return [
- {id:'numbers',title:'Numbers'}, {id:'abc',title:'Alphabet',group:'alphabet'}, {id:'shapes',title:'Shapes Everywhere',group:'shapes'},
- {id:'family',title:'Family'}, {id:'colours',title:'Mix the Colours',group:'colours'}, {id:'animals',title:'Animals'},
+ {id:'numbers',title:'Numbers'}, {id:'colours',title:'Mix the Colours',group:'colours'}, {id:'shapes',title:'Shapes Everywhere',group:'shapes'},
+ {id:'family',title:'Family'}, {id:'abc',title:'Alphabet',group:'alphabet'}, {id:'animals',title:'Animals'},
  ...saved.map(s=>({id:s.id,title:s.title,group:s.group})),
  {id:'remix',title:'Buzz Bee',group:'actions'}
 ]}
