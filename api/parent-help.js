@@ -1,3 +1,4 @@
+import {deliverMail} from '../lib/mail.js';
 import {billingUser,checkPost} from '../lib/billing-auth.js';
 import {database} from '../lib/stitch-db.js';
 export function validate(body){
@@ -23,7 +24,7 @@ export default async function handler(req,res){
     if(recent.rows[0].count>=3){await c.query('ROLLBACK');return res.status(429).json({error:'Please wait a few minutes before sending another message.'})}
     await c.query(`INSERT INTO smartclass_feedback(submission_id,usage_reason,payment_reason,other_reason,comments,contact_consent,email) VALUES($1,'other','other',$2,$3,true,$4)`,[v.id,v.action==='deletion'?'ACCOUNT DELETION REQUEST':'Parent contact message',v.action==='deletion'?'Please delete my SmartClass account. Please review any active subscription and contact me to confirm completion.':v.message,user.email]);
    }
-   await c.query('COMMIT');return res.status(200).json({received:true});
+   await c.query('COMMIT');if(process.env.SUPPORT_EMAIL_PASSWORD)try{await deliverMail(1)}catch{}return res.status(200).json({received:true});
   }catch(e){await c.query('ROLLBACK');throw e}finally{c.release()}
  }catch(e){return res.status(e.status||503).json({error:e.status?e.message:'Your request could not be saved. Please try again.'})}
 }

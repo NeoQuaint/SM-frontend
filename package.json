@@ -11,7 +11,10 @@
     "node": ">=20"
   },
   "dependencies": {
+    "imapflow": "^2.12.2",
     "jose": "^6.2.17",
+    "mailparser": "^3.15.0",
+    "nodemailer": "^10.6.1",
     "pg": "^8.23.1",
     "svix": "^2.11.1",
     "web-push": "^4.0.0"

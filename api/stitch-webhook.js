@@ -1,3 +1,4 @@
+import {deliverMail} from '../lib/mail.js';
 import {configured} from '../lib/stitch-setup.js';
 import {Webhook} from 'svix';
 import {config as stitchConfig,createClient,verifiedPayment,PLANS} from '../lib/stitch-core.js';
@@ -16,6 +17,7 @@ export function createWebhookHandler({getConfig=configured,getClient=createClien
  try{
   const {payment}=await getClient(cfg).payment(event.id);
   const outcome=await settlePayment(event,req.headers['svix-id'],payment,cfg.mode,verifiedPayment,PLANS);
+  if(cfg.mode==='live'&&process.env.BILLING_EMAIL_PASSWORD)try{await deliverMail(1)}catch{}
   return res.status(200).json({received:true,...outcome});
  }catch(e){return res.status(e.status||503).json({error:'Payment verification pending'})}
 }
