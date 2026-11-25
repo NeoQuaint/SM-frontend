@@ -1,0 +1,33 @@
+#alphabet-garden:not([data-phase=welcome]) .at-stage{inset:13% 7% 29%;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#alphabet-garden:not([data-phase=welcome]) .at-lily{height:25%;bottom:4%;left:50%;width:210px;object-fit:contain}
+#alphabet-garden .at-example-object{width:min(230px,43vw);height:min(230px,25dvh);display:grid;place-items:center;transition:transform 1s,opacity 1s}
+#alphabet-garden .at-example-object>svg,#alphabet-garden .at-example-object>img{width:100%;height:100%;object-fit:contain}
+#alphabet-garden .at-example-object.at-collected{transform:translateY(35px) scale(.72) rotate(-10deg)}
+#alphabet-garden .at-letter{font-family:'Arial Rounded MT Bold','Trebuchet MS',sans-serif}
+#alphabet-garden .at-cap{font-size:clamp(100px,27vw,185px)}
+#alphabet-garden .at-lower{font-size:clamp(65px,17vw,120px)}
+#alphabet-garden .at-example .at-cap{font-size:clamp(65px,18vw,110px)}
+#alphabet-garden .at-example .at-lower{font-size:clamp(45px,12vw,80px)}
+#alphabet-garden .at-example{gap:5px}
+#alphabet-garden .at-options button{min-width:100px;min-height:110px;touch-action:manipulation}
+#alphabet-garden .at-tools{bottom:-45px;display:flex;gap:15px}
+#alphabet-garden[data-phase=travel] .at-farm img{animation:at-farm-pass 2.4s ease-in-out}
+#alphabet-garden .at-recap{display:flex;gap:8px;justify-content:center}
+#alphabet-garden .at-recap button{display:flex;flex-direction:column;align-items:center;width:min(24vw,125px);height:150px;background:#fffcf0e8;border-radius:24px;box-shadow:0 6px 0 #d2b3dc;padding:10px}
+#alphabet-garden .at-recap b{font-size:34px;white-space:nowrap}
+#alphabet-garden .at-recap button>span{height:75px;width:75px;font-size:50px}
+#alphabet-garden .at-recap img,#alphabet-garden .at-recap svg{width:100%;height:100%;object-fit:contain}
+#alphabet-garden .at-finish h1{font-size:23px;margin:18px 0}
+#alphabet-garden .at-more{border-radius:24px;background:#8755ce;color:white;padding:14px 24px;width:auto;height:auto;font-size:20px}
+#alphabet-garden .at-extras{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center}
+#alphabet-garden .at-extras button{width:auto;height:auto;padding:10px 13px;border-radius:18px;font-size:13px;background:#fff5d9;color:#63417f}
+#alphabet-garden .at-resume{position:absolute;inset:0;margin:auto;width:90px;height:90px;border-radius:50%;background:#8755ce;color:white;z-index:20;font-size:36px;box-shadow:0 0 0 100vmax #36264560}
+#alphabet-garden.at-paused *{animation-play-state:paused!important}
+@keyframes at-farm-pass{to{transform:scale(1.1) translateX(-3%)}}
+@media(max-height:500px){#alphabet-garden:not([data-phase=welcome]) .at-stage{inset:16% 8% 18% 26%}#alphabet-garden:not([data-phase=welcome]) .at-lily{left:13%;bottom:7%;height:48%;width:140px}#alphabet-garden .at-example{display:flex;flex-direction:row;gap:20px}#alphabet-garden .at-example-object{height:140px;width:140px}#alphabet-garden .at-cap{font-size:100px}#alphabet-garden .at-lower{font-size:65px}#alphabet-garden .at-recap button{height:100px}#alphabet-garden .at-recap button>span{height:45px;width:45px}#alphabet-garden .at-finish h1{margin:7px 0;font-size:18px}#alphabet-garden .at-extras{margin-top:6px}#alphabet-garden .at-more{padding:9px 18px;font-size:16px}}
+@media(prefers-reduced-motion:reduce){#alphabet-garden .at-farm img{animation:none!important}#alphabet-garden .at-example-object{transition:none}}
+
+#alphabet-garden .at-extras button{font-size:13px!important;min-width:0}#alphabet-garden .at-more{font-size:20px!important}#alphabet-garden .at-recap button{font-size:18px!important;color:#624080}#alphabet-garden .at-extras{gap:8px!important;margin-top:16px!important}#alphabet-garden .at-lily.is-walking{animation:at-walk-depth 2.4s linear forwards}#alphabet-garden .at-tools{z-index:8;flex-direction:row}#alphabet-garden .at-resume{font-size:36px!important}
+#alphabet-garden .at-tools{left:0;right:auto;bottom:-110px;flex-direction:column;gap:8px}
+@media(max-height:500px){#alphabet-garden .at-tools{left:auto;right:-6%;bottom:0;flex-direction:column;gap:4px}#alphabet-garden .at-tools button{width:40px;height:40px;min-height:40px;min-width:40px}}
+#alphabet-garden .at-tools{position:absolute}#alphabet-garden .at-finish h1{color:#fff;text-shadow:0 2px 2px #315565}
