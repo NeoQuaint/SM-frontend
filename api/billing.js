@@ -1,7 +1,7 @@
 import {configured} from '../lib/stitch-setup.js';
 import {billingUser,checkPost} from '../lib/billing-auth.js';
 import {PLANS,config,problem,newOrder,subscriptionRequest,createClient,checkoutUrl,nextRenewal,checkoutEnabled} from '../lib/stitch-core.js';
-import {accountOrder,registerOrder,storeSubscription,markUnknown,cancelOrder} from '../lib/stitch-db.js';
+import {accountOrder,registerOrder,storeSubscription,markUnknown,cancelOrder,rejectOrder} from '../lib/stitch-db.js';
 export const maxDuration=60;
 export default async function handler(req,res){
  res.setHeader('Cache-Control','no-store');res.setHeader('Vary','Cookie');
@@ -43,7 +43,7 @@ export default async function handler(req,res){
    const sub=await client.subscription(subscriptionRequest(order,user)),url=checkoutUrl(sub.url,cfg);
    await storeSubscription(order,sub,url);
    return res.status(200).json({url});
-  }catch(e){await markUnknown(order.id);throw e}
+  }catch(e){if([400,422].includes(e.providerStatus)){await rejectOrder(order.id);throw problem('Stitch rejected the checkout details. No payment was started. Please contact support.',422)}await markUnknown(order.id);throw e}
  }catch(e){const status=e.status||503;return res.status(status).json({error:status<500?e.message:'Checkout could not finish. No access has been unlocked. Please try again shortly or contact support.'})}
 }
 

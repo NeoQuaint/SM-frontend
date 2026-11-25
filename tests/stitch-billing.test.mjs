@@ -7,7 +7,7 @@ import {billingUser,checkPost} from '../lib/billing-auth.js';
 import {createWebhookHandler} from '../api/stitch-webhook.js';
 const user={customerId:'42',name:'Parent Example',email:'parent@example.test'};
 const order={...newOrder(user,'smart','test',new Date('2026-01-31T12:00:00Z')),provider_id:'sub-1'};
-assert.equal(order.amount,7900);assert.equal(order.next_renewal.toISOString(),'2026-02-27T22:00:00.000Z');
+assert.match(order.id,/^[A-Za-z0-9]+$/);assert.equal(subscriptionRequest(order,user).merchantReference,order.id);assert.equal(order.amount,7900);assert.equal(order.next_renewal.toISOString(),'2026-02-27T22:00:00.000Z');
 assert.equal(nextRenewal(new Date('2026-12-25T12:00:00Z')).toISOString(),'2027-01-24T22:00:00.000Z');
 assert.equal(subscriptionRequest(order,user).recurrence.byMonthDay,28);assert.equal(subscriptionRequest(order,user).initialAmount,7900);
 assert.throws(()=>newOrder(user,'__proto__','test'));assert.equal(PLANS.academy.cents,12900);
