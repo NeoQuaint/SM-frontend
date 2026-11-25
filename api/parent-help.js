@@ -1,3 +1,5 @@
+import {deleteAccount} from '../lib/account-deletion.js';
+export const maxDuration=120;
 import {deliverMail} from '../lib/mail.js';
 import {billingUser,checkPost} from '../lib/billing-auth.js';
 import {database} from '../lib/stitch-db.js';
@@ -13,11 +15,12 @@ export default async function handler(req,res){
  res.setHeader('Cache-Control','private, no-store');res.setHeader('Vary','Cookie');
  if(!['GET','POST'].includes(req.method))return res.status(405).json({error:'Method not allowed'});
  try{
-  const user=await billingUser(req);
+  const user=await billingUser(req,{allowDeleting:true});
   if(req.method==='GET')return res.status(200).json({csrf:user.csrf});
   checkPost(req,user);let v;try{const body=typeof req.body==='string'?JSON.parse(req.body):req.body;v=validate(body)}catch(e){return res.status(400).json({error:e.message})}
+  if(v.action==='deletion'){const result=await deleteAccount(user);res.setHeader('Set-Cookie',['__Host-sc-parent=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0','__Host-sc-challenge=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0']);return res.status(200).json(result)}
   const c=await database().connect();try{
-   await c.query('BEGIN');await c.query('SELECT pg_advisory_xact_lock(hashtext($1))',['parent-help:'+user.customerId]);
+   await c.query('BEGIN');if(!(await c.query('SELECT 1 FROM users WHERE id::text=$1 AND deletion_started_at IS NULL FOR SHARE',[String(user.customerId)])).rowCount)throw Object.assign(Error('Account deletion is in progress.'),{status:409});await c.query('SELECT pg_advisory_xact_lock(hashtext($1))',['parent-help:'+user.customerId]);
    const existing=await c.query('SELECT 1 FROM smartclass_feedback WHERE submission_id=$1 AND email=$2',[v.id,user.email]);
    if(!existing.rowCount){
     const recent=await c.query("SELECT COUNT(*)::int AS count FROM smartclass_feedback WHERE email=$1 AND created_at>NOW()-INTERVAL '15 minutes'",[user.email]);

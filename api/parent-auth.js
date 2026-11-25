@@ -1,3 +1,4 @@
+import {activeAccount} from '../lib/account-deletion.js';
 import {randomBytes,timingSafeEqual} from 'node:crypto';
 import {createRemoteJWKSet,jwtVerify,SignJWT} from 'jose';
 const keys=createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'));
@@ -12,12 +13,12 @@ export async function saveParent(credential,account){
  if(!response.ok||data.status!=='success'||!data.user?.id||String(data.user.email).toLowerCase()!==account.email.toLowerCase())throw Error('Account registration failed');
  return String(data.user.id);
 }
-export function createHandler({persistParent=saveParent,verifyGoogle=async(token,audience)=>{const {payload}=await jwtVerify(token,keys,{audience,issuer:['https://accounts.google.com','accounts.google.com'],algorithms:['RS256']});return payload}}={}){return async function handler(req,res){
+export function createHandler({lookup=activeAccount,persistParent=saveParent,verifyGoogle=async(token,audience)=>{const {payload}=await jwtVerify(token,keys,{audience,issuer:['https://accounts.google.com','accounts.google.com'],algorithms:['RS256']});return payload}}={}){return async function handler(req,res){
 res.setHeader('Cache-Control','no-store');res.setHeader('Vary','Cookie');
 const clientId=process.env.GOOGLE_CLIENT_ID,secret=process.env.AUTH_SESSION_SECRET;
 const ready=!!clientId&&!!secret&&secret.length>=32;
 const key=new TextEncoder().encode(secret||'');const stored=cookies(req);
-async function user(){if(!ready||!stored[sessionCookie])return null;try{const {payload:p}=await jwtVerify(stored[sessionCookie],key,{issuer:'smartclass',audience:'smartclass-parent',algorithms:['HS256']});return p.customerId?{id:p.sub,customerId:p.customerId,name:p.name,email:p.email}:null}catch{return null}}
+async function user(){if(!ready||!stored[sessionCookie])return null;try{const {payload:p}=await jwtVerify(stored[sessionCookie],key,{issuer:'smartclass',audience:'smartclass-parent',algorithms:['HS256']});return p.customerId&&await lookup(p.customerId,p.email)?{id:p.sub,customerId:p.customerId,name:p.name,email:p.email}:null}catch{return null}}
 if(req.method==='GET'){
 if(!ready)return res.status(200).json({configured:false,user:null});
 const nonce=randomBytes(24).toString('base64url');const challenge=await new SignJWT({nonce}).setProtectedHeader({alg:'HS256'}).setIssuer('smartclass').setAudience('parent-login').setIssuedAt().setExpirationTime('10m').sign(key);
@@ -33,7 +34,7 @@ if(body.action==='logout'){res.setHeader('Set-Cookie',[cookie(sessionCookie,'',0
 if(body.action!=='login'||typeof body.credential!=='string'||body.credential.length>16000)return res.status(400).json({error:'Invalid request'});
 let account;
 try{const p=await verifyGoogle(body.credential,clientId);if(!p.sub||typeof p.sub!=='string'||p.email_verified!==true||!p.email||!equal(p.nonce,challenge.nonce))throw Error();account={id:p.sub,name:String(p.name||'Parent').slice(0,100),email:String(p.email).slice(0,254)}}catch{return res.status(401).json({error:'Google sign-in could not be verified. Please try again.'})}
-try{account.customerId=await persistParent(body.credential,account);if(!account.customerId)throw Error()}catch{return res.status(503).json({error:'We could not save your account yet. Please try signing in again in a moment.'})}
+try{account.customerId=await persistParent(body.credential,account);if(!account.customerId||!await lookup(account.customerId,account.email))throw Error()}catch{return res.status(503).json({error:'We could not save your account yet. Please try signing in again in a moment.'})}
 const session=await new SignJWT({name:account.name,email:account.email,customerId:account.customerId}).setProtectedHeader({alg:'HS256'}).setSubject(account.id).setIssuer('smartclass').setAudience('smartclass-parent').setIssuedAt().setExpirationTime('7d').sign(key);res.setHeader('Set-Cookie',[cookie(sessionCookie,session,604800),cookie(challengeCookie,'',0)]);return res.status(200).json({user:account});
 }}
 export default createHandler();

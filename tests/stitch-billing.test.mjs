@@ -24,7 +24,7 @@ await client.subscription({});await client.subscription({});assert.equal(calls.f
 process.env.AUTH_SESSION_SECRET='test-session-secret-with-more-than-32-characters';
 const jwt=await new SignJWT({customerId:'42',email:user.email,name:user.name}).setProtectedHeader({alg:'HS256'}).setSubject('google-42').setIssuer('smartclass').setAudience('smartclass-parent').setExpirationTime('1h').sign(new TextEncoder().encode(process.env.AUTH_SESSION_SECRET));
 const req={headers:{cookie:'__Host-sc-parent='+jwt,origin:'https://www.smartclasss.com','content-type':'application/json'}};
-const authenticated=await billingUser(req);assert.equal(authenticated.customerId,'42');req.headers['x-csrf-token']=authenticated.csrf;checkPost(req,authenticated);assert.throws(()=>checkPost({...req,headers:{...req.headers,origin:'https://evil.example'}},authenticated));await assert.rejects(()=>billingUser({headers:{}}));
+const authenticated=await billingUser(req,{lookup:async()=>true});assert.equal(authenticated.customerId,'42');req.headers['x-csrf-token']=authenticated.csrf;checkPost(req,authenticated);assert.throws(()=>checkPost({...req,headers:{...req.headers,origin:'https://evil.example'}},authenticated));await assert.rejects(()=>billingUser({headers:{}}));
 const secret='whsec_'+randomBytes(32).toString('base64'),signer=new Webhook(secret),paid=new Set();let settled=0,lookups=0;
 const handler=createWebhookHandler({getConfig:()=>({...cfg,webhookSecret:secret}),getClient:()=>({payment:async()=>{lookups++;return {payment}}}),settlePayment:async(ev,id,p,mode,validate)=>{assert.equal(mode,'test');validate(ev,p,order);if(paid.has(ev.id))return {duplicate:true};paid.add(ev.id);settled++;return {duplicate:false}}});
 async function deliver({payload=event,id='msg-1',stamp=new Date(),tamper=false}={}){
@@ -39,3 +39,5 @@ assert.equal((await deliver({payload:{type:'LINK'}})).data.ignored,true);
 console.log('PASS: prices, month-end dates, scoped token reuse, parent authentication/CSRF, signature tampering/replay, subscription ownership, amount/reference checks and duplicate delivery handling.');
 
 
+
+await assert.rejects(()=>billingUser(req,{lookup:async()=>false}));console.log('PASS: a previously valid session cannot access a deleted account');
