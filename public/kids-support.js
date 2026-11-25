@@ -66,6 +66,5 @@ document.addEventListener('focusin',e=>{if(!prefs.read||muted())return;const b=e
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopVoice()});
 function syncHome(){shell.hidden=Boolean(document.body.dataset.room&&document.body.dataset.room!=='home')||document.body.classList.contains('in-room')}
 new MutationObserver(syncHome).observe(document.body,{attributes:true,attributeFilter:['class','data-room']});syncHome();
-$('#settings .settings')?.insertAdjacentHTML('beforeend','<section class="su-parent-entry"><h3>Every way to learn</h3><p>Choose bigger controls, clearer contrast and a quieter view.</p><button class="soft" id="su-open-comfort">Make it comfy →</button></section>');$('#su-open-comfort')?.addEventListener('click',()=>{$('#settings').close();open('settings')});
 applyPrefs(false);window.KidsSupport={open,stop:stopVoice};
 })();
