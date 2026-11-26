@@ -1,8 +1,8 @@
 (()=>{
 'use strict';
 const KEY='smartclass-membership-sessions-v2';
-const categories=[['numbers','Numbers','123'],['colours','Colours','🌈'],['singalong','Sing Along','♫'],['find','Find','🔎'],['objects','Objects','🧺'],['actions','Actions','👟'],['alphabet','Alphabets','Aa'],['spelling','Spelling','🐝'],['stories','Story Time','📖'],['shapes','Shapes','◯']];
-const plans={explorer:{name:'Little Explorer',price:59,tone:'blue',symbol:'✧',description:'Counting, colours and little sing-alongs.',ids:categories.slice(0,3).map(c=>c[0])},smart:{name:'Smart Start',price:79,tone:'purple',symbol:'✦',description:'Letters, words and everyday discoveries.',ids:['numbers','colours','singalong','find','objects','alphabet']},academy:{name:'Full Academy',price:129,tone:'gold',symbol:'♛',description:'The whole world, including letters, spelling and stories.',ids:categories.map(c=>c[0])}};
+const categories=[['numbers','Numbers','123'],['colours','Colours','🌈'],['singalong','Sing Along','♫'],['find','Find','🔎'],['objects','Objects','🧺'],['actions','Actions','👟'],['alphabet','Alphabets','Aa'],['spelling','Words','📖'],['stories','Story Time','📖'],['shapes','Shapes','◯']];
+const plans={explorer:{name:'Little Explorer',price:59,tone:'blue',symbol:'✧',description:'Counting, colours and little sing-alongs.',ids:categories.slice(0,3).map(c=>c[0])},smart:{name:'Smart Start',price:79,tone:'purple',symbol:'✦',description:'Letters, words and everyday discoveries.',ids:['numbers','colours','singalong','find','objects','alphabet']},academy:{name:'Full Academy',price:129,tone:'gold',symbol:'♛',description:'The whole world, including letters, words and stories.',ids:categories.map(c=>c[0])}};
 let state={enabled:true,plan:'preview',sessions:[],freeCounted:false},pending=null,lastFocus=null,gateAnswer=0,gateAction='plans';
 try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&(saved.plan==='preview'||plans[saved.plan]))state={enabled:true,plan:'preview',sessions:Array.isArray(saved.sessions)?saved.sessions.slice(0,3):[],freeCounted:saved.freeCounted===true}}catch{}
 const active=new Map();let awaitingNotice=null;
@@ -10,7 +10,7 @@ const dialog=document.createElement('dialog');dialog.id='membership-demo';dialog
 const plan=()=>plans[state.plan];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch{}decorate()}
 function badge(id,large=false){const p=plans[id];return '<span class="mp-badge '+(p?p.tone:'preview')+(large?' mp-large':'')+'" role="img" aria-label="'+(p?p.name+' badge':'Free preview badge')+'"><span>'+ (p?'✓':'✧')+'</span></span>'}
-const starterDescriptions={numbers:'The complete 1–5 journey',colours:'Red balloons: learn and play',singalong:'Family + two songs · two plays each',find:'Nine Mountain Picnic discoveries',objects:'Juppy’s first room',actions:'Lindi’s complete school morning',alphabet:'Letters A, B and C',spelling:'Cat, dog and sun puzzles',stories:'One complete story',shapes:'Trace and colour a circle'};
+const starterDescriptions={numbers:'The complete 1–5 journey',colours:'Red balloons: learn and play',singalong:'Family + two songs · two plays each',find:'Nine Mountain Picnic discoveries',objects:'Juppy’s first room',actions:'Lindi’s complete school morning',alphabet:'Letters A, B and C',spelling:'Cat, dog and sun word stories',stories:'One complete story',shapes:'Trace and colour a circle'};
 function hasCategory(id){return !!plan()?.ids.includes(id)}
 function isStarter(id,unit){unit=String(unit);return ({numbers:()=>unit==='5',colours:()=>unit==='red',singalong:()=>songAvailable(unit),find:()=>unit==='meadow',objects:()=>unit==='room-0',actions:()=>unit===window.ACTION_STORIES?.[0]?.title,alphabet:()=>unit==='0',spelling:()=>['cat','dog','sun'].includes(unit),stories:()=>unit===window.STORY_BOOKS?.[0]?.id,shapes:()=>unit==='Circle'}[id]?.())||false}
 const SONG_KEY='smartclass-free-songs-v1';
