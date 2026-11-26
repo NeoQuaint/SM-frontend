@@ -31,3 +31,7 @@
 #alphabet-garden .at-tools{left:0;right:auto;bottom:-110px;flex-direction:column;gap:8px}
 @media(max-height:500px){#alphabet-garden .at-tools{left:auto;right:-6%;bottom:0;flex-direction:column;gap:4px}#alphabet-garden .at-tools button{width:40px;height:40px;min-height:40px;min-width:40px}}
 #alphabet-garden .at-tools{position:absolute}#alphabet-garden .at-finish h1{color:#fff;text-shadow:0 2px 2px #315565}
+
+.at-recap{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.at-recap button{min-width:0!important}.at-recap button b{font-size:clamp(24px,5vw,38px)}
+
+#alphabet-garden .at-recap button{width:100%;height:105px;padding:6px}#alphabet-garden .at-recap button>span{height:48px;width:48px;font-size:38px}#alphabet-garden .at-recap b{font-size:28px}@media(orientation:landscape) and (max-height:600px){#alphabet-garden .at-recap{grid-template-columns:repeat(6,minmax(0,1fr))}#alphabet-garden .at-recap button{height:85px}#alphabet-garden .at-recap b{font-size:22px}#alphabet-garden .at-recap button>span{height:36px;width:36px;font-size:30px}}
