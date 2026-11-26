@@ -1,0 +1,8 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const code=fs.readFileSync('public/kids-guided-welcome.js','utf8');
+async function check({requested=false,done=false,user=false,preview=false},expected){
+ let starts=0,replaced='';const el={setAttribute(){},addEventListener(){},classList:{contains(){return false},add(){},remove(){}}};
+ const context={URL,URLSearchParams,location:{href:'https://www.smartclasss.com/kids'+(requested?'?onboarding=1':''),search:requested?'?onboarding=1':''},history:{state:null,replaceState(a,b,url){replaced=url}},localStorage:{getItem(){return done?'done':null}},document:{documentElement:{dataset:{findPreview:String(preview)}},body:{...el,append(){}},createElement(){return {...el}},addEventListener(){},getElementById(){return null}},MutationObserver:class{observe(){}disconnect(){}},window:{ParentAccount:{ready:Promise.resolve(),user:user?{id:'test'}:null},AnimalSingAlong:{preload(){}},MountainQuest:{startOnboarding(){starts++}},addEventListener(){}},setTimeout,clearTimeout};
+ vm.runInNewContext(code,context);await new Promise(resolve=>setImmediate(resolve));assert.equal(starts,expected,JSON.stringify({requested,done,user,preview}));if(requested)assert.equal(replaced,'/kids');
+}
+(async()=>{await check({},1);await check({done:true},0);await check({requested:true,done:true},1);await check({requested:true,done:true,user:true},0);await check({preview:true,done:true,user:true},1);assert(fs.readFileSync('public/index.html','utf8').includes('/kids?onboarding=1'));console.log('PASS: new visitors, explicit Start exploring, returning guests, signed-in parents and preview routes')})().catch(e=>{console.error(e);process.exit(1)});

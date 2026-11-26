@@ -1,5 +1,7 @@
 (()=>{'use strict';
 const preview=document.documentElement.dataset.findPreview==='true';
+const requestedOnboarding=new URLSearchParams(location.search).get('onboarding')==='1';
+if(requestedOnboarding){const url=new URL(location.href);url.searchParams.delete('onboarding');history.replaceState(history.state,'',url.pathname+url.search+url.hash)}
 const KEY='smartclass-guided-welcome-v1';let active=false,stage='find',songTimer=null,celebrationSong=null,adventureMusic=null;
 function stopAdventureMusic(){if(adventureMusic){adventureMusic.pause();adventureMusic=null}}
 function playAdventureMusic(){stopAdventureMusic();if(document.querySelector('#sound')?.getAttribute('aria-pressed')==='false'||document.hidden)return;adventureMusic=new Audio('find-welcome-jingle.wav');adventureMusic.volume=.18;adventureMusic.loop=false;adventureMusic.play().catch(()=>{})}
@@ -20,7 +22,7 @@ panel.addEventListener('click',e=>{switch(e.target.closest('[data-ob]')?.dataset
 window.addEventListener('smartclass:animal-song-ended',()=>{if(active&&stage==='song')songTimer=setTimeout(parents,1200)});
 document.getElementById('animal-song')?.addEventListener('close',()=>{if(active&&stage==='song')parents()});
 window.addEventListener('smartclass:family-profile-saved',()=>{if(active&&stage==='parents')leave();window.guidedAccountSetup=false});
-async function begin(){if(!preview){await window.ParentAccount?.ready;if(window.ParentAccount?.user)return}let done=false;try{done=localStorage.getItem(KEY)==='done'}catch{}if(done&&!preview)return;active=true;if(!preview)window.AnimalSingAlong?.preload();document.body.classList.add('ob-active');window.MountainQuest.startOnboarding({done:choice,exit:home})}
+async function begin(){if(!preview){await window.ParentAccount?.ready;if(window.ParentAccount?.user)return}let done=false;try{done=localStorage.getItem(KEY)==='done'}catch{}if(done&&!preview&&!requestedOnboarding)return;active=true;if(!preview)window.AnimalSingAlong?.preload();document.body.classList.add('ob-active');window.MountainQuest.startOnboarding({done:choice,exit:home})}
 function ready(){if(document.body.classList.contains('kids-is-loading'))return;observer.disconnect();begin()}
 const observer=new MutationObserver(ready);observer.observe(document.body,{attributes:true,attributeFilter:['class']});ready();
 })();
