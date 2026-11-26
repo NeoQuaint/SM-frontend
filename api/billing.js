@@ -1,5 +1,6 @@
 import {configured} from '../lib/stitch-setup.js';
 import {billingUser,checkPost} from '../lib/billing-auth.js';
+import {complimentaryAccess,complimentaryState} from '../lib/complimentary-access.js';
 import {PLANS,config,problem,newOrder,subscriptionRequest,createClient,checkoutUrl,nextRenewal,checkoutEnabled} from '../lib/stitch-core.js';
 import {accountOrder,registerOrder,storeSubscription,markUnknown,cancelOrder,rejectOrder} from '../lib/stitch-db.js';
 export const maxDuration=60;
@@ -7,7 +8,11 @@ export default async function handler(req,res){
  res.setHeader('Cache-Control','no-store');res.setHeader('Vary','Cookie');
  if(!['GET','POST'].includes(req.method))return res.status(405).json({error:'Method not allowed'});
  try{
-  const user=await billingUser(req);let cfg;try{cfg=await configured()}catch(e){if(req.method==='GET')return res.status(200).json({configured:false,plan:'preview',csrf:user.csrf,packages:PLANS,error:e.message});throw e}
+  const user=await billingUser(req);
+  const grant=await complimentaryAccess(user);
+  if(grant&&req.method==='GET')return res.status(200).json({...complimentaryState(user,grant),packages:PLANS});
+  if(grant&&req.method==='POST'){checkPost(req,user);throw problem('Your Full Academy access is complimentary. No payment is needed.',409)}
+  let cfg;try{cfg=await configured()}catch(e){if(req.method==='GET')return res.status(200).json({configured:false,plan:'preview',csrf:user.csrf,packages:PLANS,error:e.message});throw e}
   const testAllowed=cfg.mode!=='test'||user.email.toLowerCase()===String(cfg.owner||'').toLowerCase();
   if(!testAllowed)return res.status(req.method==='GET'?200:403).json({configured:false,plan:'preview',csrf:user.csrf,error:'Checkout is being tested. Please check back soon.'});
   if(req.method==='GET'){

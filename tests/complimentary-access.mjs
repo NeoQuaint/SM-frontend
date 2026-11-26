@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {complimentaryAccess,complimentaryState} from '../lib/complimentary-access.js';
+const user={customerId:'test-id',email:'Example@icloud.com',csrf:'token'};
+let query;
+assert.equal(await complimentaryAccess(user,{async query(sql,values){query={sql,values};return {rows:[]}}}),null);
+assert.deepEqual(query.values,['test-id','Example@icloud.com']);
+for(const guard of ["status='complimentary'","amount=0","payment_reference LIKE 'complimentary:%'","end_date>NOW()","lower(user_id)=lower($2)"])assert(query.sql.includes(guard));
+const grant={id:1,end_date:null};assert.equal(await complimentaryAccess(user,{async query(){return {rows:[grant]}}}),grant);
+const state=complimentaryState(user,grant);assert.equal(state.plan,'academy');assert.equal(state.checkoutEnabled,false);assert.equal(state.subscription.nextRenewal,null);assert.equal(state.subscription.canCancel,false);assert.equal(state.subscription.status,'complimentary');
+console.log('PASS: server-side grant checks, case-insensitive identity, no checkout or renewal, Full Academy access');
