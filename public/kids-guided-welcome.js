@@ -20,7 +20,7 @@ panel.addEventListener('click',e=>{switch(e.target.closest('[data-ob]')?.dataset
 window.addEventListener('smartclass:animal-song-ended',()=>{if(active&&stage==='song')songTimer=setTimeout(parents,1200)});
 document.getElementById('animal-song')?.addEventListener('close',()=>{if(active&&stage==='song')parents()});
 window.addEventListener('smartclass:family-profile-saved',()=>{if(active&&stage==='parents')leave();window.guidedAccountSetup=false});
-function begin(){let done=false;try{done=localStorage.getItem(KEY)==='done'}catch{}if(done&&!preview)return;active=true;if(!preview)window.AnimalSingAlong?.preload();document.body.classList.add('ob-active');window.MountainQuest.startOnboarding({done:choice,exit:home})}
+async function begin(){if(!preview){await window.ParentAccount?.ready;if(window.ParentAccount?.user)return}let done=false;try{done=localStorage.getItem(KEY)==='done'}catch{}if(done&&!preview)return;active=true;if(!preview)window.AnimalSingAlong?.preload();document.body.classList.add('ob-active');window.MountainQuest.startOnboarding({done:choice,exit:home})}
 function ready(){if(document.body.classList.contains('kids-is-loading'))return;observer.disconnect();begin()}
 const observer=new MutationObserver(ready);observer.observe(document.body,{attributes:true,attributeFilter:['class']});ready();
 })();
