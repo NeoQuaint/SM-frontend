@@ -8,7 +8,7 @@ let order;
 try {
  await ready();
  const candidates=[newOrder(user,'smart','test'),newOrder(user,'smart','test')];
- const results=await Promise.all(candidates.map(registerOrder));
+ const results=await Promise.all(candidates.map(order=>registerOrder(order,{initialAmount:order.amount,recurringAmount:order.amount})));
  assert.equal(results.filter(r=>r.created).length,1);order=results[0].order;
  const sub={id:'test-sub-'+suffix,merchantReference:order.id,amount:order.amount,payerId:user.customerId};
  await storeSubscription(order,sub,'https://express.stitch.money/subscribe/test');

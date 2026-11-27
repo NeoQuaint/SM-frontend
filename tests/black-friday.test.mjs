@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {BLACK_FRIDAY,reserveBlackFriday,assertQuote} from '../lib/black-friday.js';
+import {newOrder,subscriptionRequest,verifiedPayment} from '../lib/stitch-core.js';
+const user={customerId:'bf-test',name:'Parent',email:'parent@example.test'},now=new Date('2026-11-27T10:00:00Z');
+const quote={initialAmount:7900,recurringAmount:12900};
+const db=(used=0,claimed=false)=>({query:async(sql)=>sql.includes('COUNT(')?{rows:[{used,claimed}]}:{rows:[]}});
+const make=()=>newOrder(user,'academy','test',now);
+const order=await reserveBlackFriday(db(),make(),quote);order.provider_id='bf-sub';
+assert.equal(BLACK_FRIDAY.limit,250);assert.equal(subscriptionRequest(order,user).initialAmount,7900);assert.equal(subscriptionRequest(order,user).amount,12900);
+await assert.rejects(()=>reserveBlackFriday(db(250),make(),quote),e=>e.status===409);
+await assert.rejects(()=>reserveBlackFriday(db(1,true),make(),quote),e=>e.status===409);
+assert.equal((await reserveBlackFriday(db(250),make(),{initialAmount:12900,recurringAmount:12900})).promotion,undefined);
+await assert.rejects(()=>reserveBlackFriday(db(),make(),{initialAmount:1,recurringAmount:12900}));
+assert.throws(()=>assertQuote(order));
+const event={id:'first',type:'SUBSCRIPTION',subscriptionId:order.provider_id,status:'PAID',amount:7900};
+const payment={...event,merchantReference:order.id,paidAt:now.toISOString()};
+assert.equal(+verifiedPayment(event,payment,order),+order.next_renewal);
+order.initial_payment_id='first';assert.doesNotThrow(()=>verifiedPayment(event,payment,order));
+assert.throws(()=>verifiedPayment({...event,id:'second-discount'},{...payment,id:'second-discount'},order));
+const renew={...event,id:'renew',amount:12900};assert.doesNotThrow(()=>verifiedPayment(renew,{...payment,...renew,paidAt:'2026-12-27T10:00:00Z'},order));
+assert.throws(()=>verifiedPayment(renew,{...payment,...renew},order));
+for(const plan of ['explorer','smart']){const regular=newOrder(user,plan,'test',now);await reserveBlackFriday(db(),regular,{initialAmount:regular.amount,recurringAmount:regular.amount});assert.equal(regular.promotion,undefined);}
+console.log('PASS: R79 initial/R129 renewal, 250 cap, one offer per parent, stale/tampered quotes, duplicate first event and wrong renewal amounts');
