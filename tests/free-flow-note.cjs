@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const code=fs.readFileSync('public/kids-free-flow.js','utf8');
+let open=false,kind='plans',html='',observer,click,visible=false;const timers=new Map(),storage=new Map();let id=0;
+const holder={insertAdjacentHTML(_,value){html=value;visible=true},querySelector(selector){if(selector.includes('button'))return {};return visible?{remove(){visible=false}}:null}};
+const button={parentElement:holder,addEventListener(_,fn){click=fn},setAttribute(){},removeAttribute(){}};
+const ctx={localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)},document:{hidden:false,getElementById:key=>key==='free-flow'?button:{hasAttribute:()=>false},body:{classList:{contains:()=>false}},querySelector:sel=>sel.includes('membership-demo')?open&&kind==='plans':open,addEventListener(){}},window:{MountainQuest:{startFreeFlow(){}}},MutationObserver:class{constructor(fn){observer=fn}observe(){}disconnect(){}},setTimeout(fn,ms){timers.set(++id,{fn,ms});return id},clearTimeout(id){timers.delete(id)}};
+vm.runInNewContext(code,ctx);assert.equal(timers.size,0,'Do not show before packages');
+open=true;observer();assert.equal(timers.size,0,'Do not cover the paywall');
+open=false;observer();let timer=[...timers.values()][0];assert.equal(timer.ms,3000);timers.clear();timer.fn();assert(visible);assert(html.includes('Hands-free. Auto play.'));assert(html.includes('Sit back and learn.'));
+timer=[...timers.values()][0];assert.equal(timer.ms,3000);timer.fn();assert(!visible);assert.equal(storage.get('smartclass-free-flow-note-v2'),'seen');
+console.log('PASS: note waits for paywall dismissal, delays three seconds and auto-dismisses after three seconds');
