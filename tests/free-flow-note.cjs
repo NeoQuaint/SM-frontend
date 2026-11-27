@@ -7,5 +7,5 @@ const ctx={localStorage:{getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,
 vm.runInNewContext(code,ctx);assert.equal(timers.size,0,'Do not show before packages');
 open=true;observer();assert.equal(timers.size,0,'Do not cover the paywall');
 open=false;observer();let timer=[...timers.values()][0];assert.equal(timer.ms,3000);timers.clear();timer.fn();assert(visible);assert(html.includes('Hands-free. Auto play.'));assert(html.includes('Sit back and learn.'));
-timer=[...timers.values()][0];assert.equal(timer.ms,3000);timer.fn();assert(!visible);assert.equal(storage.get('smartclass-free-flow-note-v2'),'seen');
-console.log('PASS: note waits for paywall dismissal, delays three seconds and auto-dismisses after three seconds');
+timer=[...timers.values()][0];assert.equal(timer.ms,5000);timer.fn();assert(!visible);assert.equal(storage.get('smartclass-free-flow-note-v2'),'seen');
+console.log('PASS: note waits for paywall dismissal, delays three seconds and auto-dismisses after five seconds');
