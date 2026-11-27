@@ -15,3 +15,18 @@ body.ob-active #kids-app{visibility:hidden}body.ob-active .ff-note{display:none!
 #mountain-quest .mq-onboarding-header .ob-skip{position:absolute;right:16px;top:14px;min-width:60px;min-height:44px;padding:8px 14px;border:2px solid #ffffffd9;border-radius:22px;background:#fff8ed;color:#65468b;font:800 16px system-ui;box-shadow:0 3px 10px #49336a20;pointer-events:auto}#mountain-quest .mq-onboarding-header .ob-stars{gap:7px;padding:8px 12px}#mountain-quest .mq-onboarding-header{padding-right:88px!important;padding-left:12px!important}
 
 #guided-welcome .ob-coco-peek{left:auto;right:-62px;top:85px;transform:rotate(-90deg)}
+
+/* Soft glove sits underneath the label, leaving the whole object visible. */
+#mountain-quest.mq-onboarding>.mq-onboarding-header{position:absolute;top:0;left:0;right:0;z-index:30;pointer-events:none}
+#mountain-quest.mq-onboarding>.mq-onboarding-header>.ob-stars{display:flex;flex-shrink:0}
+#mountain-quest.mq-onboarding .mq-skip-travel{display:block;pointer-events:auto}
+#mountain-quest.mq-onboarding .ob-helping-hand{top:calc(100% + 40px);bottom:auto;left:calc(50% - 30px);right:auto;width:60px;height:72px;background:url("find-soft-glove.svg") center/contain no-repeat;filter:drop-shadow(0 3px 3px #754c7b35);animation:ob-gentle-hand 1.8s .8s infinite;pointer-events:none}
+#mountain-quest.mq-onboarding .ob-star-burst{font-size:0;text-shadow:none;animation:ob-soft-star 1.8s ease-out both}
+.ob-star-burst img{width:min(43vw,210px);height:auto;filter:drop-shadow(0 7px 7px #c28e4230)}
+.ob-stars span{font-size:0;width:29px;height:29px;background:url("find-soft-star.svg") center/contain no-repeat;filter:grayscale(1);opacity:.45}
+.ob-stars span.earned{filter:none;opacity:1}
+@keyframes ob-gentle-hand{0%,100%{opacity:.8;transform:translateY(5px) rotate(-7deg)}50%{opacity:1;transform:translateY(0) rotate(-3deg)}}
+@keyframes ob-soft-star{0%{opacity:0;transform:scale(.65)}30%,65%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translateY(-45px) scale(.85)}}
+@media(max-height:500px) and (orientation:landscape){#mountain-quest.mq-onboarding .ob-helping-hand{top:calc(100% + 30px);width:42px;height:50px;left:calc(50% - 21px)}}
+@media(prefers-reduced-motion:reduce){#mountain-quest.mq-onboarding .ob-helping-hand,#mountain-quest.mq-onboarding .ob-star-burst{animation:none;opacity:1}}
+#mountain-quest.mq-onboarding .ob-helping-hand{font-size:0}
